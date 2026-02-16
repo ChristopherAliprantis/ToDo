@@ -1,0 +1,6 @@
+<Project>
+    <!-- This forces the crashing task to be empty so it can't fail -->
+    <Target Name="UnoGeneratePackageAppxManifest"
+            Condition="'$(TargetFramework)' == 'net10.0-windows10.0.19041.0'"
+            AfterTargets="Build" />
+</Project>
