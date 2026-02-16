@@ -485,3 +485,7 @@ $RECYCLE.BIN/
 solution-config.props
 # Publish Profiles
 !**/Properties/PublishProfiles/*.pubxml
+# my own stuff
+
+*.keystore
+ToDo/keystore.targets

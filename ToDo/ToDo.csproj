@@ -68,6 +68,6 @@
         <Folder Include="Platforms\Android\Resources\mipmap-xxxhdpi" />
     </ItemGroup>
 
-    <Import Project="kesytore.targets" />
+    <Import Project="Keystore.targets" />
 
 </Project>
