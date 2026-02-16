@@ -67,5 +67,4 @@
         <Folder Include="Platforms\Android\Resources\mipmap-xxhdpi" />
         <Folder Include="Platforms\Android\Resources\mipmap-xxxhdpi" />
     </ItemGroup>
-
 </Project>
