@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "ToDo (Desktop)": {
+      "commandName": "Project",
+      "compatibleTargetFramework": "desktop"
+    }
+  }
+}

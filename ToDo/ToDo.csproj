@@ -1,0 +1,73 @@
+﻿<Project Sdk="Uno.Sdk">
+
+    <PropertyGroup>
+        <TargetFrameworks>net10.0-android;net10.0-desktop</TargetFrameworks>
+        <OutputType>Exe</OutputType>
+        <UnoSingleProject>true</UnoSingleProject>
+
+        <ApplicationTitle>ToDo</ApplicationTitle>
+        <Product>ToDo</Product>
+        <ApplicationId>com.christopheraliprantis.todo</ApplicationId>
+
+        <ApplicationDisplayVersion>1</ApplicationDisplayVersion>
+        <ApplicationVersion>1</ApplicationVersion>
+        <Version>1</Version>
+
+        <ApplicationPublisher>Christopher Aliprantis</ApplicationPublisher>
+        <Description>ToDo, your ultimate time management app.</Description>
+	    <authors>Christopher Aliprantis</authors>
+
+        <UnoDisableHotDesign>true</UnoDisableHotDesign>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+
+        <UnoFeatures>
+            CSharpMarkup;
+            Lottie;
+            Hosting;
+            Toolkit;
+            MVUX;
+            Configuration;
+            Localization;
+            ThemeService;
+            SkiaRenderer;
+        </UnoFeatures>
+
+        <!-- Global Build Fixes -->
+        <NeutralLanguage>en-US</NeutralLanguage>
+        <DefaultLanguage>en-US</DefaultLanguage>
+        <SkipResourcesGenerator>true</SkipResourcesGenerator>
+        <UnoDeployOptionalResources>false</UnoDeployOptionalResources>
+    </PropertyGroup>
+
+    <!-- DESKTOP ONLY: Fixes Original Filename and Metadata -->
+    <PropertyGroup Condition="'$(TargetFramework)' == 'net10.0-desktop'">
+        <ApplicationIcon>assets\icons\todoico.ico</ApplicationIcon>
+        <AssemblyName>ToDo</AssemblyName>
+        <TargetName>ToDo</TargetName>
+        <AssemblyTitle>ToDo, your ultimate time management app</AssemblyTitle>
+        <!-- This is what was causing Android errors; now it's isolated -->
+        <UseAppHost>true</UseAppHost>
+    </PropertyGroup>
+    <ItemGroup Condition="'$(TargetFramework)' == 'net10.0-desktop'">
+    </ItemGroup>
+
+  <PropertyGroup Condition="'$(TargetFramework)' == 'net10.0-android'">
+    <AndroidApplication>true</AndroidApplication>
+    <AndroidIcon>appicon</AndroidIcon>
+    <UseAppHost>false</UseAppHost>
+    
+    <AndroidResgenExtraArgs>--no-version-vectors</AndroidResgenExtraArgs>
+</PropertyGroup>
+
+
+    <ItemGroup>
+        <Folder Include="Platforms\Android\Resources\mipmap-mdpi" />
+        <Folder Include="Platforms\Android\Resources\mipmap-hdpi" />
+        <Folder Include="Platforms\Android\Resources\mipmap-xhdpi" />
+        <Folder Include="Platforms\Android\Resources\mipmap-xxhdpi" />
+        <Folder Include="Platforms\Android\Resources\mipmap-xxxhdpi" />
+    </ItemGroup>
+
+    <Import Project="Keystore.targets" />
+
+</Project>
