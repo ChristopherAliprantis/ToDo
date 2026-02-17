@@ -19,7 +19,6 @@
 
         <UnoDisableHotDesign>true</UnoDisableHotDesign>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-
         <UnoFeatures>
             CSharpMarkup;
             Lottie;
@@ -58,7 +57,7 @@
     
     <AndroidResgenExtraArgs>--no-version-vectors</AndroidResgenExtraArgs>
 </PropertyGroup>
-
+    <Import Project="keystore.targets" />
 
     <ItemGroup>
         <Folder Include="Platforms\Android\Resources\mipmap-mdpi" />
