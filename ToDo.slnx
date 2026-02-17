@@ -5,6 +5,7 @@
     <File Path="Directory.Build.targets" />
     <File Path="Directory.Packages.props" />
     <File Path="global.json" />
+    <File Path="ToDo/Platforms/keystore.targets" />
   </Folder>
   <Project Path="ToDo/ToDo.csproj">
     <Deploy />
