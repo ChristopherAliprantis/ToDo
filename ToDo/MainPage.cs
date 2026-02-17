@@ -2,9 +2,6 @@ namespace ToDo;
 
 using System.Text.Json;
 
-
-
-
 public sealed partial class MainPage : Page // #if __DESKTOP__ for all of skia desktop, #if WINDOWS for windows, #if __ANDROID__ for android.
 {
     public static Windows.Foundation.Rect bounds;
@@ -80,11 +77,11 @@ public sealed partial class MainPage : Page // #if __DESKTOP__ for all of skia d
             }
             if (bounds.Width > bounds.Height)
             {
-                avail = H.ColumnDefinitions[1].ActualWidth / 4 - h / 96 * 2.7 * 1.20;
+                avail = (w - Bar.Width) / 4 - h / 96 * 2.7 * 1.20;
             }
             else
             {
-                avail = H.ColumnDefinitions[1].ActualWidth - (h / 96 * 2.7 * 2.20);
+                avail = (w - Bar.Width) - (h / 96 * 2.7 * 2.20);
             }
             todos.col1.Children.Clear();
             todos.col2.Children.Clear();
@@ -124,7 +121,7 @@ public sealed partial class MainPage : Page // #if __DESKTOP__ for all of skia d
 #if __DESKTOP__
                 Bar.Width = w / 14.7;
 #else
-                            Bar.Width = w / 8.6;
+                Bar.Width = w / 8.6;
 #endif
             }
             else
@@ -137,7 +134,7 @@ public sealed partial class MainPage : Page // #if __DESKTOP__ for all of skia d
             }
             else
             {
-                avail = H.ColumnDefinitions[1].ActualWidth - (h / 96 * 2.7 * 2.20);
+                avail = H.ColumnDefinitions[1].ActualWidth - (h / 96 * 2.7 * 2.16);
             }
             todos.col1.Children.Clear();
             todos.col2.Children.Clear();
