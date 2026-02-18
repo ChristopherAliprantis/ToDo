@@ -75,6 +75,7 @@ public sealed partial class MainPage : Page // #if __DESKTOP__ for all of skia d
             {
                 Bar.Width = w / 4.8;
             }
+
             if (bounds.Width > bounds.Height)
             {
                 avail = (w - Bar.Width) / 4 - h / 96 * 2.7 * 1.20;
