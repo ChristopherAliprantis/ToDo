@@ -7,5 +7,3 @@ global using Microsoft.Extensions.Options;
 global using Microsoft.UI.Dispatching;
 global using Windows.Storage;
 global using Color = Microsoft.UI.Colors;
-global using Uno.Extensions;
-global using Uno.Extensions.Notifications;
