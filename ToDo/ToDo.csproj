@@ -29,7 +29,6 @@
             Localization;
             ThemeService;
             SkiaRenderer;
-            MauiEmbedding;
         </UnoFeatures>
 
         <!-- Global Build Fixes -->
