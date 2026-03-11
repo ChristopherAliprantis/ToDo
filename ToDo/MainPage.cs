@@ -264,12 +264,14 @@ public partial class ToDos : StackPanel
                     new TextBlock
                     {
                         Text = Title,
-                        TextWrapping = TextWrapping.Wrap
+                        TextWrapping = TextWrapping.Wrap,
+                        IsTextSelectionEnabled = true,
                     },
                     new TextBlock
                     {
                         Text = Descrip,
-                        TextWrapping = TextWrapping.Wrap
+                        TextWrapping = TextWrapping.Wrap,
+                        IsTextSelectionEnabled = true,
                     },
                     new Button
                     {
