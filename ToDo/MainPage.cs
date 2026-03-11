@@ -251,12 +251,16 @@ public partial class ToDos : StackPanel
     {
         public Border border;
         public StackPanel content;
+        public object? Date { get; set; }
+        public object? Time { get; set; }
         public string Title;
         public string Descrip;
-        public ToDo(string title, string descrip)
+        public ToDo(string title, string descrip, object date, object time)
         {
             Title = title;
             Descrip = descrip;
+            Date = date;
+            Time = time;
             content = new StackPanel
             {
                 Children =
@@ -301,9 +305,9 @@ public partial class ToDos : StackPanel
             };
         }
     }
-    public void ADD(string title, string descrip)
+    public void ADD(string title, string descrip, object date, object time)
     {
-        var N = new ToDo(title, descrip);
+        var N = new ToDo(title, descrip, date, time);
         MainPage.TODOS.Add(N);
         MainPage.todos.Save();
     }
@@ -351,7 +355,9 @@ public partial class ToDos : StackPanel
             todos.Add(new ToDoData
             {
                 Title = t.Title,
-                Descrip = t.Descrip
+                Descrip = t.Descrip,
+                Date = t.Date,
+                Time = t.Time
             });
         }
 
@@ -406,7 +412,9 @@ public partial class ToDos : StackPanel
             MainPage.TODOS.Add(
                 new ToDos.ToDo(
                     d.Title ?? "",
-                    d.Descrip ?? ""));
+                    d.Descrip ?? "",
+                    d.Date ?? "",
+                    d.Date ?? "" ));
         }
 
         MainPage.RebuildTodos();
@@ -418,4 +426,8 @@ public class ToDoData
 {
     public string? Title { get; set; }
     public string? Descrip { get; set; }
+
+    public object? Date { get; set; }
+
+    public object? Time { get; set; }
 }

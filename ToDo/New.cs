@@ -70,7 +70,7 @@ public sealed partial class New : Page // #if __DESKTOP__ for all of skia deskto
         };
         done.Click += (s, e) =>
         {
-            MainPage.todos.ADD(title.Text, describe.Text);
+            MainPage.todos.ADD(title.Text, describe.Text, null, null);
             App.rootFrame.Navigate(typeof(MainPage));
         };
         var scroll = new ScrollViewer
