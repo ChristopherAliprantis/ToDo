@@ -7,10 +7,4 @@ global using Microsoft.Extensions.Options;
 global using Microsoft.UI.Dispatching;
 global using Windows.Storage;
 global using Color = Microsoft.UI.Colors;
-#if __ANDROID__
-global using Android.App;
-global using Android.Content;
-global using Android.Graphics;
-global using AndroidX.Core.App;
-global using Android.OS;
-#endif
+global using Windows.UI.Notifications;
