@@ -15,6 +15,7 @@ public sealed partial class MainPage : Page // #if __DESKTOP__ for all of skia d
     public MainPage()
     {
         todos.Load();
+        todos.Save();
         var Bar = new StackPanel
         {
             Height = 0,
@@ -209,12 +210,13 @@ public sealed partial class MainPage : Page // #if __DESKTOP__ for all of skia d
 #endif
             ((TextBlock)TODOS[i].content.Children[1]).FontSize = NEW.FontSize - 6.28;
 #if __DESKTOP__
-            ((Button)TODOS[i].content.Children[2]).Width = avail * 0.32;
+            ((Button)TODOS[i].content.Children[3]).Width = avail * 0.32;
 #else
-            ((Button)TODOS[i].content.Children[2]).Width = avail * 0.48;
-#endif
-            ((Button)TODOS[i].content.Children[2]).Height = ((Button)TODOS[i].content.Children[2]).Width * 0.46;
-            ((Button)TODOS[i].content.Children[2]).FontSize = ((Button)TODOS[i].content.Children[2]).Width / 4.86;
+            ((Button)TODOS[i].content.Children[3]).Width = avail * 0.48;
+#endif       
+            ((TextBlock)TODOS[i].content.Children[2]).FontSize = NEW.FontSize - 6.28;
+            ((Button)TODOS[i].content.Children[3]).Height = ((Button)TODOS[i].content.Children[2]).Width * 0.46;
+            ((Button)TODOS[i].content.Children[3]).FontSize = ((Button)TODOS[i].content.Children[2]).Width / 4.86;
             todos.AddBack(TODOS[i]);
         }
     }
@@ -255,12 +257,31 @@ public partial class ToDos : StackPanel
         public object? Time { get; set; }
         public string Title;
         public string Descrip;
-        public ToDo(string title, string descrip, object date, object time)
+
+        public string? DTime;
+        public string? DDate;
+        public ToDo(string title, string descrip, object? date, object? time)
         {
             Title = title;
             Descrip = descrip;
             Date = date;
             Time = time;
+            if (Date == null)
+            {
+                DDate = "";
+            }
+            else
+            {
+                DDate = Date.ToString();
+            }
+            if (Time == null)
+            {
+                DTime = "";
+            }
+            else
+            {
+                DTime = Time.ToString();
+            }
             content = new StackPanel
             {
                 Children =
@@ -276,6 +297,12 @@ public partial class ToDos : StackPanel
                         Text = Descrip,
                         TextWrapping = TextWrapping.Wrap,
                         IsTextSelectionEnabled = true,
+                    },
+                    new TextBlock
+                    {
+                        IsTextSelectionEnabled = true,
+                        TextWrapping = TextWrapping.Wrap,
+                        Text = $"{DDate} {DTime}"
                     },
                     new Button
                     {
@@ -305,7 +332,7 @@ public partial class ToDos : StackPanel
             };
         }
     }
-    public void ADD(string title, string descrip, object date, object time)
+    public void ADD(string title, string descrip, object? date, object? time)
     {
         var N = new ToDo(title, descrip, date, time);
         MainPage.TODOS.Add(N);
@@ -345,79 +372,93 @@ public partial class ToDos : StackPanel
 
     public async void Save()
     {
-        List<ToDoData> todos = new();
-
-        for (int i = 0; i < MainPage.TODOS.Count; i++)
+        try
         {
-            var t = MainPage.TODOS[i];
-            if (t == null) continue;
+            List<ToDoData> todos = new();
 
-            todos.Add(new ToDoData
+            for (int i = 0; i < MainPage.TODOS.Count; i++)
             {
-                Title = t.Title,
-                Descrip = t.Descrip,
-                Date = t.Date,
-                Time = t.Time
-            });
+                var t = MainPage.TODOS[i];
+                if (t == null) continue;
+
+                todos.Add(new ToDoData
+                {
+                    Title = t.Title,
+                    Descrip = t.Descrip,
+                    Date = t.Date,
+                    Time = t.Time
+                });
+            }
+
+            string jsonData = JsonSerializer.Serialize(todos);
+
+            StorageFolder local = ApplicationData.Current.LocalFolder;
+
+            StorageFolder folder =
+                await local.CreateFolderAsync("ToDo", CreationCollisionOption.OpenIfExists);
+
+            StorageFile file =
+                await folder.CreateFileAsync("todos.json", CreationCollisionOption.ReplaceExisting);
+
+            await FileIO.WriteTextAsync(file, jsonData);
         }
-
-        string jsonData = JsonSerializer.Serialize(todos);
-
-        StorageFolder local = ApplicationData.Current.LocalFolder;
-
-        StorageFolder folder =
-            await local.CreateFolderAsync("ToDo", CreationCollisionOption.OpenIfExists);
-
-        StorageFile file =
-            await folder.CreateFileAsync("todos.json", CreationCollisionOption.ReplaceExisting);
-
-        await FileIO.WriteTextAsync(file, jsonData);
+        catch (Exception e)
+        {
+            Console.WriteLine(e.Message);
+        }
     }
 
 
     public async void Load()
     {
-        StorageFolder local = ApplicationData.Current.LocalFolder;
-
-        StorageFolder folder =
-            await local.CreateFolderAsync("ToDo", CreationCollisionOption.OpenIfExists);
-
-        StorageFile file;
-
         try
         {
-            file = await folder.GetFileAsync("todos.json");
+            StorageFolder local = ApplicationData.Current.LocalFolder;
+
+            StorageFolder folder =
+                await local.CreateFolderAsync("ToDo", CreationCollisionOption.OpenIfExists);
+
+            StorageFile file;
+
+            try
+            {
+                file = await folder.GetFileAsync("todos.json");
+            }
+            catch
+            {
+                file = await folder.CreateFileAsync(
+                    "todos.json",
+                    CreationCollisionOption.ReplaceExisting);
+
+                await FileIO.WriteTextAsync(file, "[]");
+                return;
+            }
+
+            string jsonData = await FileIO.ReadTextAsync(file);
+
+            var todos =
+                JsonSerializer.Deserialize<List<ToDoData>>(jsonData);
+
+            if (todos == null) return;
+
+            MainPage.TODOS.Clear();
+
+            foreach (var d in todos)
+            {
+                MainPage.TODOS.Add(
+                    new ToDos.ToDo(
+                        d.Title ?? "",
+                        d.Descrip ?? "",
+                        d.Date ?? "",
+                        d.Date ?? ""));
+            }
+
+            MainPage.RebuildTodos();
         }
-        catch
+        catch (Exception e)
         {
-            file = await folder.CreateFileAsync(
-                "todos.json",
-                CreationCollisionOption.ReplaceExisting);
-
-            await FileIO.WriteTextAsync(file, "[]");
-            return;
+            Console.WriteLine(e.Message);
         }
-
-        string jsonData = await FileIO.ReadTextAsync(file);
-
-        var todos =
-            JsonSerializer.Deserialize<List<ToDoData>>(jsonData);
-
-        if (todos == null) return;
-
-        MainPage.TODOS.Clear();
-
-        foreach (var d in todos)
-        {
-            MainPage.TODOS.Add(
-                new ToDos.ToDo(
-                    d.Title ?? "",
-                    d.Descrip ?? "",
-                    d.Date ?? "",
-                    d.Date ?? "" ));
-        }
-
-        MainPage.RebuildTodos();
     }
 
 }
