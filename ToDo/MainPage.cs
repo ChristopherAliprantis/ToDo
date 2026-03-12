@@ -15,7 +15,6 @@ public sealed partial class MainPage : Page // #if __DESKTOP__ for all of skia d
     public MainPage()
     {
         todos.Load();
-        todos.Save();
         var Bar = new StackPanel
         {
             Height = 0,
@@ -214,9 +213,14 @@ public sealed partial class MainPage : Page // #if __DESKTOP__ for all of skia d
 #else
             ((Button)TODOS[i].content.Children[3]).Width = avail * 0.48;
 #endif       
-            ((TextBlock)TODOS[i].content.Children[2]).FontSize = NEW.FontSize - 6.28;
-            ((Button)TODOS[i].content.Children[3]).Height = ((Button)TODOS[i].content.Children[2]).Width * 0.46;
-            ((Button)TODOS[i].content.Children[3]).FontSize = ((Button)TODOS[i].content.Children[2]).Width / 4.86;
+            var source = (TextBlock)TODOS[i].content.Children[1];
+            var target = (TextBlock)TODOS[i].content.Children[2];
+
+            target.Text = source.Text;
+            target.FontSize = source.FontSize;
+            target.Foreground = source.Foreground;
+            ((Button)TODOS[i].content.Children[3]).Height = ((Button)TODOS[i].content.Children[3]).Width * 0.46;
+            ((Button)TODOS[i].content.Children[3]).FontSize = ((Button)TODOS[i].content.Children[3]).Width / 4.86;
             todos.AddBack(TODOS[i]);
         }
     }
