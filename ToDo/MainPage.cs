@@ -167,6 +167,10 @@ public sealed partial class MainPage : Page // #if __DESKTOP__ for all of skia d
     }
     public static void RebuildTodos()
     {
+        if (TODOS == null || TODOS.Count == 0 || TODOS[0]?.content == null)
+        {
+            return;
+        }
         if (bounds.Width > bounds.Height)
         { 
             todos.currentcol = 0; 
@@ -208,6 +212,7 @@ public sealed partial class MainPage : Page // #if __DESKTOP__ for all of skia d
             ((TextBlock)TODOS[i].content.Children[0]).FontSize = NEW.FontSize - 0.68;
 #endif
             ((TextBlock)TODOS[i].content.Children[1]).FontSize = NEW.FontSize - 6.28;
+
 #if __DESKTOP__
             ((Button)TODOS[i].content.Children[3]).Width = avail * 0.32;
 #else
@@ -219,6 +224,7 @@ public sealed partial class MainPage : Page // #if __DESKTOP__ for all of skia d
             target.Text = source.Text;
             target.FontSize = source.FontSize;
             target.Foreground = source.Foreground;
+
             ((Button)TODOS[i].content.Children[3]).Height = ((Button)TODOS[i].content.Children[3]).Width * 0.46;
             ((Button)TODOS[i].content.Children[3]).FontSize = ((Button)TODOS[i].content.Children[3]).Width / 4.86;
             todos.AddBack(TODOS[i]);
@@ -324,7 +330,7 @@ public partial class ToDos : StackPanel
                 Background = new SolidColorBrush(Color.White),
                 Child = content,
             };
-            ((Button)content.Children[2]).Click += async (s, e) =>
+            ((Button)content.Children[3]).Click += async (s, e) =>
             {
                 for (int i = 0; i < MainPage.todos.Children.Count; i++)
                 {
@@ -454,7 +460,7 @@ public partial class ToDos : StackPanel
                         d.Title ?? "",
                         d.Descrip ?? "",
                         d.Date ?? "",
-                        d.Date ?? ""));
+                        d.Time ?? ""));
             }
 
             MainPage.RebuildTodos();
