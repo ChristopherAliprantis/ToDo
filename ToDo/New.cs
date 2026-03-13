@@ -1,8 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Text;
-using Uno.Extensions.Specialized;
-using Windows.Media.Capture.Core;
+
 namespace ToDo;
 
 
@@ -224,7 +220,7 @@ class UpDownBox : UserControl
             ((StackPanel)c.Children[1]).Spacing = this.Height / 28;
             ((StackPanel)c.Children[1]).Height = this.Height;
             ((StackPanel)c.Children[1]).Width = this.Width - c.Spacing - ((FrameworkElement)c.Children[0]).Width;
-            for (int i = 0; i <= ((StackPanel)c.Children[1]).Count(); i++)
+            for (int i = 0; i <= ((StackPanel)c.Children[1]).Children.Count; i++)
             {
                 ((Button)((StackPanel)c.Children[1]).Children[i]).Height = ((StackPanel)c.Children[1]).Height / 2 - ((StackPanel)c.Children[1]).Spacing;
                 ((Button)((StackPanel)c.Children[1]).Children[i]).FontSize = ((Button)((StackPanel)c.Children[1]).Children[i]).Width / 4.8;
@@ -238,7 +234,7 @@ class UpDownBox : UserControl
             ((StackPanel)c.Children[1]).Spacing = this.Height / 28;
             ((StackPanel)c.Children[1]).Height = this.Height;
             ((StackPanel)c.Children[1]).Width = this.Width - c.Spacing - ((FrameworkElement)c.Children[0]).Width;
-            for (int i = 0; i <= ((StackPanel)c.Children[1]).Count(); i++)
+            for (int i = 0; i <= ((StackPanel)c.Children[1]).Children.Count; i++)
             {
                 ((Button)((StackPanel)c.Children[1]).Children[i]).Height = ((StackPanel)c.Children[1]).Height / 2 - ((StackPanel)c.Children[1]).Spacing;
                 ((Button)((StackPanel)c.Children[1]).Children[i]).FontSize = ((Button)((StackPanel)c.Children[1]).Children[i]).Width / 4.8;

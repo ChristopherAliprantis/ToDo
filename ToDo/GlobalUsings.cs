@@ -6,5 +6,7 @@ global using Microsoft.Extensions.Logging;
 global using Microsoft.Extensions.Options;
 global using Microsoft.UI.Dispatching;
 global using Windows.Storage;
+global using System;
+global using System.Collections.Generic;
 global using Color = Microsoft.UI.Colors;
 global using Windows.UI.Notifications;
