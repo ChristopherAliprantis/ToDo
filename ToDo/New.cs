@@ -217,6 +217,7 @@ class UpDownBox : UserControl
         this.SizeChanged += (s, e) =>
         {
             c.Spacing = this.Width / 30;
+            ((TextBox)c.Children[0]).FontSize = ((TextBox)c.Children[0]).Width / 4.6;
             ((StackPanel)c.Children[1]).Spacing = this.Height / 28;
             ((StackPanel)c.Children[1]).Height = this.Height;
             ((StackPanel)c.Children[1]).Width = this.Width - c.Spacing - ((FrameworkElement)c.Children[0]).Width;
@@ -231,6 +232,7 @@ class UpDownBox : UserControl
         this.Loaded += (s, e) =>
         {
             c.Spacing = this.Width / 30;
+            ((TextBox)c.Children[0]).FontSize = ((TextBox)c.Children[0]).Width / 4.6;
             ((StackPanel)c.Children[1]).Spacing = this.Height / 28;
             ((StackPanel)c.Children[1]).Height = this.Height;
             ((StackPanel)c.Children[1]).Width = this.Width - c.Spacing - ((FrameworkElement)c.Children[0]).Width;
