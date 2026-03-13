@@ -25,6 +25,7 @@ public sealed partial class New : Page // #if __DESKTOP__ for all of skia deskto
         TextBox? title;
         Button? done;
         TextBox? describe;
+        Button? op;
         all = new StackPanel
         {
             Orientation = Orientation.Vertical,
@@ -57,8 +58,11 @@ public sealed partial class New : Page // #if __DESKTOP__ for all of skia deskto
                 (divide = new Rectangle
                 {
                     Fill = new SolidColorBrush(Color.Black)
-                })
-
+                }),
+                (op = new Button
+                {
+                    Content = "optional",
+                }),
             }
 
         };
@@ -97,21 +101,15 @@ public sealed partial class New : Page // #if __DESKTOP__ for all of skia deskto
             }
             else back.Height = this.ActualHeight / 17.1;
 #endif
-            back.Width = back.Height * 2.3;
-            back.Margin = new Thickness((this.ActualWidth / 6.597677), 0, 0, 0);
-            back.FontSize = back.ActualWidth / 4.8;
-            divide.Width = this.ActualWidth;done.Margin = back.Margin;
-            done.Width = back.Width;
-            done.Height = back.Height;
-            done.FontSize = back.FontSize;
+
+            divide.Width = this.ActualWidth;
             divide.Height = this.ActualHeight / 676.6;
             title.Height = back.Height * 1.1;
             title.Width = title.Height * 2.3;
             title.Margin = new Thickness((this.ActualWidth / 6.597677), all.Spacing * 4.8, 0, 0);
-            title.FontSize = title.ActualWidth / 4.6;
-            
-            describe.Margin = done.Margin;
-            describe.Margin = done.Margin;
+            title.FontSize = title.Width / 4.6;
+
+
 #if __ANDROID__
             if (bounds.Width > bounds.Height)
             {
@@ -126,6 +124,17 @@ public sealed partial class New : Page // #if __DESKTOP__ for all of skia deskto
 #endif
             describe.Width = describe.Height * 0.8;
             describe.FontSize = describe.Height / 12.46;
+            back.Width = back.Height * 2.3;
+            back.Margin = new Thickness((this.ActualWidth / 6.597677), 0, 0, 0);
+            back.FontSize = back.Width / 4.8;
+            done.Margin = back.Margin;
+            done.Width = back.Width;
+            done.Height = back.Height;
+            done.FontSize = back.FontSize;
+            describe.Margin = done.Margin;
+            op.Width = done.Width * 0.7;
+            op.Height = done.Height * 0.46;
+            op.FontSize = op.Width / 4.7;
         };
         this.SizeChanged += (s,e) =>
         {
@@ -173,7 +182,9 @@ public sealed partial class New : Page // #if __DESKTOP__ for all of skia deskto
             done.Height = back.Height;
             done.FontSize = back.FontSize;
             describe.Margin = done.Margin;
-            describe.Margin = done.Margin;
+            op.Width = done.Width * 0.7;
+            op.Height = done.Height * 0.46;
+            op.FontSize = op.Width / 4.7;
         };
         Helpers.Add(N, scroll, 1, 0);
         this.Content = N;
