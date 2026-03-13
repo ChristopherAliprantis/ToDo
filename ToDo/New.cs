@@ -196,7 +196,7 @@ public sealed partial class New : Page // #if __DESKTOP__ for all of skia deskto
 
 class UpDownBox : UserControl
 {
-    public string? Text;
+    public string Text = "";
     public Button? up;
     public Button? down;
 
