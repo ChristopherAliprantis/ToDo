@@ -135,6 +135,7 @@ public sealed partial class New : Page // #if __DESKTOP__ for all of skia deskto
             op.Width = done.Width * 0.7;
             op.Height = done.Height * 0.46;
             op.FontSize = op.Width / 4.7;
+            op.Margin = done.Margin;
         };
         this.SizeChanged += (s,e) =>
         {
@@ -185,6 +186,7 @@ public sealed partial class New : Page // #if __DESKTOP__ for all of skia deskto
             op.Width = done.Width * 0.7;
             op.Height = done.Height * 0.46;
             op.FontSize = op.Width / 4.7;
+            op.Margin = done.Margin;
         };
         Helpers.Add(N, scroll, 1, 0);
         this.Content = N;
