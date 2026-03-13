@@ -132,10 +132,10 @@ public sealed partial class New : Page // #if __DESKTOP__ for all of skia deskto
             done.Height = back.Height;
             done.FontSize = back.FontSize;
             describe.Margin = done.Margin;
-            op.Width = done.Width * 0.72;
-            op.Height = done.Height * 0.66;
-            op.FontSize = op.Width / 4.7;
-            op.Margin = new Thickness(done.Margin.Left * 0.87);
+            op.Width = done.Width * 0.82;
+            op.Height = done.Height * 0.79;
+            op.FontSize = op.Width / 5.96;
+            op.Margin = new Thickness(done.Margin.Left * 0.87, 0, 0, 0);
         };
         this.SizeChanged += (s,e) =>
         {
@@ -183,10 +183,10 @@ public sealed partial class New : Page // #if __DESKTOP__ for all of skia deskto
             done.Height = back.Height;
             done.FontSize = back.FontSize;
             describe.Margin = done.Margin;
-            op.Width = done.Width * 0.72;
-            op.Height = done.Height * 0.66;
-            op.FontSize = op.Width / 4.7;
-            op.Margin = new Thickness(done.Margin.Left * 0.87);
+            op.Width = done.Width * 0.82;
+            op.Height = done.Height * 0.79;
+            op.FontSize = op.Width / 5.96;
+            op.Margin = new Thickness(done.Margin.Left * 0.87, 0,0,0);
         };
         Helpers.Add(N, scroll, 1, 0);
         this.Content = N;
