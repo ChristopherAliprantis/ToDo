@@ -26,6 +26,8 @@ public sealed partial class New : Page // #if __DESKTOP__ for all of skia deskto
         Button? done;
         TextBox? describe;
         Button? op;
+        UpDownBox? date;
+        UpDownBox? time;
         all = new StackPanel
         {
             Orientation = Orientation.Vertical,
@@ -63,6 +65,15 @@ public sealed partial class New : Page // #if __DESKTOP__ for all of skia deskto
                 {
                     Content = "optional",
                 }),
+                (date = new UpDownBox
+                {
+
+                }),
+                (time = new UpDownBox
+                {
+
+                }),
+
             }
 
         };
@@ -136,6 +147,10 @@ public sealed partial class New : Page // #if __DESKTOP__ for all of skia deskto
             op.Height = done.Height * 0.79;
             op.FontSize = op.Width / 5.96;
             op.Margin = new Thickness(done.Margin.Left * 0.87, 0, 0, 0);
+            date.Height = done.Height * 0.9;
+            date.Width = done.Width * 1.3;
+            time.Height = done.Height * 0.9;
+            time.Width = done.Width * 1.3;
         };
         this.SizeChanged += (s,e) =>
         {
@@ -187,6 +202,10 @@ public sealed partial class New : Page // #if __DESKTOP__ for all of skia deskto
             op.Height = done.Height * 0.79;
             op.FontSize = op.Width / 5.96;
             op.Margin = new Thickness(done.Margin.Left * 0.87, 0,0,0);
+            date.Height = done.Height * 0.9;
+            date.Width = done.Width * 1.3;
+            time.Height = done.Height * 0.9;
+            time.Width = done.Width * 1.3;
         };
         Helpers.Add(N, scroll, 1, 0);
         this.Content = N;
@@ -229,6 +248,7 @@ class UpDownBox : UserControl
             }
 
         };
+        this.Content = c;
         this.SizeChanged += (s, e) =>
         {
             c.Spacing = this.Width / 30;
