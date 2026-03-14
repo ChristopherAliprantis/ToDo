@@ -21,6 +21,7 @@ public partial class App : Application
 
     protected override void OnLaunched(LaunchActivatedEventArgs args)
     {
+
         // Load WinUI Resources
         Resources.Build(r => r.Merged(
             new XamlControlsResources()));
@@ -48,7 +49,6 @@ public partial class App : Application
                 })
             );
         MainWindow = builder.Window;
-
         MainWindow.SetWindowIcon();
         MainWindow.Title = "ToDo";
         Host = builder.Build();

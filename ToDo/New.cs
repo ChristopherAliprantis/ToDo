@@ -64,18 +64,35 @@ public sealed partial class New : Page // #if __DESKTOP__ for all of skia deskto
                 (op = new Button
                 {
                     Content = "optional",
+                    HorizontalAlignment = HorizontalAlignment.Left,
                 }),
                 (date = new UpDownBox
                 {
-
+                    Visibility = Visibility.Collapsed,
+                    HorizontalAlignment = HorizontalAlignment.Left,
+                    PlaceholderText = "Date"
                 }),
                 (time = new UpDownBox
                 {
-
+                    Visibility = Visibility.Collapsed,
+                    HorizontalAlignment = HorizontalAlignment.Left,
+                    PlaceholderText = "Time"
                 }),
 
             }
 
+        };
+        op.Click += (s, e) =>
+        {
+            if (time.Visibility == Visibility.Collapsed)
+                time.Visibility = Visibility.Visible;
+            else
+                time.Visibility = Visibility.Collapsed;
+
+            if (date.Visibility == Visibility.Collapsed)
+                date.Visibility = Visibility.Visible;
+            else
+                date.Visibility = Visibility.Collapsed;
         };
         back.Click += (s, e) =>
         {
@@ -147,10 +164,12 @@ public sealed partial class New : Page // #if __DESKTOP__ for all of skia deskto
             op.Height = done.Height * 0.79;
             op.FontSize = op.Width / 5.96;
             op.Margin = new Thickness(done.Margin.Left * 0.87, 0, 0, 0);
-            date.Height = done.Height * 0.9;
-            date.Width = done.Width * 1.3;
-            time.Height = done.Height * 0.9;
-            time.Width = done.Width * 1.3;
+            date.Height = done.Height;
+            date.Width = done.Width * 1.73;
+            time.Height = done.Height;
+            time.Width = done.Width * 1.73;
+            time.Margin = done.Margin;
+            date.Margin = done.Margin;
         };
         this.SizeChanged += (s,e) =>
         {
@@ -202,10 +221,12 @@ public sealed partial class New : Page // #if __DESKTOP__ for all of skia deskto
             op.Height = done.Height * 0.79;
             op.FontSize = op.Width / 5.96;
             op.Margin = new Thickness(done.Margin.Left * 0.87, 0,0,0);
-            date.Height = done.Height * 0.9;
-            date.Width = done.Width * 1.3;
-            time.Height = done.Height * 0.9;
-            time.Width = done.Width * 1.3;
+            date.Height = done.Height;
+            date.Width = done.Width * 1.73;
+            time.Height = done.Height;
+            time.Width = done.Width * 1.73;
+            time.Margin = done.Margin;
+            date.Margin = done.Margin;
         };
         Helpers.Add(N, scroll, 1, 0);
         this.Content = N;
@@ -216,6 +237,7 @@ public sealed partial class New : Page // #if __DESKTOP__ for all of skia deskto
 class UpDownBox : UserControl
 {
     public string Text = "";
+    public string PlaceholderText = "";
     public Button? up;
     public Button? down;
 
@@ -230,6 +252,7 @@ class UpDownBox : UserControl
                 {
                     IsReadOnly = true,
                     Text = this.Text,
+                    PlaceholderText = this.PlaceholderText
                 },
                 new StackPanel
                 {
@@ -237,11 +260,11 @@ class UpDownBox : UserControl
                     {
                         (up = new Button
                         {
-                            Content = "+"
+                            Content = "+",
                         }),
                         (down = new Button
                         {
-                            Content = "-"
+                            Content = "-",
                         })
                     }
                 }
@@ -252,6 +275,8 @@ class UpDownBox : UserControl
         this.SizeChanged += (s, e) =>
         {
             c.Spacing = this.Width / 30;
+            ((TextBox)c.Children[0]).Height = this.Height;
+            ((TextBox)c.Children[0]).Width = this.Width * (22.0 / 30.0);
             ((TextBox)c.Children[0]).FontSize = ((TextBox)c.Children[0]).Width / 4.6;
             ((StackPanel)c.Children[1]).Spacing = this.Height / 28;
             ((StackPanel)c.Children[1]).Height = this.Height;
@@ -259,14 +284,15 @@ class UpDownBox : UserControl
             for (int i = 0; i <= ((StackPanel)c.Children[1]).Children.Count; i++)
             {
                 ((Button)((StackPanel)c.Children[1]).Children[i]).Height = ((StackPanel)c.Children[1]).Height / 2 - ((StackPanel)c.Children[1]).Spacing;
-                ((Button)((StackPanel)c.Children[1]).Children[i]).FontSize = ((Button)((StackPanel)c.Children[1]).Children[i]).Width / 4.8;
+                ((Button)((StackPanel)c.Children[1]).Children[i]).Width = ((Button)((StackPanel)c.Children[1]).Children[i]).Height;
+                ((Button)((StackPanel)c.Children[1]).Children[i]).FontSize = ((Button)((StackPanel)c.Children[1]).Children[i]).Width;
             }
-            ((TextBox)c.Children[0]).Height = this.Height;
-            ((TextBox)c.Children[0]).Width = this.Width * (22.0 / 30.0);
         };
         this.Loaded += (s, e) =>
         {
             c.Spacing = this.Width / 30;
+            ((TextBox)c.Children[0]).Height = this.Height;
+            ((TextBox)c.Children[0]).Width = this.Width * (22.0 / 30.0);
             ((TextBox)c.Children[0]).FontSize = ((TextBox)c.Children[0]).Width / 4.6;
             ((StackPanel)c.Children[1]).Spacing = this.Height / 28;
             ((StackPanel)c.Children[1]).Height = this.Height;
@@ -274,10 +300,9 @@ class UpDownBox : UserControl
             for (int i = 0; i <= ((StackPanel)c.Children[1]).Children.Count; i++)
             {
                 ((Button)((StackPanel)c.Children[1]).Children[i]).Height = ((StackPanel)c.Children[1]).Height / 2 - ((StackPanel)c.Children[1]).Spacing;
-                ((Button)((StackPanel)c.Children[1]).Children[i]).FontSize = ((Button)((StackPanel)c.Children[1]).Children[i]).Width / 4.8;
+                ((Button)((StackPanel)c.Children[1]).Children[i]).Width = ((Button)((StackPanel)c.Children[1]).Children[i]).Height;
+                ((Button)((StackPanel)c.Children[1]).Children[i]).FontSize = ((Button)((StackPanel)c.Children[1]).Children[i]).Width;
             }
-            ((TextBox)c.Children[0]).Height = this.Height;
-            ((TextBox)c.Children[0]).Width = this.Width * (22.0 / 30.0);
         };
     }
 }
