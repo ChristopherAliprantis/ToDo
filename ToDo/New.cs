@@ -165,9 +165,9 @@ public sealed partial class New : Page // #if DESKTOP for all of skia desktop, #
             op.FontSize = op.Width / 5.96;
             op.Margin = new Thickness(done.Margin.Left * 0.87, 0, 0, 0);
             date.Height = done.Height;
-            date.Width = done.Width * 1.73;
+            date.Width = done.Width * 2.23;
             time.Height = done.Height;
-            time.Width = done.Width * 1.73;
+            time.Width = done.Width * 2.23;
             time.Margin = done.Margin;
             date.Margin = done.Margin;
         };
@@ -222,9 +222,9 @@ public sealed partial class New : Page // #if DESKTOP for all of skia desktop, #
             op.FontSize = op.Width / 5.96;
             op.Margin = new Thickness(done.Margin.Left * 0.87, 0,0,0);
             date.Height = done.Height;
-            date.Width = done.Width * 1.73;
+            date.Width = done.Width * 2.23;
             time.Height = done.Height;
-            time.Width = done.Width * 1.73;
+            time.Width = done.Width * 2.23;
             time.Margin = done.Margin;
             date.Margin = done.Margin;
         };
@@ -256,6 +256,7 @@ class UpDownBox : UserControl
                 },
                 new StackPanel
                 {
+                    Orientation = Orientation.Horizontal,
                     Children =
                     {
                         (up = new Button
@@ -274,37 +275,37 @@ class UpDownBox : UserControl
         this.Content = c;
         this.SizeChanged += (s, e) =>
         {
-            c.Spacing = this.Width / 30;
+            c.Spacing = 0;
             ((TextBox)c.Children[0]).Height = this.Height;
-            ((TextBox)c.Children[0]).Width = this.Width * (22.0 / 30.0);
+            ((TextBox)c.Children[0]).Width = this.Width * (14.0 / 30.0);
             ((TextBox)c.Children[0]).FontSize = ((TextBox)c.Children[0]).Width / 4.6;
-            ((StackPanel)c.Children[1]).Spacing = this.Height / 31;
+            ((StackPanel)c.Children[1]).Spacing = 0;
             ((StackPanel)c.Children[1]).Height = this.Height;
             ((StackPanel)c.Children[1]).Width = this.Width - c.Spacing - ((FrameworkElement)c.Children[0]).Width;
 
-            ((Button)((StackPanel)c.Children[1]).Children[0]).Width = ((StackPanel)c.Children[1]).Height / 2 - ((StackPanel)c.Children[1]).Spacing;
-            ((Button)((StackPanel)c.Children[1]).Children[0]).Height = ((Button)((StackPanel)c.Children[0]).Children[0]).Width;
-            ((Button)((StackPanel)c.Children[1]).Children[0]).FontSize = ((Button)((StackPanel)c.Children[0]).Children[0]).Width * 2.1;
-            ((Button)((StackPanel)c.Children[1]).Children[1]).Width = ((StackPanel)c.Children[1]).Height / 2 - ((StackPanel)c.Children[1]).Spacing;
-            ((Button)((StackPanel)c.Children[1]).Children[1]).Height = ((Button)((StackPanel)c.Children[1]).Children[1]).Width;
-            ((Button)((StackPanel)c.Children[1]).Children[1]).FontSize = ((Button)((StackPanel)c.Children[1]).Children[1]).Width * 2.1;
+            ((Button)((StackPanel)c.Children[1]).Children[0]).Width = this.Height;
+            ((Button)((StackPanel)c.Children[1]).Children[0]).Height = this.Height;
+            ((Button)((StackPanel)c.Children[1]).Children[0]).FontSize = this.Width * 0.1;
+            ((Button)((StackPanel)c.Children[1]).Children[1]).Width = this.Height;
+            ((Button)((StackPanel)c.Children[1]).Children[1]).Height = this.Height;
+            ((Button)((StackPanel)c.Children[1]).Children[1]).FontSize = this.Width * 0.1;
         };
         this.Loaded += (s, e) =>
         {
-            c.Spacing = this.Width / 30;
+            c.Spacing = 0;
             ((TextBox)c.Children[0]).Height = this.Height;
-            ((TextBox)c.Children[0]).Width = this.Width * (22.0 / 30.0);
+            ((TextBox)c.Children[0]).Width = this.Width * (14.0 / 30.0);
             ((TextBox)c.Children[0]).FontSize = ((TextBox)c.Children[0]).Width / 4.6;
-            ((StackPanel)c.Children[1]).Spacing = this.Height / 31;
+            ((StackPanel)c.Children[1]).Spacing = 0;
             ((StackPanel)c.Children[1]).Height = this.Height;
             ((StackPanel)c.Children[1]).Width = this.Width - c.Spacing - ((FrameworkElement)c.Children[0]).Width;
-            
-            ((Button)((StackPanel)c.Children[1]).Children[0]).Width = ((StackPanel)c.Children[1]).Height / 2 - ((StackPanel)c.Children[1]).Spacing;
-            ((Button)((StackPanel)c.Children[1]).Children[0]).Height = ((Button)((StackPanel)c.Children[0]).Children[0]).Width;
-            ((Button)((StackPanel)c.Children[1]).Children[0]).FontSize = ((Button)((StackPanel)c.Children[0]).Children[0]).Width * 2.1;
-            ((Button)((StackPanel)c.Children[1]).Children[1]).Width = ((StackPanel)c.Children[1]).Height / 2 - ((StackPanel)c.Children[1]).Spacing;
-            ((Button)((StackPanel)c.Children[1]).Children[1]).Height = ((Button)((StackPanel)c.Children[1]).Children[1]).Width;
-            ((Button)((StackPanel)c.Children[1]).Children[1]).FontSize = ((Button)((StackPanel)c.Children[1]).Children[1]).Width * 2.1;
+
+            ((Button)((StackPanel)c.Children[1]).Children[0]).Width = this.Height;
+            ((Button)((StackPanel)c.Children[1]).Children[0]).Height = this.Height;
+            ((Button)((StackPanel)c.Children[1]).Children[0]).FontSize = this.Width * 0.1;
+            ((Button)((StackPanel)c.Children[1]).Children[1]).Width = this.Height;
+            ((Button)((StackPanel)c.Children[1]).Children[1]).Height = this.Height;
+            ((Button)((StackPanel)c.Children[1]).Children[1]).FontSize = this.Width * 0.1;
         };
     }
 }
