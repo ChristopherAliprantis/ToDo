@@ -265,7 +265,7 @@ class UpDownBox : UserControl
                         }),
                         (down = new Button
                         {
-                            Content = "-",
+                            Content = "\u2212",
                         })
                     }
                 }
@@ -285,10 +285,10 @@ class UpDownBox : UserControl
 
             ((Button)((StackPanel)c.Children[1]).Children[0]).Width = this.Height;
             ((Button)((StackPanel)c.Children[1]).Children[0]).Height = this.Height;
-            ((Button)((StackPanel)c.Children[1]).Children[0]).FontSize = this.Width * 0.1;
+            ((Button)((StackPanel)c.Children[1]).Children[0]).FontSize = this.Width * 0.13;
             ((Button)((StackPanel)c.Children[1]).Children[1]).Width = this.Height;
             ((Button)((StackPanel)c.Children[1]).Children[1]).Height = this.Height;
-            ((Button)((StackPanel)c.Children[1]).Children[1]).FontSize = this.Width * 0.1;
+            ((Button)((StackPanel)c.Children[1]).Children[1]).FontSize = this.Width * 0.13;
         };
         this.Loaded += (s, e) =>
         {
@@ -302,10 +302,10 @@ class UpDownBox : UserControl
 
             ((Button)((StackPanel)c.Children[1]).Children[0]).Width = this.Height;
             ((Button)((StackPanel)c.Children[1]).Children[0]).Height = this.Height;
-            ((Button)((StackPanel)c.Children[1]).Children[0]).FontSize = this.Width * 0.1;
+            ((Button)((StackPanel)c.Children[1]).Children[0]).FontSize = this.Width * 0.13;
             ((Button)((StackPanel)c.Children[1]).Children[1]).Width = this.Height;
             ((Button)((StackPanel)c.Children[1]).Children[1]).Height = this.Height;
-            ((Button)((StackPanel)c.Children[1]).Children[1]).FontSize = this.Width * 0.1;
+            ((Button)((StackPanel)c.Children[1]).Children[1]).FontSize = this.Width * 0.13;
         };
     }
 }
