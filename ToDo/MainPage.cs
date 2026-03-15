@@ -2,7 +2,7 @@ namespace ToDo;
 
 using System.Text.Json;
 
-public sealed partial class MainPage : Page // #if __DESKTOP__ for all of skia desktop, #if WINDOWS for windows, #if __ANDROID__ for android.
+public sealed partial class MainPage : Page // #if DESKTOP for all of skia desktop, #if WINDOWS for windows, #if ANDROID for android.
 {
     public static Windows.Foundation.Rect bounds;
     public static ToDos todos = new();
@@ -48,7 +48,7 @@ public sealed partial class MainPage : Page // #if __DESKTOP__ for all of skia d
         var Scroll = new ScrollViewer
         {
             HorizontalScrollBarVisibility = ScrollBarVisibility.Hidden,
-#if __DESKTOP__
+#if DESKTOP
             VerticalScrollBarVisibility = ScrollBarVisibility.Visible,
 #else
             VerticalScrollBarVisibility = ScrollBarVisibility.Hidden,
@@ -65,7 +65,7 @@ public sealed partial class MainPage : Page // #if __DESKTOP__ for all of skia d
             else todos.currentcol = 0;
             if (bounds.Width > bounds.Height)
             {
-#if __DESKTOP__
+#if DESKTOP
                 Bar.Width = w / 14.7;
 #else
                 Bar.Width = w / 8.6;
@@ -119,7 +119,7 @@ public sealed partial class MainPage : Page // #if __DESKTOP__ for all of skia d
             else todos.currentcol = 0;
             if (bounds.Width > bounds.Height)
             {
-#if __DESKTOP__
+#if DESKTOP
                 Bar.Width = w / 14.7;
 #else
                 Bar.Width = w / 8.6;
@@ -199,7 +199,7 @@ public sealed partial class MainPage : Page // #if __DESKTOP__ for all of skia d
             }
             TODOS[i].Width = avail;
             TODOS[i].content.Padding = new Thickness(avail / 17, avail / 17, avail / 17, avail / 17);
-#if __ANDROID__
+#if ANDROID
             if (bounds.Width > bounds.Height)
             {
                 ((TextBlock)TODOS[i].content.Children[0]).FontSize = NEW.FontSize - 3.7;
@@ -213,7 +213,7 @@ public sealed partial class MainPage : Page // #if __DESKTOP__ for all of skia d
 #endif
             ((TextBlock)TODOS[i].content.Children[1]).FontSize = NEW.FontSize - 6.28;
 
-#if __DESKTOP__
+#if DESKTOP
             ((Button)TODOS[i].content.Children[3]).Width = avail * 0.32;
 #else
             ((Button)TODOS[i].content.Children[3]).Width = avail * 0.48;
