@@ -489,3 +489,4 @@ solution-config.props
 
 *.keystore
 ToDo/keystore.targets
+*.pem

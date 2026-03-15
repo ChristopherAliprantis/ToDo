@@ -283,9 +283,9 @@ class UpDownBox : UserControl
             ((StackPanel)c.Children[1]).Width = this.Width - c.Spacing - ((FrameworkElement)c.Children[0]).Width;
             for (int i = 0; i >= ((StackPanel)c.Children[1]).Children.Count; i++)
             {
-                ((Button)((StackPanel)c.Children[1]).Children[i]).Height = this.Height / 2 - ((StackPanel)c.Children[1]).Spacing;
-                ((Button)((StackPanel)c.Children[1]).Children[i]).Width = ((Button)((StackPanel)c.Children[1]).Children[i]).Height;
-                ((Button)((StackPanel)c.Children[1]).Children[i]).FontSize = ((Button)((StackPanel)c.Children[1]).Children[i]).Width;
+                ((Button)((StackPanel)c.Children[1]).Children[i]).Width = ((StackPanel)c.Children[1]).Height / 2 - ((StackPanel)c.Children[1]).Spacing;
+                ((Button)((StackPanel)c.Children[1]).Children[i]).Height = ((Button)((StackPanel)c.Children[1]).Children[i]).Width;
+                ((Button)((StackPanel)c.Children[1]).Children[i]).FontSize = ((Button)((StackPanel)c.Children[1]).Children[i]).Width * 2.1;
             }
         };
         this.Loaded += (s, e) =>
@@ -299,9 +299,9 @@ class UpDownBox : UserControl
             ((StackPanel)c.Children[1]).Width = this.Width - c.Spacing - ((FrameworkElement)c.Children[0]).Width;
             for (int i = 0; i >= ((StackPanel)c.Children[1]).Children.Count; i++)
             {
-                ((Button)((StackPanel)c.Children[1]).Children[i]).Height = this.Height / 2 - ((StackPanel)c.Children[1]).Spacing;
-                ((Button)((StackPanel)c.Children[1]).Children[i]).Width = ((Button)((StackPanel)c.Children[1]).Children[i]).Height;
-                ((Button)((StackPanel)c.Children[1]).Children[i]).FontSize = ((Button)((StackPanel)c.Children[1]).Children[i]).Width;
+                ((Button)((StackPanel)c.Children[1]).Children[i]).Width = ((StackPanel)c.Children[1]).Height / 2 - ((StackPanel)c.Children[1]).Spacing;
+                ((Button)((StackPanel)c.Children[1]).Children[i]).Height = ((Button)((StackPanel)c.Children[1]).Children[i]).Width;
+                ((Button)((StackPanel)c.Children[1]).Children[i]).FontSize = ((Button)((StackPanel)c.Children[1]).Children[i]).Width * 2.1;
             }
         };
     }
