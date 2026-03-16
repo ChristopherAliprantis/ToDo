@@ -303,7 +303,7 @@ class UpDownBox : UserControl
             c.Spacing = 0;
             ((TextBox)c.Children[0]).Height = this.Height;
             ((TextBox)c.Children[0]).Width = this.Width * (14.0 / 30.0);
-            ((TextBox)c.Children[0]).FontSize = ((TextBox)c.Children[0]).Width / 6.2;
+            ((TextBox)c.Children[0]).FontSize = ((TextBox)c.Children[0]).Width / 6.49;
             ((StackPanel)c.Children[1]).Spacing = 0;
             ((StackPanel)c.Children[1]).Height = this.Height;
             ((StackPanel)c.Children[1]).Width = this.Width - c.Spacing - ((FrameworkElement)c.Children[0]).Width;
@@ -321,7 +321,7 @@ class UpDownBox : UserControl
             c.Spacing = 0;
             ((TextBox)c.Children[0]).Height = this.Height;
             ((TextBox)c.Children[0]).Width = this.Width * (14.0 / 30.0);
-            ((TextBox)c.Children[0]).FontSize = ((TextBox)c.Children[0]).Width / 6.2;
+            ((TextBox)c.Children[0]).FontSize = ((TextBox)c.Children[0]).Width / 6.49;
             ((StackPanel)c.Children[1]).Spacing = 0;
             ((StackPanel)c.Children[1]).Height = this.Height;
             ((StackPanel)c.Children[1]).Width = this.Width - c.Spacing - ((FrameworkElement)c.Children[0]).Width;
