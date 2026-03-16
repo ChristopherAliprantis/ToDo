@@ -24,6 +24,8 @@ public sealed partial class New : Page // #if DESKTOP for all of skia desktop, #
         Rectangle? divide;
         TextBox? title;
         Button? done;
+        TimeOnly Time = TimeOnly.FromDateTime(DateTime.Now);
+        DateTime Date = DateTime.Now.Date;
         TextBox? describe;
         Button? op;
         UpDownBox? date;
@@ -70,17 +72,41 @@ public sealed partial class New : Page // #if DESKTOP for all of skia desktop, #
                 {
                     Visibility = Visibility.Collapsed,
                     HorizontalAlignment = HorizontalAlignment.Left,
-                    PlaceholderText = "Date"
+                    Text = Date.ToString("yyyy-MM-dd"),
                 }),
                 (time = new UpDownBox
                 {
                     Visibility = Visibility.Collapsed,
                     HorizontalAlignment = HorizontalAlignment.Left,
-                    PlaceholderText = "Time"
+                    Text = Time.ToString("hh:mm tt"),
                 }),
 
             }
 
+        };
+        time.up.Click += (s, e) =>
+        {
+            Time = Time.AddMinutes(1);
+            time.Text = Time.ToString("hh:mm tt");
+            time.text.Text = time.Text;
+        };
+        time.down.Click += (s, e) =>
+        {
+            Time = Time.AddMinutes(-1);
+            time.Text = Time.ToString("hh:mm tt");
+            time.text.Text = time.Text;
+        };
+        date.up.Click += (s, e) =>
+        {
+            Date = Date.AddDays(1);
+            date.Text = Date.ToString("yyyy-MM-dd");
+            date.text.Text = date.Text;
+        };
+        date.down.Click += (s, e) =>
+        {
+            Date = Date.AddDays(-1);
+            date.Text = Date.ToString("yyyy-MM-dd");
+            date.text.Text = date.Text;
         };
         op.Click += (s, e) =>
         {
@@ -165,9 +191,9 @@ public sealed partial class New : Page // #if DESKTOP for all of skia desktop, #
             op.FontSize = op.Width / 5.96;
             op.Margin = new Thickness(done.Margin.Left * 0.87, 0, 0, 0);
             date.Height = done.Height;
-            date.Width = done.Width * 2.23;
+            date.Width = done.Width * 2.76;
             time.Height = done.Height;
-            time.Width = done.Width * 2.23;
+            time.Width = done.Width * 2.22;
             time.Margin = done.Margin;
             date.Margin = done.Margin;
         };
@@ -222,9 +248,9 @@ public sealed partial class New : Page // #if DESKTOP for all of skia desktop, #
             op.FontSize = op.Width / 5.96;
             op.Margin = new Thickness(done.Margin.Left * 0.87, 0,0,0);
             date.Height = done.Height;
-            date.Width = done.Width * 2.23;
+            date.Width = done.Width * 2.76;
             time.Height = done.Height;
-            time.Width = done.Width * 2.23;
+            time.Width = done.Width * 2.22;
             time.Margin = done.Margin;
             date.Margin = done.Margin;
         };
@@ -236,24 +262,23 @@ public sealed partial class New : Page // #if DESKTOP for all of skia desktop, #
 
 class UpDownBox : UserControl
 {
-    public string Text = "";
-    public string PlaceholderText = "";
+    public string? Text;
     public Button? up;
     public Button? down;
+    public TextBox? text;
 
     public UpDownBox()
     {
+        
         var c = new StackPanel
         {
             Orientation = Orientation.Horizontal,
             Children =
             {
-                new TextBox
+                (text = new TextBox
                 {
                     IsReadOnly = true,
-                    Text = this.Text,
-                    PlaceholderText = this.PlaceholderText
-                },
+                }),
                 new StackPanel
                 {
                     Orientation = Orientation.Horizontal,
@@ -278,7 +303,7 @@ class UpDownBox : UserControl
             c.Spacing = 0;
             ((TextBox)c.Children[0]).Height = this.Height;
             ((TextBox)c.Children[0]).Width = this.Width * (14.0 / 30.0);
-            ((TextBox)c.Children[0]).FontSize = ((TextBox)c.Children[0]).Width / 4.6;
+            ((TextBox)c.Children[0]).FontSize = ((TextBox)c.Children[0]).Width / 6.2;
             ((StackPanel)c.Children[1]).Spacing = 0;
             ((StackPanel)c.Children[1]).Height = this.Height;
             ((StackPanel)c.Children[1]).Width = this.Width - c.Spacing - ((FrameworkElement)c.Children[0]).Width;
@@ -292,10 +317,11 @@ class UpDownBox : UserControl
         };
         this.Loaded += (s, e) =>
         {
+            text.Text = this.Text;
             c.Spacing = 0;
             ((TextBox)c.Children[0]).Height = this.Height;
             ((TextBox)c.Children[0]).Width = this.Width * (14.0 / 30.0);
-            ((TextBox)c.Children[0]).FontSize = ((TextBox)c.Children[0]).Width / 4.6;
+            ((TextBox)c.Children[0]).FontSize = ((TextBox)c.Children[0]).Width / 6.2;
             ((StackPanel)c.Children[1]).Spacing = 0;
             ((StackPanel)c.Children[1]).Height = this.Height;
             ((StackPanel)c.Children[1]).Width = this.Width - c.Spacing - ((FrameworkElement)c.Children[0]).Width;
