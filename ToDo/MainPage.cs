@@ -217,13 +217,9 @@ public sealed partial class MainPage : Page // #if DESKTOP for all of skia deskt
             ((Button)TODOS[i].content.Children[3]).Width = avail * 0.32;
 #else
             ((Button)TODOS[i].content.Children[3]).Width = avail * 0.48;
-#endif       
-            var source = (TextBlock)TODOS[i].content.Children[1];
-            var target = (TextBlock)TODOS[i].content.Children[2];
+#endif
 
-            target.Text = source.Text;
-            target.FontSize = source.FontSize;
-            target.Foreground = source.Foreground;
+            ((TextBlock)TODOS[i].content.Children[2]).FontSize = ((TextBlock)TODOS[i].content.Children[1]).FontSize;
 
             ((Button)TODOS[i].content.Children[3]).Height = ((Button)TODOS[i].content.Children[3]).Width * 0.46;
             ((Button)TODOS[i].content.Children[3]).FontSize = ((Button)TODOS[i].content.Children[3]).Width / 4.86;
@@ -263,14 +259,14 @@ public partial class ToDos : StackPanel
     {
         public Border border;
         public StackPanel content;
-        public object? Date { get; set; }
-        public object? Time { get; set; }
+        public DateTime? Date { get; set; }
+        public TimeOnly? Time { get; set; }
         public string Title;
         public string Descrip;
 
         public string? DTime;
         public string? DDate;
-        public ToDo(string title, string descrip, object? date, object? time)
+        public ToDo(string title, string descrip, DateTime? date, TimeOnly? time)
         {
             Title = title;
             Descrip = descrip;
@@ -282,7 +278,7 @@ public partial class ToDos : StackPanel
             }
             else
             {
-                DDate = Date.ToString();
+                DDate = ((DateTime)Date).ToString("yyyy-MM-dd");
             }
             if (Time == null)
             {
@@ -290,7 +286,7 @@ public partial class ToDos : StackPanel
             }
             else
             {
-                DTime = Time.ToString();
+                DTime = ((TimeOnly)Time).ToString("hh:mm tt");
             }
             content = new StackPanel
             {
@@ -312,7 +308,7 @@ public partial class ToDos : StackPanel
                     {
                         IsTextSelectionEnabled = true,
                         TextWrapping = TextWrapping.Wrap,
-                        Text = $"{DDate} {DTime}"
+                        Text = $"{DDate}\n{DTime}"
                     },
                     new Button
                     {
@@ -342,7 +338,7 @@ public partial class ToDos : StackPanel
             };
         }
     }
-    public void ADD(string title, string descrip, object? date, object? time)
+    public void ADD(string title, string descrip, DateTime? date, TimeOnly? time)
     {
         var N = new ToDo(title, descrip, date, time);
         MainPage.TODOS.Add(N);
@@ -380,7 +376,7 @@ public partial class ToDos : StackPanel
         }
     }
 
-    public async void Save()
+    public async Task Save()
     {
         try
         {
@@ -419,7 +415,7 @@ public partial class ToDos : StackPanel
     }
 
 
-    public async void Load()
+    public async Task Load()
     {
         try
         {
@@ -459,8 +455,8 @@ public partial class ToDos : StackPanel
                     new ToDos.ToDo(
                         d.Title ?? "",
                         d.Descrip ?? "",
-                        d.Date ?? "",
-                        d.Time ?? ""));
+                        d.Date,
+                        d.Time ));
             }
 
             MainPage.RebuildTodos();
@@ -478,7 +474,7 @@ public class ToDoData
     public string? Title { get; set; }
     public string? Descrip { get; set; }
 
-    public object? Date { get; set; }
+    public DateTime? Date { get; set; }
 
-    public object? Time { get; set; }
+    public TimeOnly? Time { get; set; }
 }

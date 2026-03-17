@@ -1,4 +1,6 @@
 
+using static System.Runtime.InteropServices.JavaScript.JSType;
+
 namespace ToDo;
 
 
@@ -126,7 +128,14 @@ public sealed partial class New : Page // #if DESKTOP for all of skia desktop, #
         };
         done.Click += (s, e) =>
         {
-            MainPage.todos.ADD(title.Text, describe.Text, null, null);
+            if (date.Visibility == Visibility.Collapsed && time.Visibility == Visibility.Collapsed)
+            {
+                MainPage.todos.ADD(title.Text, describe.Text, null, null);
+            }
+            else
+            {
+                MainPage.todos.ADD(title.Text, describe.Text, Date, Time);
+            }
             App.rootFrame.Navigate(typeof(MainPage));
         };
         var scroll = new ScrollViewer
