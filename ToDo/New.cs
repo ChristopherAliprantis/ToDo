@@ -1,7 +1,4 @@
 
-using static System.Runtime.InteropServices.JavaScript.JSType;
-using static ToDo.ToDos;
-
 namespace ToDo;
 
 

@@ -1,7 +1,6 @@
 namespace ToDo;
 
 using System.Text.Json;
-using static global::ToDo.ToDos;
 
 public sealed partial class MainPage : Page // #if DESKTOP for all of skia desktop, #if WINDOWS for windows, #if ANDROID for android.
 {
@@ -239,43 +238,73 @@ public class Helpers
         Grid.SetColumn(which, col);
     }
 
+    private static readonly System.Collections.Concurrent.ConcurrentDictionary<string, System.Threading.CancellationTokenSource> _notifications = new();
+
     public static void SendNotif(ToDos.ToDo todo)
     {
-        if (!todo.Date.HasValue || !todo.Time.HasValue)
-        {
-            return;
-        }
+        if (todo.Date == null || todo.Time == null || string.IsNullOrEmpty(todo.ID)) return;
 
         System.DateTime scheduledTime = todo.Date.Value.Date + todo.Time.Value.ToTimeSpan();
+        System.TimeSpan delay = scheduledTime - System.DateTime.Now;
 
-        if (scheduledTime <= System.DateTime.Now)
-        {
-            return;
-        }
+        CancelNotif(todo.ID);
+        var cts = new System.Threading.CancellationTokenSource();
+        _notifications[todo.ID] = cts;
 
-        var request = new Plugin.LocalNotification.NotificationRequest
+        _ = System.Threading.Tasks.Task.Run(async () =>
         {
-            NotificationId = todo.ID.GetHashCode(),
-            Title = todo.Title,
-            Description = todo.Descrip,
-            Schedule = new Plugin.LocalNotification.NotificationRequestSchedule
+            try
             {
-                NotifyTime = scheduledTime
+                if (delay > System.TimeSpan.Zero)
+                    await System.Threading.Tasks.Task.Delay(delay, cts.Token);
+
+                Microsoft.UI.Dispatching.DispatcherQueue.GetForCurrentThread()?.TryEnqueue(() =>
+                {
+#if DESKTOP
+                if (Microsoft.UI.Xaml.Application.Current.Resources.TryGetValue("MyTrayIcon", out var res) && 
+                    res is Notif.TaskbarIcon tray)
+                {
+                    tray.ShowNotification(todo.Title, todo.Descrip);
+                }
+#elif __ANDROID__
+                    var context = Android.App.Application.Context;
+                    var manager = context.GetSystemService(Android.Content.Context.NotificationService) as Android.App.NotificationManager;
+                    var channelId = "todo_notifications";
+
+                    if (Android.OS.Build.VERSION.SdkInt >= Android.OS.BuildVersionCodes.O)
+                    {
+                        var channel = new Android.App.NotificationChannel(channelId, "ToDo", Android.App.NotificationImportance.High);
+                        channel.EnableVibration(true);
+                        manager.CreateNotificationChannel(channel);
+                    }
+
+                    var builder = new Android.App.Notification.Builder(context, channelId)
+                        .SetContentTitle(todo.Title)
+                        .SetContentText(todo.Descrip)
+                        .SetSmallIcon(Android.Resource.Drawable.IcDialogInfo)
+                        .SetAutoCancel(true)
+                        .SetDefaults(Android.App.NotificationDefaults.All);
+
+                    manager.Notify(todo.ID.GetHashCode(), builder.Build());
+#endif
+                });
+                _notifications.TryRemove(todo.ID, out _);
             }
-        };
-
-        Plugin.LocalNotification.LocalNotificationCenter.Current.Show(request);
+            catch (System.OperationCanceledException) { }
+        });
     }
-
-
 
     public static void CancelNotif(string todoId)
     {
-        // You must use the EXACT same integer conversion you used when sending
-        int intId = todoId.GetHashCode();
-
-        Plugin.LocalNotification.LocalNotificationCenter.Current.Cancel(intId);
+        if (todoId != null && _notifications.TryRemove(todoId, out var cts))
+        {
+            cts.Cancel();
+            cts.Dispose();
+        }
     }
+
+
+
 }
 
 public partial class ToDos : StackPanel

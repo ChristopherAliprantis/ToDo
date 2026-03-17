@@ -1,3 +1,7 @@
+#if DESKTOP
+extern alias DesktopLib;
+global using Notif = DesktopLib::H.NotifyIcon;
+#endif
 global using System.Collections.Immutable;
 global using Microsoft.Extensions.DependencyInjection;
 global using Microsoft.Extensions.Hosting;
@@ -9,4 +13,3 @@ global using Windows.Storage;
 global using System;
 global using System.Collections.Generic;
 global using Color = Microsoft.UI.Colors;
-global using Plugin.LocalNotification;

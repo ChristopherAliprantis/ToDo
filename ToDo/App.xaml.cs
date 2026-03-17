@@ -1,65 +1,58 @@
-
-using Microsoft.Maui.Hosting;
 using Uno.Resizetizer;
 
 namespace ToDo;
 
 public partial class App : Application
 {
-    /// <summary>
-    /// Initializes the singleton application object. This is the first line of authored code
-    /// executed, and as such is the logical equivalent of main() or WinMain().
-    /// </summary>
+#if DESKTOP
+    public Notif.TaskbarIcon? _trayIcon;
+#endif
+
     public App()
     {
         this.InitializeComponent();
     }
+
     public static Window? MainWindow { get; private set; }
     public IHost? Host { get; private set; }
-
     public static Frame? rootFrame;
-
 
     protected override void OnLaunched(LaunchActivatedEventArgs args)
     {
+        // 1. Setup Resources
+        Resources.Build(r => r.Merged(new XamlControlsResources()));
+        Resources.Build(r => r.Merged(new ToolkitResources()));
 
-        // Load WinUI Resources
-        Resources.Build(r => r.Merged(
-            new XamlControlsResources()));
-
-        // Load Uno.UI.Toolkit Resources
-        Resources.Build(r => r.Merged(
-            new ToolkitResources()));
+        // 2. Setup Builder
         var builder = this.CreateBuilder(args)
             .Configure(host => host
                 .UseStorage()
 #if DEBUG
-                // Switch to Development environment when running in DEBUG
                 .UseEnvironment(Environments.Development)
 #endif
                 .UseConfiguration(configure: configBuilder =>
-                    configBuilder
-                        .EmbeddedSource<App>()
+                    configBuilder.EmbeddedSource<App>()
                 )
-                // Enable localization (see appsettings.json for supported languages)
                 .UseLocalization()
-                .ConfigureServices((context, services) =>
-                {
-                    // TODO: Register your services
-                    //services.AddSingleton<IMyService, MyService>();
-                })
             );
+
         MainWindow = builder.Window;
         MainWindow.SetWindowIcon();
         MainWindow.Title = "ToDo";
         Host = builder.Build();
-        rootFrame = MainWindow.Content as Frame;
 
-        if (rootFrame == null)
+#if DESKTOP
+        _trayIcon = new Notif.TaskbarIcon
         {
-            rootFrame = new Frame();
-            MainWindow.Content = rootFrame;
-        }
+            IconSource = "ms-appx:///Assets/Icons/todoico.ico",
+            ToolTipText = "ToDo"
+        };
+        
+        _trayIcon.ForceCreate(); 
+#endif
+
+        rootFrame = MainWindow.Content as Frame ?? new Frame();
+        MainWindow.Content = rootFrame;
 
         if (rootFrame.Content == null)
         {
@@ -67,16 +60,5 @@ public partial class App : Application
         }
 
         MainWindow.Activate();
-
-    }
-
-    protected static MauiApp CreateMauiApp()
-    {
-        var builder = MauiApp.CreateBuilder();
-
-        builder
-            .UseLocalNotification(); 
-
-        return builder.Build();
     }
 }

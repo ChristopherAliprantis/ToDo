@@ -29,7 +29,6 @@
             Localization;
             ThemeService;
             SkiaRenderer;
-            MauiEmbedding;
         </UnoFeatures>
 
         <!-- Global Build Fixes -->
@@ -68,7 +67,8 @@
         <Folder Include="Platforms\Android\Resources\mipmap-xxxhdpi" />
     </ItemGroup>
 
-    <ItemGroup>
-      <PackageReference Include="Plugin.LocalNotification" Version="13.0.0" />
+    <ItemGroup Condition="'$(TargetFramework)' == 'net10.0-desktop'">
+        <PackageReference Include="H.NotifyIcon.Uno.WinUI" Version="2.4.1" Aliases="DesktopLib" />
     </ItemGroup>
+
 </Project>
