@@ -9,4 +9,3 @@ global using Windows.Storage;
 global using System;
 global using System.Collections.Generic;
 global using Color = Microsoft.UI.Colors;
-global using Windows.UI.Notifications;

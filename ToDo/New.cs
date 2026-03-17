@@ -1,5 +1,6 @@
 
 using static System.Runtime.InteropServices.JavaScript.JSType;
+using static ToDo.ToDos;
 
 namespace ToDo;
 
@@ -130,11 +131,13 @@ public sealed partial class New : Page // #if DESKTOP for all of skia desktop, #
         {
             if (date.Visibility == Visibility.Collapsed && time.Visibility == Visibility.Collapsed)
             {
-                MainPage.todos.ADD(title.Text, describe.Text, null, null);
+                MainPage.todos.ADD(title.Text, describe.Text, null, null, null);
             }
             else
             {
-                MainPage.todos.ADD(title.Text, describe.Text, Date, Time);
+                string ID = System.Guid.NewGuid().ToString();
+                MainPage.todos.ADD(title.Text, describe.Text, Date, Time, ID);
+
             }
             App.rootFrame.Navigate(typeof(MainPage));
         };

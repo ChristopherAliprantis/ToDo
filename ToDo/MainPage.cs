@@ -1,6 +1,7 @@
 namespace ToDo;
 
 using System.Text.Json;
+using static global::ToDo.ToDos;
 
 public sealed partial class MainPage : Page // #if DESKTOP for all of skia desktop, #if WINDOWS for windows, #if ANDROID for android.
 {
@@ -237,6 +238,44 @@ public class Helpers
         Grid.SetRow(which, row);
         Grid.SetColumn(which, col);
     }
+
+    public static void SendNotif(ToDos.ToDo todo)
+    {
+        if (!todo.Date.HasValue || !todo.Time.HasValue)
+        {
+            return;
+        }
+
+        System.DateTime scheduledTime = todo.Date.Value.Date + todo.Time.Value.ToTimeSpan();
+
+        if (scheduledTime <= System.DateTime.Now)
+        {
+            return;
+        }
+
+        var request = new Plugin.LocalNotification.NotificationRequest
+        {
+            NotificationId = todo.ID.GetHashCode(),
+            Title = todo.Title,
+            Description = todo.Descrip,
+            Schedule = new Plugin.LocalNotification.NotificationRequestSchedule
+            {
+                NotifyTime = scheduledTime
+            }
+        };
+
+        Plugin.LocalNotification.LocalNotificationCenter.Current.Show(request);
+    }
+
+
+
+    public static void CancelNotif(string todoId)
+    {
+        // You must use the EXACT same integer conversion you used when sending
+        int intId = todoId.GetHashCode();
+
+        Plugin.LocalNotification.LocalNotificationCenter.Current.Cancel(intId);
+    }
 }
 
 public partial class ToDos : StackPanel
@@ -266,12 +305,14 @@ public partial class ToDos : StackPanel
 
         public string? DTime;
         public string? DDate;
-        public ToDo(string title, string descrip, DateTime? date, TimeOnly? time)
+        public string? ID;
+        public ToDo(string title, string descrip, DateTime? date, TimeOnly? time, string? id)
         {
             Title = title;
             Descrip = descrip;
             Date = date;
             Time = time;
+            ID = id;
             if (Date == null)
             {
                 DDate = "";
@@ -332,15 +373,20 @@ public partial class ToDos : StackPanel
                 {
                     ((StackPanel)MainPage.todos.Children[i]).Children.Clear();
                 }
+                if (ID != null)Helpers.CancelNotif(this.ID);
                 MainPage.TODOS.Remove(this);
                 MainPage.todos.Save();
                 MainPage.todos.Load();
             };
         }
     }
-    public void ADD(string title, string descrip, DateTime? date, TimeOnly? time)
+    public void ADD(string title, string descrip, DateTime? date, TimeOnly? time, string? id)
     {
-        var N = new ToDo(title, descrip, date, time);
+        var N = new ToDo(title, descrip, date, time, id);
+        if (N.ID != null)
+        {
+            Helpers.SendNotif(N);
+        }
         MainPage.TODOS.Add(N);
         MainPage.todos.Save();
     }
@@ -392,7 +438,8 @@ public partial class ToDos : StackPanel
                     Title = t.Title,
                     Descrip = t.Descrip,
                     Date = t.Date,
-                    Time = t.Time
+                    Time = t.Time,
+                    ID = t.ID
                 });
             }
 
@@ -456,7 +503,8 @@ public partial class ToDos : StackPanel
                         d.Title ?? "",
                         d.Descrip ?? "",
                         d.Date,
-                        d.Time ));
+                        d.Time,
+                        d.ID ?? "" ));
             }
 
             MainPage.RebuildTodos();
@@ -477,4 +525,5 @@ public class ToDoData
     public DateTime? Date { get; set; }
 
     public TimeOnly? Time { get; set; }
+    public string? ID;
 }
