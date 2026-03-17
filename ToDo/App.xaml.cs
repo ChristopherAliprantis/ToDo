@@ -1,4 +1,5 @@
 
+using Microsoft.Maui.Hosting;
 using Uno.Resizetizer;
 
 namespace ToDo;
@@ -67,5 +68,15 @@ public partial class App : Application
 
         MainWindow.Activate();
 
+    }
+
+    protected static MauiApp CreateMauiApp()
+    {
+        var builder = MauiApp.CreateBuilder();
+
+        builder
+            .UseLocalNotification(); 
+
+        return builder.Build();
     }
 }
