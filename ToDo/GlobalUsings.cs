@@ -1,6 +1,3 @@
-#if DESKTOP
-global using Notif = H.NotifyIcon;
-#endif
 global using System.Collections.Immutable;
 global using Microsoft.Extensions.DependencyInjection;
 global using Microsoft.Extensions.Hosting;

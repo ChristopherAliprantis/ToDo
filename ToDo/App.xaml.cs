@@ -4,9 +4,6 @@ namespace ToDo;
 
 public partial class App : Application
 {
-#if DESKTOP
-    public static Notif.TaskbarIcon? _trayIcon;
-#endif
 
     public App()
     {
@@ -43,15 +40,6 @@ public partial class App : Application
         MainWindow.Title = "ToDo";
         Host = builder.Build();
 
-#if DESKTOP
-        _trayIcon = new Notif.TaskbarIcon
-        {
-            IconSource = "ms-appx:///Assets/Icons/todoico.ico",
-            ToolTipText = "ToDo"
-        };
-        
-        _trayIcon.ForceCreate(); 
-#endif
 
         rootFrame = MainWindow.Content as Frame ?? new Frame();
         MainWindow.Content = rootFrame;
