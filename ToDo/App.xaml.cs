@@ -1,4 +1,5 @@
 using Uno.Resizetizer;
+using static ToDo.Helpers;
 
 namespace ToDo;
 
@@ -9,7 +10,6 @@ public partial class App : Application
     {
         this.InitializeComponent();
     }
-
     public static Window? MainWindow { get; private set; }
     public IHost? Host { get; private set; }
     public static Frame? rootFrame;
@@ -34,7 +34,7 @@ public partial class App : Application
                 )
                 .UseLocalization()
             );
-
+        _ = Helpers.InitNotifications();
         MainWindow = builder.Window;
         MainWindow.SetWindowIcon();
         MainWindow.Title = "ToDo";

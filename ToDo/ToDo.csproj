@@ -67,4 +67,8 @@
         <Folder Include="Platforms\Android\Resources\mipmap-xxxhdpi" />
     </ItemGroup>
 
+    <ItemGroup>
+      <PackageReference Include="Shiny.Notifications" Version="3.3.4" />
+    </ItemGroup>
+
 </Project>

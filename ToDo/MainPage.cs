@@ -1,6 +1,8 @@
 namespace ToDo;
 
 using System.Text.Json;
+using Shiny.Notifications;
+using static global::ToDo.Helpers;
 
 public sealed partial class MainPage : Page // #if DESKTOP for all of skia desktop, #if WINDOWS for windows, #if ANDROID for android.
 {
@@ -238,27 +240,62 @@ public class Helpers
         Grid.SetColumn(which, col);
     }
 
-    private static readonly System.Collections.Concurrent.ConcurrentDictionary<string, System.Threading.Thread> _threads = new();
+    public static async Task InitNotifications()
+    {
+        var manager = Shiny.Hosting.Host.GetService<INotificationManager>();
 
-    public static void SendNotif(ToDos.ToDo todo)
+        manager.AddChannel(new Channel
+        {
+            Identifier = "high_priority",
+            Importance = ChannelImportance.High
+        });
+    }
+
+    public static async void SendNotif(ToDos.ToDo todo)
     {
         if (todo.Date == null || todo.Time == null || string.IsNullOrEmpty(todo.ID)) return;
 
-        System.DateTime scheduledTime = todo.Date.Value.Date + todo.Time.Value.ToTimeSpan();
-        System.TimeSpan delay = scheduledTime - System.DateTime.Now;
+        var manager = Shiny.Hosting.Host.GetService<INotificationManager>();
+        DateTime scheduledTime = todo.Date.Value.Date + todo.Time.Value.ToTimeSpan();
+
+        await manager.Send(new Notification
+        {
+            Id = todo.ID.GetHashCode(),
+            Title = todo.Title,
+            Message = todo.Descrip,
+            ScheduleDate = scheduledTime,
+            Channel = "high_priority",
+            Payload = new Dictionary<string, string> { { "TodoId", todo.ID } }
+        });
     }
 
-    public static void CancelNotif(string todoId)
+    public static async void CancelNotif(string todoId)
     {
-        
+        var manager = Shiny.Hosting.Host.GetService<INotificationManager>();
+        await manager.Cancel(todoId.GetHashCode());
     }
 
 
+    public class NotificationDelegate : INotificationDelegate
+    {
+        public async Task OnPresent(Notification notification)
+        {
+            if (notification.Payload.TryGetValue("TodoId", out var todoId))
+            {
+                ToDos.ToDo.DeleteById(todoId);
+            }
+        }
 
+        public async Task OnEntry(NotificationResponse response)
+        {
+        }
+    }
 
+}
 
-
-
+public class Notif : Notification
+{
+    public ToDos.ToDo? todo;
 }
 
 public partial class ToDos : StackPanel
@@ -366,6 +403,21 @@ public partial class ToDos : StackPanel
             MainPage.TODOS.Remove(this);
             MainPage.todos.Save();
             MainPage.todos.Load();
+        }
+
+        public static void DeleteById(string ID)
+        {
+            int i = 0;
+            int pos = 0;
+            foreach (ToDos.ToDo t in (MainPage.TODOS[i]))
+            {
+                if (t.ID == ID)
+                {
+                    pos = i;
+                }
+                i++;
+            }
+            MainPage.TODOS[pos].Delete();
         }
     }
     public void ADD(string title, string descrip, DateTime? date, TimeOnly? time, string? id)
@@ -515,29 +567,3 @@ public class ToDoData
     public TimeOnly? Time { get; set; }
     public string? ID;
 }
-
-#if __ANDROID__
-[Android.App.Service]
-public class NotificationService : Android.App.Service
-{
-    public override Android.App.StartCommandResult OnStartCommand(Android.Content.Intent intent, Android.App.StartCommandFlags flags, int startId)
-    {
-        var title = intent.GetStringExtra("title") ?? "ToDo";
-        var desc = intent.GetStringExtra("desc") ?? "Managing tasks...";
-        var channelId = "todo_notifications";
-
-        var notification = new Android.App.Notification.Builder(this, channelId)
-            .SetContentTitle(title) 
-            .SetContentText(desc)  
-            .SetSmallIcon(Android.Resource.Drawable.IcDialogInfo)
-            .SetOngoing(true)
-            .Build();
-
-        StartForeground(1001, notification);
-        return Android.App.StartCommandResult.Sticky;
-    }
-
-    public override Android.OS.IBinder OnBind(Android.Content.Intent intent) => null;
-}
-#endif
-
