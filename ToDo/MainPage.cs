@@ -238,7 +238,7 @@ public class Helpers
         Grid.SetColumn(which, col);
     }
 
-    private static readonly System.Collections.Concurrent.ConcurrentDictionary<string, System.Threading.CancellationTokenSource> _notifications = new();
+    private static readonly System.Collections.Concurrent.ConcurrentDictionary<string, System.Threading.Thread> _threads = new();
 
     public static void SendNotif(ToDos.ToDo todo)
     {
@@ -247,61 +247,77 @@ public class Helpers
         System.DateTime scheduledTime = todo.Date.Value.Date + todo.Time.Value.ToTimeSpan();
         System.TimeSpan delay = scheduledTime - System.DateTime.Now;
 
-        CancelNotif(todo.ID);
-        var cts = new System.Threading.CancellationTokenSource();
-        _notifications[todo.ID] = cts;
+        if (delay <= System.TimeSpan.Zero) return;
 
-        _ = System.Threading.Tasks.Task.Run(async () =>
+        CancelNotif(todo.ID);
+
+#if __ANDROID__
+        var context = Android.App.Application.Context;
+        var serviceIntent = new Android.Content.Intent(context, typeof(NotificationService));
+        serviceIntent.PutExtra("title", todo.Title);
+        serviceIntent.PutExtra("desc", todo.Descrip);
+        context.StartForegroundService(serviceIntent);
+#endif
+
+        var thread = new System.Threading.Thread(() =>
         {
             try
             {
-                if (delay > System.TimeSpan.Zero)
-                    await System.Threading.Tasks.Task.Delay(delay, cts.Token);
+                System.Threading.Thread.Sleep(delay);
 
-                Microsoft.UI.Dispatching.DispatcherQueue.GetForCurrentThread()?.TryEnqueue(() =>
+                App.MainDispatcher?.TryEnqueue(() =>
                 {
 #if DESKTOP
-                if (Microsoft.UI.Xaml.Application.Current.Resources.TryGetValue("MyTrayIcon", out var res) && 
-                    res is Notif.TaskbarIcon tray)
+                if (App._trayIcon != null)
                 {
-                    tray.ShowNotification(todo.Title, todo.Descrip);
+                    App._trayIcon.ShowNotification(todo.Title, todo.Descrip);
                 }
 #elif __ANDROID__
-                    var context = Android.App.Application.Context;
-                    var manager = context.GetSystemService(Android.Content.Context.NotificationService) as Android.App.NotificationManager;
-                    var channelId = "todo_notifications";
-
-                    if (Android.OS.Build.VERSION.SdkInt >= Android.OS.BuildVersionCodes.O)
-                    {
-                        var channel = new Android.App.NotificationChannel(channelId, "ToDo", Android.App.NotificationImportance.High);
-                        channel.EnableVibration(true);
-                        manager.CreateNotificationChannel(channel);
-                    }
-
-                    var builder = new Android.App.Notification.Builder(context, channelId)
+                    var manager = Android.App.Application.Context.GetSystemService(Android.Content.Context.NotificationService) as Android.App.NotificationManager;
+                    var builder = new Android.App.Notification.Builder(Android.App.Application.Context, "todo_notifications")
                         .SetContentTitle(todo.Title)
                         .SetContentText(todo.Descrip)
                         .SetSmallIcon(Android.Resource.Drawable.IcDialogInfo)
-                        .SetAutoCancel(true)
-                        .SetDefaults(Android.App.NotificationDefaults.All);
+                        .SetAutoCancel(true);
 
-                    manager.Notify(todo.ID.GetHashCode(), builder.Build());
+                    manager?.Notify(todo.ID.GetHashCode(), builder.Build());
+
+                    var ctx = Android.App.Application.Context;
+                    ctx.StopService(new Android.Content.Intent(ctx, typeof(NotificationService)));
 #endif
+                    todo.Delete();
+
+                    if (_threads.IsEmpty)
+                    {
+#if DESKTOP
+                    Microsoft.UI.Xaml.Application.Current.Exit();
+#endif
+                    }
                 });
-                _notifications.TryRemove(todo.ID, out _);
             }
-            catch (System.OperationCanceledException) { }
-        });
+            catch (System.Threading.ThreadInterruptedException) { }
+            finally { _threads.TryRemove(todo.ID, out _); }
+        })
+        {
+            IsBackground = true,
+            Name = $"Notif_{todo.ID}"
+        };
+
+        _threads[todo.ID] = thread;
+        thread.Start();
     }
 
     public static void CancelNotif(string todoId)
     {
-        if (todoId != null && _notifications.TryRemove(todoId, out var cts))
+        if (todoId != null && _threads.TryRemove(todoId, out var thread))
         {
-            cts.Cancel();
-            cts.Dispose();
+            thread.Interrupt();
         }
     }
+
+
+
+
 
 
 
@@ -398,15 +414,20 @@ public partial class ToDos : StackPanel
             };
             ((Button)content.Children[3]).Click += async (s, e) =>
             {
-                for (int i = 0; i < MainPage.todos.Children.Count; i++)
-                {
-                    ((StackPanel)MainPage.todos.Children[i]).Children.Clear();
-                }
-                if (ID != null)Helpers.CancelNotif(this.ID);
-                MainPage.TODOS.Remove(this);
-                MainPage.todos.Save();
-                MainPage.todos.Load();
+                Delete();
             };
+        }
+
+        public void Delete()
+        {
+            for (int i = 0; i < MainPage.todos.Children.Count; i++)
+            {
+                ((StackPanel)MainPage.todos.Children[i]).Children.Clear();
+            }
+            if (ID != null) Helpers.CancelNotif(this.ID);
+            MainPage.TODOS.Remove(this);
+            MainPage.todos.Save();
+            MainPage.todos.Load();
         }
     }
     public void ADD(string title, string descrip, DateTime? date, TimeOnly? time, string? id)
@@ -556,3 +577,29 @@ public class ToDoData
     public TimeOnly? Time { get; set; }
     public string? ID;
 }
+
+#if __ANDROID__
+[Android.App.Service]
+public class NotificationService : Android.App.Service
+{
+    public override Android.App.StartCommandResult OnStartCommand(Android.Content.Intent intent, Android.App.StartCommandFlags flags, int startId)
+    {
+        var title = intent.GetStringExtra("title") ?? "ToDo";
+        var desc = intent.GetStringExtra("desc") ?? "Managing tasks...";
+        var channelId = "todo_notifications";
+
+        var notification = new Android.App.Notification.Builder(this, channelId)
+            .SetContentTitle(title) 
+            .SetContentText(desc)  
+            .SetSmallIcon(Android.Resource.Drawable.IcDialogInfo)
+            .SetOngoing(true)
+            .Build();
+
+        StartForeground(1001, notification);
+        return Android.App.StartCommandResult.Sticky;
+    }
+
+    public override Android.OS.IBinder OnBind(Android.Content.Intent intent) => null;
+}
+#endif
+

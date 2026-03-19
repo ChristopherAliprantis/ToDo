@@ -1,6 +1,5 @@
 #if DESKTOP
-extern alias DesktopLib;
-global using Notif = DesktopLib::H.NotifyIcon;
+global using Notif = H.NotifyIcon;
 #endif
 global using System.Collections.Immutable;
 global using Microsoft.Extensions.DependencyInjection;

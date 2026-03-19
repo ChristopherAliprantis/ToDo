@@ -68,7 +68,7 @@
     </ItemGroup>
 
     <ItemGroup Condition="'$(TargetFramework)' == 'net10.0-desktop'">
-        <PackageReference Include="H.NotifyIcon.Uno.WinUI" Version="2.4.1" Aliases="DesktopLib" />
+        <PackageReference Include="H.NotifyIcon.Uno.WinUI" Version="2.4.1" />
     </ItemGroup>
 
 </Project>

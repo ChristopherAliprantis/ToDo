@@ -1,5 +1,11 @@
 ﻿<Application
     x:Class="ToDo.App"
-    xmlns="http://schemas.microsoft.com"
-    xmlns:x="http://schemas.microsoft.com">
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:ToDo"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:d="http://schemas.microsoft.com"
+    xmlns:android="http://uno.ui/android"
+    xmlns:desktop="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+
 </Application>
