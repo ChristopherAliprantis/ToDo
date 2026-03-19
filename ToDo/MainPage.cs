@@ -246,73 +246,11 @@ public class Helpers
 
         System.DateTime scheduledTime = todo.Date.Value.Date + todo.Time.Value.ToTimeSpan();
         System.TimeSpan delay = scheduledTime - System.DateTime.Now;
-
-        if (delay <= System.TimeSpan.Zero) return;
-
-        CancelNotif(todo.ID);
-
-#if __ANDROID__
-        var context = Android.App.Application.Context;
-        var serviceIntent = new Android.Content.Intent(context, typeof(NotificationService));
-        serviceIntent.PutExtra("title", todo.Title);
-        serviceIntent.PutExtra("desc", todo.Descrip);
-        context.StartForegroundService(serviceIntent);
-#endif
-
-        var thread = new System.Threading.Thread(() =>
-        {
-            try
-            {
-                System.Threading.Thread.Sleep(delay);
-
-                App.MainDispatcher?.TryEnqueue(() =>
-                {
-#if DESKTOP
-                if (App._trayIcon != null)
-                {
-                    App._trayIcon.ShowNotification(todo.Title, todo.Descrip);
-                }
-#elif __ANDROID__
-                    var manager = Android.App.Application.Context.GetSystemService(Android.Content.Context.NotificationService) as Android.App.NotificationManager;
-                    var builder = new Android.App.Notification.Builder(Android.App.Application.Context, "todo_notifications")
-                        .SetContentTitle(todo.Title)
-                        .SetContentText(todo.Descrip)
-                        .SetSmallIcon(Android.Resource.Drawable.IcDialogInfo)
-                        .SetAutoCancel(true);
-
-                    manager?.Notify(todo.ID.GetHashCode(), builder.Build());
-
-                    var ctx = Android.App.Application.Context;
-                    ctx.StopService(new Android.Content.Intent(ctx, typeof(NotificationService)));
-#endif
-                    todo.Delete();
-
-                    if (_threads.IsEmpty)
-                    {
-#if DESKTOP
-                    Microsoft.UI.Xaml.Application.Current.Exit();
-#endif
-                    }
-                });
-            }
-            catch (System.Threading.ThreadInterruptedException) { }
-            finally { _threads.TryRemove(todo.ID, out _); }
-        })
-        {
-            IsBackground = true,
-            Name = $"Notif_{todo.ID}"
-        };
-
-        _threads[todo.ID] = thread;
-        thread.Start();
     }
 
     public static void CancelNotif(string todoId)
     {
-        if (todoId != null && _threads.TryRemove(todoId, out var thread))
-        {
-            thread.Interrupt();
-        }
+        
     }
 
 
