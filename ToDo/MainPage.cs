@@ -239,64 +239,26 @@ public class Helpers
         Grid.SetRow(which, row);
         Grid.SetColumn(which, col);
     }
-
-    public static async Task InitNotifications()
-    {
-        var manager = Shiny.Hosting.Host.GetService<INotificationManager>();
-
-        manager.AddChannel(new Channel
-        {
-            Identifier = "high_priority",
-            Importance = ChannelImportance.High
-        });
-    }
+  });
 
     public static async void SendNotif(ToDos.ToDo todo)
     {
         if (todo.Date == null || todo.Time == null || string.IsNullOrEmpty(todo.ID)) return;
-
-        var manager = Shiny.Hosting.Host.GetService<INotificationManager>();
         DateTime scheduledTime = todo.Date.Value.Date + todo.Time.Value.ToTimeSpan();
 
-        await manager.Send(new Notification
-        {
-            Id = todo.ID.GetHashCode(),
-            Title = todo.Title,
-            Message = todo.Descrip,
-            ScheduleDate = scheduledTime,
-            Channel = "high_priority",
-            Payload = new Dictionary<string, string> { { "TodoId", todo.ID } }
-        });
+        
     }
 
     public static async void CancelNotif(string todoId)
     {
-        var manager = Shiny.Hosting.Host.GetService<INotificationManager>();
-        await manager.Cancel(todoId.GetHashCode());
+        
     }
 
 
-    public class NotificationDelegate : INotificationDelegate
-    {
-        public async Task OnPresent(Notification notification)
-        {
-            if (notification.Payload.TryGetValue("TodoId", out var todoId))
-            {
-                ToDos.ToDo.DeleteById(todoId);
-            }
-        }
-
-        public async Task OnEntry(NotificationResponse response)
-        {
-        }
-    }
 
 }
 
-public class Notif : Notification
-{
-    public ToDos.ToDo? todo;
-}
+
 
 public partial class ToDos : StackPanel
 {

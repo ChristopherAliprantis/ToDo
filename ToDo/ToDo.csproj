@@ -41,6 +41,7 @@
     <!-- DESKTOP ONLY: Fixes Original Filename and Metadata -->
     <PropertyGroup Condition="'$(TargetFramework)' == 'net10.0-desktop'">
         <ApplicationIcon>assets\icons\todoico.ico</ApplicationIcon>
+        <UnoIcon>assets\icons\todoico.ico</UnoIcon>
         <AssemblyName>ToDo</AssemblyName>
         <TargetName>ToDo</TargetName>
         <AssemblyTitle>ToDo, your ultimate time management app</AssemblyTitle>
@@ -65,10 +66,6 @@
         <Folder Include="Platforms\Android\Resources\mipmap-xhdpi" />
         <Folder Include="Platforms\Android\Resources\mipmap-xxhdpi" />
         <Folder Include="Platforms\Android\Resources\mipmap-xxxhdpi" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <PackageReference Include="Shiny.Notifications" Version="3.3.4" />
     </ItemGroup>
 
 </Project>

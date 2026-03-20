@@ -34,13 +34,10 @@ public partial class App : Application
                 )
                 .UseLocalization()
             );
-        _ = Helpers.InitNotifications();
         MainWindow = builder.Window;
         MainWindow.SetWindowIcon();
         MainWindow.Title = "ToDo";
         Host = builder.Build();
-
-
         rootFrame = MainWindow.Content as Frame ?? new Frame();
         MainWindow.Content = rootFrame;
 
