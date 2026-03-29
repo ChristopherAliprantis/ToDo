@@ -1,9 +1,6 @@
 namespace ToDo;
 
 using System.Text.Json;
-using Shiny.Notifications;
-using static global::ToDo.Helpers;
-
 public sealed partial class MainPage : Page // #if DESKTOP for all of skia desktop, #if WINDOWS for windows, #if ANDROID for android.
 {
     public static Windows.Foundation.Rect bounds;
@@ -239,9 +236,8 @@ public class Helpers
         Grid.SetRow(which, row);
         Grid.SetColumn(which, col);
     }
-  });
 
-    public static async void SendNotif(ToDos.ToDo todo)
+    public static void SendNotif(ToDos.ToDo todo)
     {
         if (todo.Date == null || todo.Time == null || string.IsNullOrEmpty(todo.ID)) return;
         DateTime scheduledTime = todo.Date.Value.Date + todo.Time.Value.ToTimeSpan();
@@ -249,7 +245,7 @@ public class Helpers
         
     }
 
-    public static async void CancelNotif(string todoId)
+    public static void CancelNotif(string todoId)
     {
         
     }

@@ -1,5 +1,4 @@
 using Uno.Resizetizer;
-using static ToDo.Helpers;
 
 namespace ToDo;
 
