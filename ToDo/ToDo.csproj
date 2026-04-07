@@ -14,7 +14,7 @@
         <Version>1</Version>
 
         <ApplicationPublisher>Christopher Aliprantis</ApplicationPublisher>
-        <Description>ToDo, your ultimate time management app.</Description>
+        <Description>ToDo</Description>
 	    <authors>Christopher Aliprantis</authors>
 
         <UnoDisableHotDesign>true</UnoDisableHotDesign>
