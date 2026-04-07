@@ -12,9 +12,8 @@
         <ApplicationDisplayVersion>1</ApplicationDisplayVersion>
         <ApplicationVersion>1</ApplicationVersion>
         <Version>1</Version>
-
         <ApplicationPublisher>Christopher Aliprantis</ApplicationPublisher>
-        <Description>ToDo</Description>
+        <Description>ToDo, your ultimate time management app</Description>
 	    <authors>Christopher Aliprantis</authors>
 
         <UnoDisableHotDesign>true</UnoDisableHotDesign>
@@ -44,7 +43,7 @@
         <UnoIcon>assets\icons\todoico.ico</UnoIcon>
         <AssemblyName>ToDo</AssemblyName>
         <TargetName>ToDo</TargetName>
-        <AssemblyTitle>ToDo, your ultimate time management app</AssemblyTitle>
+        <AssemblyTitle>ToDo</AssemblyTitle>
         <!-- This is what was causing Android errors; now it's isolated -->
         <UseAppHost>true</UseAppHost>
     </PropertyGroup>
