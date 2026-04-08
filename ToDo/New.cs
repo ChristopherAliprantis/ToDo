@@ -50,14 +50,15 @@ public sealed partial class New : Page // #if DESKTOP for all of skia desktop, #
                 (title = new TextBox
                 {
                     PlaceholderText = "Title",
-                    HorizontalAlignment = HorizontalAlignment.Left
+                    HorizontalAlignment = HorizontalAlignment.Left,
+                    TextWrapping = TextWrapping.Wrap,
+                    AcceptsReturn = true
                 }),
                 (describe = new TextBox
                 {
                     HorizontalAlignment = HorizontalAlignment.Left,
                     PlaceholderText = "Description",
-                    TextWrapping = TextWrapping.Wrap,
-
+                    AcceptsReturn = true
                 }),
                 (divide = new Rectangle
                 {
