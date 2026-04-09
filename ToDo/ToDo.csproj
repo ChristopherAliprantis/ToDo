@@ -42,6 +42,7 @@
         <ApplicationIcon>assets\icons\todoico.ico</ApplicationIcon>
         <UnoIcon>assets\icons\todoico.ico</UnoIcon>
         <AssemblyName>ToDo</AssemblyName>
+        <EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
         <TargetName>ToDo</TargetName>
         <AssemblyTitle>ToDo</AssemblyTitle>
         <!-- This is what was causing Android errors; now it's isolated -->
