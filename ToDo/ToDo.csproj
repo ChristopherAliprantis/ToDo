@@ -45,6 +45,8 @@
         <EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
         <TargetName>ToDo</TargetName>
         <AssemblyTitle>ToDo</AssemblyTitle>
+        <PublishReadyToRun>true</PublishReadyToRun>
+        <PublishReadyToRunComposite>true</PublishReadyToRunComposite>
         <!-- This is what was causing Android errors; now it's isolated -->
         <UseAppHost>true</UseAppHost>
     </PropertyGroup>
