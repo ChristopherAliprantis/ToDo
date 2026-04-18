@@ -347,11 +347,11 @@ public partial class ToDos : StackPanel
             };
             ((Button)content.Children[3]).Click += async (s, e) =>
             {
-                Delete();
+                await Delete();
             };
         }
 
-        public void Delete()
+        public async Task Delete()
         {
             for (int i = 0; i < MainPage.todos.Children.Count; i++)
             {
@@ -359,8 +359,8 @@ public partial class ToDos : StackPanel
             }
             if (ID != null) Helpers.CancelNotif(this.ID);
             MainPage.TODOS.Remove(this);
-            MainPage.todos.Save();
-            MainPage.todos.Load();
+            await MainPage.todos.Save();
+            await MainPage.todos.Load();
         }
 
         public static void DeleteById(string ID)
