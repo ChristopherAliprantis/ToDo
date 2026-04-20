@@ -1,8 +1,12 @@
 {
   "profiles": {
-    "ToDo (Desktop)": {
+    "ToDo (WinAppSDK Unpackaged)": {
       "commandName": "Project",
-      "compatibleTargetFramework": "desktop"
+      "compatibleTargetFramework": "windows"
+    },
+    "ToDo (WinAppSDK Packaged)": {
+      "commandName": "MsixPackage",
+      "compatibleTargetFramework": "windows"
     }
   }
 }
