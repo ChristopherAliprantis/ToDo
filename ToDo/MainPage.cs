@@ -367,7 +367,7 @@ public partial class ToDos : StackPanel
         {
             int i = 0;
             int pos = 0;
-            foreach (ToDos.ToDo t in (MainPage.TODOS[i]))
+            foreach (ToDo t in (MainPage.TODOS))
             {
                 if (t.ID == ID)
                 {

@@ -270,7 +270,7 @@ public sealed partial class New : Page // #if DESKTOP for all of skia desktop, #
 }
 
 
-class UpDownBox : UserControl
+partial class UpDownBox : UserControl
 {
     public string? Text;
     public Button? up;
