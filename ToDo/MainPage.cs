@@ -363,7 +363,7 @@ public partial class ToDos : StackPanel
             await MainPage.todos.Load();
         }
 
-        public static void DeleteById(string ID)
+        public static async Task DeleteById(string ID)
         {
             int i = 0;
             int pos = 0;
@@ -375,7 +375,7 @@ public partial class ToDos : StackPanel
                 }
                 i++;
             }
-            MainPage.TODOS[pos].Delete();
+            await MainPage.TODOS[pos].Delete();
         }
     }
     public void ADD(string title, string descrip, DateTime? date, TimeOnly? time, string? id)
