@@ -31,8 +31,6 @@
         </UnoFeatures>
 
         <!-- Global Build Fixes -->
-        <NeutralLanguage>en-US</NeutralLanguage>
-        <DefaultLanguage>en-US</DefaultLanguage>
         <SkipResourcesGenerator>true</SkipResourcesGenerator>
         <UnoDeployOptionalResources>false</UnoDeployOptionalResources>
     </PropertyGroup>
