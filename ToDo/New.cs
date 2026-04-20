@@ -142,7 +142,7 @@ public sealed partial class New : Page // #if DESKTOP for all of skia desktop, #
         var scroll = new ScrollViewer
         {
             HorizontalScrollBarVisibility = ScrollBarVisibility.Hidden,
-#if DESKTOP
+#if DESKTOP || WINDOWS
             VerticalScrollBarVisibility = ScrollBarVisibility.Visible,
 #else
             VerticalScrollBarVisibility = ScrollBarVisibility.Hidden,
@@ -156,7 +156,7 @@ public sealed partial class New : Page // #if DESKTOP for all of skia desktop, #
             all.Width = this.ActualWidth;
             space.Height = new GridLength(this.ActualHeight / 9.2, GridUnitType.Pixel);
             all.Spacing = this.ActualHeight / 96;
-#if DESKTOP
+#if DESKTOP || WINDOWS
             back.Height = this.ActualHeight / 17.3;
 #else
             if (bounds.Width > bounds.Height)
@@ -183,7 +183,7 @@ public sealed partial class New : Page // #if DESKTOP for all of skia desktop, #
             {
                 describe.Height = this.ActualHeight / 3.3;
             }
-#elif DESKTOP
+#elif DESKTOP || WINDOWS
             describe.Height = this.ActualHeight / 3.3;
 #endif
             describe.Width = describe.Height * 0.8;
@@ -213,7 +213,7 @@ public sealed partial class New : Page // #if DESKTOP for all of skia desktop, #
             all.Width = this.ActualWidth;
             space.Height = new GridLength(this.ActualHeight / 9.2, GridUnitType.Pixel);
             all.Spacing = this.ActualHeight / 96;
-#if DESKTOP
+#if DESKTOP || WINDOWS
             back.Height = this.ActualHeight / 17.3;
 #else
             if (bounds.Width > bounds.Height)
@@ -240,7 +240,7 @@ public sealed partial class New : Page // #if DESKTOP for all of skia desktop, #
             {
                 describe.Height = this.ActualHeight / 3.3;
             }
-#elif DESKTOP
+#elif DESKTOP || WINDOWS
             describe.Height = this.ActualHeight / 3.3;
 #endif
             describe.Width = describe.Height * 0.8;
