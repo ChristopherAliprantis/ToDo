@@ -1,19 +1,14 @@
 using System;
 using System.Diagnostics;
-using System.IO;
 using Microsoft.Win32;
-
-using Path = System.IO.Path;
+using Path = System.IO.Path; // Explicit alias to avoid Shape collision
 
 namespace ToDo.Win32;
 
 public class Win32NotificationService : INotificationService
 {
-    private readonly string _iconPath;
-
     public Win32NotificationService()
     {
-        _iconPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "assets", "icons", "todoico.ico");
         RegisterApp();
     }
 
@@ -21,18 +16,23 @@ public class Win32NotificationService : INotificationService
     {
         try
         {
+            // Registers 'ToDo' so the Toast header and Action Center show the correct name
             using var key = Registry.CurrentUser.CreateSubKey(@"Software\Classes\AppUserModelId\ToDo");
             key.SetValue("DisplayName", "ToDo");
-            if (File.Exists(_iconPath)) key.SetValue("IconUri", _iconPath);
+
+            // Reference to your icon from the csproj assets
+            string iconPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "assets", "icons", "todoico.ico");
+            if (System.IO.File.Exists(iconPath)) key.SetValue("IconUri", iconPath);
         }
-        catch { /* Registry access might fail without admin, but script still runs */ }
+        catch { }
     }
 
     public void ScheduleNotification(string title, string message, DateTimeOffset scheduleTime, string actionData)
     {
+        // 'actionData' is your ToDo ID; used here to name the signal file
         string signalPath = Path.Combine(Path.GetTempPath(), $"todo_click_{actionData}.txt");
 
-        // PowerShell script using ToDo AppId and scenario=reminder
+        // PowerShell script to trigger a native Windows Toast with 'ToDo' branding
         string toastScript = $"[Windows.UI.Notifications.ToastNotificationManager, Windows.UI.Notifications, ContentType = WindowsRuntime] | Out-Null; " +
                              $"$template = [Windows.UI.Notifications.ToastNotificationManager]::GetTemplateContent([Windows.UI.Notifications.ToastTemplateType]::ToastText02); " +
                              $"$xml = [xml]$template.GetXml(); " +
@@ -51,6 +51,7 @@ public class Win32NotificationService : INotificationService
         }
         else
         {
+            // Real OS scheduling via Windows Task Scheduler
             string taskName = $"ToDo_Notif_{actionData.GetHashCode()}";
             string cmd = $"/Create /SC ONCE /TN {taskName} /TR \"powershell -WindowStyle Hidden -Command {toastScript}\" /ST {scheduleTime.ToString("HH:mm")} /SD {scheduleTime.ToString("MM/dd/yyyy")} /F /IT /RL HIGHEST";
             Process.Start(new ProcessStartInfo { FileName = "schtasks.exe", Arguments = cmd, CreateNoWindow = true });

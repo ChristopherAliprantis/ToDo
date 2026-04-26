@@ -13,11 +13,12 @@ public class AndroidNotificationService : INotificationService
         var intent = new Intent(context, typeof(NotificationReceiver));
         intent.PutExtra("title", title);
         intent.PutExtra("message", message);
-        intent.PutExtra("data", actionData);
+        intent.PutExtra("action_data", actionData); // ID used for deletion later
 
         var pending = PendingIntent.GetBroadcast(context, actionData.GetHashCode(), intent, PendingIntentFlags.UpdateCurrent | PendingIntentFlags.Immutable);
         var alarmManager = (AlarmManager)context.GetSystemService(Context.AlarmService);
 
+        // Native AlarmManager handles the scheduling even if app is closed
         alarmManager.SetExactAndAllowWhileIdle(AlarmType.RtcWakeup, scheduleTime.ToUnixTimeMilliseconds(), pending);
     }
 
@@ -37,12 +38,13 @@ public class NotificationReceiver : BroadcastReceiver
     {
         var title = intent.GetStringExtra("title");
         var message = intent.GetStringExtra("message");
-        var data = intent.GetStringExtra("data");
+        var data = intent.GetStringExtra("action_data");
         var channelId = "urgent_reminders";
 
         if (Android.OS.Build.VERSION.SdkInt >= Android.OS.BuildVersionCodes.O)
         {
-            var channel = new NotificationChannel(channelId, "Reminders", NotificationImportance.High);
+            // High importance for 'peek' and 'sound' behavior
+            var channel = new NotificationChannel(channelId, "Urgent Reminders", NotificationImportance.High);
             ((NotificationManager)context.GetSystemService(Context.NotificationService)).CreateNotificationChannel(channel);
         }
 
@@ -51,10 +53,12 @@ public class NotificationReceiver : BroadcastReceiver
         var pending = PendingIntent.GetActivity(context, 0, clickIntent, PendingIntentFlags.UpdateCurrent | PendingIntentFlags.Immutable);
 
         var builder = new NotificationCompat.Builder(context, channelId)
-            .SetContentTitle(title).SetContentText(message)
+            .SetContentTitle(title)
+            .SetContentText(message)
             .SetSmallIcon(global::Android.Resource.Drawable.IcDialogInfo)
             .SetPriority(NotificationCompat.PriorityHigh)
-            .SetContentIntent(pending).SetAutoCancel(true);
+            .SetContentIntent(pending)
+            .SetAutoCancel(true);
 
         NotificationManagerCompat.From(context).Notify(data.GetHashCode(), builder.Build());
     }
