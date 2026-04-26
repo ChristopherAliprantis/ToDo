@@ -69,8 +69,4 @@
         <Folder Include="Platforms\Android\Resources\mipmap-xxxhdpi" />
     </ItemGroup>
 
-    <ItemGroup>
-      <PackageReference Include="CommunityToolkit.WinUI.Notifications" Version="7.1.2" />
-    </ItemGroup>
-
 </Project>

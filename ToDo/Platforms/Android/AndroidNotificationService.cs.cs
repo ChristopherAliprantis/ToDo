@@ -15,11 +15,18 @@ namespace ToDo.Droid
             intent.PutExtra("message", message);
             intent.PutExtra("data", actionData);
 
-            var pendingIntent = PendingIntent.GetBroadcast(context, new Random().Next(), intent,
-                PendingIntentFlags.UpdateCurrent | PendingIntentFlags.Immutable);
-
+            var pendingIntent = PendingIntent.GetBroadcast(context, actionData.GetHashCode(), intent, PendingIntentFlags.UpdateCurrent | PendingIntentFlags.Immutable);
             var alarmManager = (AlarmManager)context.GetSystemService(Context.AlarmService);
+
             alarmManager.SetExactAndAllowWhileIdle(AlarmType.RtcWakeup, scheduleTime.ToUnixTimeMilliseconds(), pendingIntent);
+        }
+
+        public void CancelNotification(string actionData)
+        {
+            var context = Application.Context;
+            var intent = new Intent(context, typeof(NotificationReceiver));
+            var pendingIntent = PendingIntent.GetBroadcast(context, actionData.GetHashCode(), intent, PendingIntentFlags.UpdateCurrent | PendingIntentFlags.Immutable);
+            ((AlarmManager)context.GetSystemService(Context.AlarmService)).Cancel(pendingIntent);
         }
     }
 
@@ -30,21 +37,25 @@ namespace ToDo.Droid
         {
             var title = intent.GetStringExtra("title");
             var message = intent.GetStringExtra("message");
-            var channelId = "todo_notifications";
+            var data = intent.GetStringExtra("data");
+            var channelId = "urgent_reminders";
 
             if (Android.OS.Build.VERSION.SdkInt >= Android.OS.BuildVersionCodes.O)
             {
-                var channel = new NotificationChannel(channelId, "To-Do Reminders", NotificationImportance.High);
+                // Importance.High makes it pop up (peek) and make sound
+                var channel = new NotificationChannel(channelId, "Urgent Reminders", NotificationImportance.High);
                 ((NotificationManager)context.GetSystemService(Context.NotificationService)).CreateNotificationChannel(channel);
             }
 
             var builder = new NotificationCompat.Builder(context, channelId)
-                .SetContentTitle(title) // Becomes Bold/Large
-                .SetContentText(message) // Becomes Normal/Small
+                .SetContentTitle(title)
+                .SetContentText(message)
                 .SetSmallIcon(global::Android.Resource.Drawable.IcDialogInfo)
+                .SetPriority(NotificationCompat.PriorityHigh) // High Priority for older Android versions
+                .SetCategory(NotificationCompat.CategoryReminder)
                 .SetAutoCancel(true);
 
-            NotificationManagerCompat.From(context).Notify(new Random().Next(), builder.Build());
+            NotificationManagerCompat.From(context).Notify(data.GetHashCode(), builder.Build());
         }
     }
 }
