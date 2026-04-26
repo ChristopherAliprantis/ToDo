@@ -13,13 +13,14 @@ public class AndroidNotificationService : INotificationService
         var intent = new Intent(context, typeof(NotificationReceiver));
         intent.PutExtra("title", title);
         intent.PutExtra("message", message);
-        intent.PutExtra("action_data", actionData); // ID used for deletion later
+        intent.PutExtra("action_data", actionData);
 
         var pending = PendingIntent.GetBroadcast(context, actionData.GetHashCode(), intent, PendingIntentFlags.UpdateCurrent | PendingIntentFlags.Immutable);
         var alarmManager = (AlarmManager)context.GetSystemService(Context.AlarmService);
 
-        // Native AlarmManager handles the scheduling even if app is closed
-        alarmManager.SetExactAndAllowWhileIdle(AlarmType.RtcWakeup, scheduleTime.ToUnixTimeMilliseconds(), pending);
+        // Using SetAlarmClock is the 'High Priority' way to wake the phone
+        var info = new AlarmManager.AlarmClockInfo(scheduleTime.ToUnixTimeMilliseconds(), pending);
+        alarmManager.SetAlarmClock(info, pending);
     }
 
     public void CancelNotification(string actionData)
@@ -27,7 +28,9 @@ public class AndroidNotificationService : INotificationService
         var context = Application.Context;
         var intent = new Intent(context, typeof(NotificationReceiver));
         var pending = PendingIntent.GetBroadcast(context, actionData.GetHashCode(), intent, PendingIntentFlags.UpdateCurrent | PendingIntentFlags.Immutable);
-        ((AlarmManager)context.GetSystemService(Context.AlarmService)).Cancel(pending);
+
+        var alarmManager = (AlarmManager)context.GetSystemService(Context.AlarmService);
+        alarmManager.Cancel(pending);
     }
 }
 
@@ -43,11 +46,12 @@ public class NotificationReceiver : BroadcastReceiver
 
         if (Android.OS.Build.VERSION.SdkInt >= Android.OS.BuildVersionCodes.O)
         {
-            // High importance for 'peek' and 'sound' behavior
+            // Set to High Importance so it pops up (peeks) at the user
             var channel = new NotificationChannel(channelId, "Urgent Reminders", NotificationImportance.High);
             ((NotificationManager)context.GetSystemService(Context.NotificationService)).CreateNotificationChannel(channel);
         }
 
+        // Setup the intent so clicking the notification opens the app
         var clickIntent = new Intent(context, typeof(MainActivity));
         clickIntent.PutExtra("action_data", data);
         var pending = PendingIntent.GetActivity(context, 0, clickIntent, PendingIntentFlags.UpdateCurrent | PendingIntentFlags.Immutable);
