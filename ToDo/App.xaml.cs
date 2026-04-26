@@ -12,6 +12,7 @@ public partial class App : Application
     public static Window? MainWindow { get; private set; }
     public IHost? Host { get; private set; }
     public static Frame? rootFrame;
+    public static INotificationService NotificationService { get; private set; }
     public static Microsoft.UI.Dispatching.DispatcherQueue? MainDispatcher { get; private set; }
 
     protected override void OnLaunched(LaunchActivatedEventArgs args)
@@ -33,6 +34,13 @@ public partial class App : Application
                 )
                 .UseLocalization()
             );
+
+#if __ANDROID__
+        // global:: tells it to look for the NAMESPACE ToDo, not your CLASS ToDo
+        NotificationService = new global::ToDo.Droid.AndroidNotificationService();
+#elif WIN32
+        NotificationService = new global::ToDo.Win32.Win32NotificationService();
+#endif
         MainWindow = builder.Window;
         MainWindow.SetWindowIcon();
         MainWindow.Title = "ToDo";

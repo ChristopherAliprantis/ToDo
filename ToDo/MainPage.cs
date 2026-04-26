@@ -254,6 +254,11 @@ public class Helpers
 
 }
 
+public interface INotificationService
+{
+    void ScheduleNotification(string title, string message, DateTimeOffset scheduleTime, string actionData);
+}
+
 
 
 public partial class ToDos : StackPanel
