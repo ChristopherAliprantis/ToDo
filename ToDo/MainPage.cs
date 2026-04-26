@@ -237,26 +237,12 @@ public class Helpers
         Grid.SetColumn(which, col);
     }
 
-    public static void SendNotif(ToDos.ToDo todo)
-    {
-        if (todo.Date == null || todo.Time == null || string.IsNullOrEmpty(todo.ID)) return;
-        DateTime scheduledTime = todo.Date.Value.Date + todo.Time.Value.ToTimeSpan();
-
-        
-    }
-
-    public static void CancelNotif(string todoId)
-    {
-        
-    }
-
-
-
 }
 
 public interface INotificationService
 {
     void ScheduleNotification(string title, string message, DateTimeOffset scheduleTime, string actionData);
+    void CancelNotification(string actionData);
 }
 
 
@@ -362,7 +348,7 @@ public partial class ToDos : StackPanel
             {
                 ((StackPanel)MainPage.todos.Children[i]).Children.Clear();
             }
-            if (ID != null) Helpers.CancelNotif(this.ID);
+            if (ID != null) await Notifications.CancelNotif(this.ID);
             MainPage.TODOS.Remove(this);
             await MainPage.todos.Save();
             await MainPage.todos.Load();
@@ -383,12 +369,12 @@ public partial class ToDos : StackPanel
             await MainPage.TODOS[pos].Delete();
         }
     }
-    public void ADD(string title, string descrip, DateTime? date, TimeOnly? time, string? id)
+    public async Task ADD(string title, string descrip, DateTime? date, TimeOnly? time, string? id)
     {
         var N = new ToDo(title, descrip, date, time, id);
         if (N.ID != null)
         {
-            Helpers.SendNotif(N);
+            await Notifications.SendNotif(N);
         }
         MainPage.TODOS.Add(N);
         MainPage.todos.Save();

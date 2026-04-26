@@ -125,7 +125,7 @@ public sealed partial class New : Page // #if DESKTOP for all of skia desktop, #
         {
             App.rootFrame.Navigate(typeof(MainPage));
         };
-        done.Click += (s, e) =>
+        done.Click += async(s, e) =>
         {
             if (date.Visibility == Visibility.Collapsed && time.Visibility == Visibility.Collapsed)
             {
@@ -134,7 +134,7 @@ public sealed partial class New : Page // #if DESKTOP for all of skia desktop, #
             else
             {
                 string ID = System.Guid.NewGuid().ToString();
-                MainPage.todos.ADD(title.Text, describe.Text, Date, Time, ID);
+                await MainPage.todos.ADD(title.Text, describe.Text, Date, Time, ID);
 
             }
             App.rootFrame.Navigate(typeof(MainPage));

@@ -4,11 +4,16 @@ namespace ToDo;
 
 public partial class App : Application
 {
-
     public App()
     {
         this.InitializeComponent();
     }
+
+    // --- ADDED FIELD HERE ---
+#if __UNO_SKIA_WIN32__
+    private System.IO.FileSystemWatcher? _clickWatcher;
+#endif
+
     public static Window? MainWindow { get; private set; }
     public IHost? Host { get; private set; }
     public static Frame? rootFrame;
@@ -18,11 +23,10 @@ public partial class App : Application
     protected override void OnLaunched(LaunchActivatedEventArgs args)
     {
         MainDispatcher = Microsoft.UI.Dispatching.DispatcherQueue.GetForCurrentThread();
-        // 1. Setup Resources
+
         Resources.Build(r => r.Merged(new XamlControlsResources()));
         Resources.Build(r => r.Merged(new ToolkitResources()));
 
-        // 2. Setup Builder
         var builder = this.CreateBuilder(args)
             .Configure(host => host
                 .UseStorage()
@@ -36,10 +40,10 @@ public partial class App : Application
             );
 
 #if __ANDROID__
-        // global:: tells it to look for the NAMESPACE ToDo, not your CLASS ToDo
         NotificationService = new global::ToDo.Droid.AndroidNotificationService();
-#elif WIN32
+#elif __UNO_SKIA_WIN32__
         NotificationService = new global::ToDo.Win32.Win32NotificationService();
+        StartWindowsNotificationListener();
 #endif
         MainWindow = builder.Window;
         MainWindow.SetWindowIcon();
@@ -54,5 +58,30 @@ public partial class App : Application
         }
 
         MainWindow.Activate();
+    }
+
+    private void StartWindowsNotificationListener()
+    {
+#if __UNO_SKIA_WIN32__
+        string tempPath = System.IO.Path.GetTempPath();
+
+        _clickWatcher = new System.IO.FileSystemWatcher(tempPath, "todo_click_*.txt");
+        
+        _clickWatcher.Created += (s, e) =>
+        {
+            string id = System.IO.Path.GetFileNameWithoutExtension(e.Name)
+                            .Replace("todo_click_", "");
+
+            try { System.IO.File.Delete(e.FullPath); } catch { }
+
+            // Use the MainDispatcher to run the deletion safely
+            MainDispatcher?.TryEnqueue(async () => 
+            {
+                await global::ToDo.Notifications.CancelNotif(id);
+            });
+        };
+
+        _clickWatcher.EnableRaisingEvents = true;
+#endif
     }
 }
