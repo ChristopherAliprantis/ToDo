@@ -17,6 +17,7 @@ public class AndroidNotificationService : INotificationService
 
         var pending = PendingIntent.GetBroadcast(context, actionData.GetHashCode(), intent, PendingIntentFlags.UpdateCurrent | PendingIntentFlags.Immutable);
         var alarmManager = (AlarmManager)context.GetSystemService(Context.AlarmService);
+
         alarmManager.SetExactAndAllowWhileIdle(AlarmType.RtcWakeup, scheduleTime.ToUnixTimeMilliseconds(), pending);
     }
 

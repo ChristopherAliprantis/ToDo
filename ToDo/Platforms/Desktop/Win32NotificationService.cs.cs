@@ -1,15 +1,38 @@
 using System;
 using System.Diagnostics;
 using System.IO;
+using Microsoft.Win32;
+
+using Path = System.IO.Path;
 
 namespace ToDo.Win32;
 
 public class Win32NotificationService : INotificationService
 {
+    private readonly string _iconPath;
+
+    public Win32NotificationService()
+    {
+        _iconPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "assets", "icons", "todoico.ico");
+        RegisterApp();
+    }
+
+    private void RegisterApp()
+    {
+        try
+        {
+            using var key = Registry.CurrentUser.CreateSubKey(@"Software\Classes\AppUserModelId\ToDo");
+            key.SetValue("DisplayName", "ToDo");
+            if (File.Exists(_iconPath)) key.SetValue("IconUri", _iconPath);
+        }
+        catch { /* Registry access might fail without admin, but script still runs */ }
+    }
+
     public void ScheduleNotification(string title, string message, DateTimeOffset scheduleTime, string actionData)
     {
-        string signalPath = System.IO.Path.Combine(System.IO.Path.GetTempPath(), $"todo_click_{actionData}.txt");
+        string signalPath = Path.Combine(Path.GetTempPath(), $"todo_click_{actionData}.txt");
 
+        // PowerShell script using ToDo AppId and scenario=reminder
         string toastScript = $"[Windows.UI.Notifications.ToastNotificationManager, Windows.UI.Notifications, ContentType = WindowsRuntime] | Out-Null; " +
                              $"$template = [Windows.UI.Notifications.ToastNotificationManager]::GetTemplateContent([Windows.UI.Notifications.ToastTemplateType]::ToastText02); " +
                              $"$xml = [xml]$template.GetXml(); " +
@@ -20,7 +43,7 @@ public class Win32NotificationService : INotificationService
                              $"$textNodes.Item(1).AppendChild($xml.CreateTextNode('{message}')) | Out-Null; " +
                              $"$toastXml = [Windows.Data.Xml.Dom.XmlDocument]::new(); $toastXml.LoadXml($xml.OuterXml); " +
                              $"$toast = [Windows.UI.Notifications.ToastNotification]::new($toastXml); " +
-                             $"[Windows.UI.Notifications.ToastNotificationManager]::CreateToastNotifier('ToDoApp').Show($toast);";
+                             $"[Windows.UI.Notifications.ToastNotificationManager]::CreateToastNotifier('ToDo').Show($toast);";
 
         if (scheduleTime <= DateTimeOffset.Now)
         {
