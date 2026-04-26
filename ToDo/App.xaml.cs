@@ -9,7 +9,6 @@ public partial class App : Application
         this.InitializeComponent();
     }
 
-    // --- ADDED FIELD HERE ---
 #if __UNO_SKIA_WIN32__
     private System.IO.FileSystemWatcher? _clickWatcher;
 #endif
@@ -44,7 +43,26 @@ public partial class App : Application
 #elif __UNO_SKIA_WIN32__
         NotificationService = new global::ToDo.Win32.Win32NotificationService();
         StartWindowsNotificationListener();
+
+        // --- HOUSEKEEPING: Clear old Windows Task Scheduler entries ---
+        try
+        {
+            System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo 
+            { 
+                FileName = "schtasks.exe", 
+                Arguments = "/Delete /TN ToDo_Notif_* /F", 
+                CreateNoWindow = true 
+            });
+        }
+        catch { }
 #endif
+
+        // --- CLEANUP: Auto-delete tasks that expired while app was closed ---
+        MainDispatcher?.TryEnqueue(async () =>
+        {
+            await Notifications.CleanupPastTasks();
+        });
+
         MainWindow = builder.Window;
         MainWindow.SetWindowIcon();
         MainWindow.Title = "ToDo";
@@ -74,7 +92,6 @@ public partial class App : Application
 
             try { System.IO.File.Delete(e.FullPath); } catch { }
 
-            // Use the MainDispatcher to run the deletion safely
             MainDispatcher?.TryEnqueue(async () => 
             {
                 await global::ToDo.Notifications.CancelNotif(id);

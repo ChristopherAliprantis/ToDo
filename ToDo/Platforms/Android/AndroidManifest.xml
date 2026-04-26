@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.christopheraliprantis.todo">
-    <!-- Required to show notifications -->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+          package="com.christopheraliprantis.todo"
+          android:versionCode="1"
+          android:versionName="1.0">
+
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
-    <!-- Required for the Real OS Scheduling (AlarmManager) -->
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
 
     <application
@@ -11,8 +13,8 @@
         android:label="ToDo"
         android:theme="@style/UnoAppTheme"
         android:icon="@mipmap/appicon">
+        <!-- Add this back for your icon -->
 
-        <!-- This is your main app window -->
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -24,8 +26,6 @@
             </intent-filter>
         </activity>
 
-        <!-- The 'Catcher' for your notifications -->
         <receiver android:name=".NotificationReceiver" android:enabled="true" android:exported="false" />
-
     </application>
 </manifest>
