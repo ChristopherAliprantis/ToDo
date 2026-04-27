@@ -16,7 +16,13 @@ public class MainActivity : Microsoft.UI.Xaml.ApplicationActivity
     protected override void OnCreate(Bundle? savedInstanceState)
     {
         global::AndroidX.Core.SplashScreen.SplashScreen.InstallSplashScreen(this);
-
+        if (Build.VERSION.SdkInt >= BuildVersionCodes.Tiramisu)
+        {
+            if (CheckSelfPermission(Android.Manifest.Permission.PostNotifications) != Android.Content.PM.Permission.Granted)
+            {
+                RequestPermissions(new[] { Android.Manifest.Permission.PostNotifications }, 1000);
+            }
+        }
         base.OnCreate(savedInstanceState);
     }
 

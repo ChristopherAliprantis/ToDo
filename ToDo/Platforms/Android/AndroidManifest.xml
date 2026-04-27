@@ -4,8 +4,14 @@
           android:versionCode="1"
           android:versionName="1.0">
 
+    <!-- Notifications (Android 13+) -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
+    <!-- Exact alarms (Android 12+) -->
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+
+    <!-- Needed for alarms to survive reboot (optional but recommended) -->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <application
         android:allowBackup="true"
@@ -13,19 +19,24 @@
         android:label="ToDo"
         android:theme="@style/UnoAppTheme"
         android:icon="@mipmap/appicon">
-        <!-- Add this back for your icon -->
 
         <activity
             android:name=".MainActivity"
             android:exported="true"
             android:configChanges="orientation|screenSize|keyboardHidden"
             android:windowSoftInputMode="adjustPan">
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
-        <receiver android:name=".NotificationReceiver" android:enabled="true" android:exported="false" />
+        <!-- Notification trigger -->
+        <receiver
+          android:name="ToDo.Droid.AndroidNotificationService+NotificationReceiver"
+          android:enabled="true"
+          android:exported="false" />
+
     </application>
 </manifest>
