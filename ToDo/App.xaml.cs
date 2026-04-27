@@ -39,24 +39,6 @@ public partial class App : Application
 #elif __UNO_SKIA_WIN32__
         NotificationService = new global::ToDo.Win32.Win32NotificationService();
 #endif
-
-        // --- CLEANUP: Auto-delete tasks that expired while app was closed ---
-        MainDispatcher?.TryEnqueue(async() =>
-        {
-            foreach (var todo in MainPage.TODOS)
-            {
-                if (todo.Date == null || todo.Time == null) continue;
-
-                DateTime scheduledTime = todo.Date.Value.Date + todo.Time.Value.ToTimeSpan();
-
-                // If the task is older than right now, wipe it
-                if (scheduledTime < DateTime.Now)
-                {
-                    await ToDos.ToDo.DeleteById(todo.ID);
-                }
-            }
-        });
-
         MainWindow = builder.Window;
         MainWindow.SetWindowIcon();
         MainWindow.Title = "ToDo";
