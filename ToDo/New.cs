@@ -152,25 +152,6 @@ public sealed partial class New : Page // #if DESKTOP for all of skia desktop, #
         };
         this.Loaded += (s, e) =>
         {
-            App.MainDispatcher?.TryEnqueue(async () =>
-            {
-                List<int> Is = new(0);
-                foreach (var todo in MainPage.TODOS)
-                {
-                    if (todo.Date == null || todo.Time == null) continue;
-
-                    DateTime scheduledTime = todo.Date.Value.Date + todo.Time.Value.ToTimeSpan();
-
-                    if (scheduledTime < DateTime.Now)
-                    {
-                        Is.Add(MainPage.TODOS.IndexOf(todo));
-                    }
-                }
-                for (int i = 0; i < Is.Count; i++)
-                {
-                    await MainPage.TODOS[Is[i]].Delete();
-                }
-            });
             var bounds = App.MainWindow.Bounds;
             all.Width = this.ActualWidth;
             space.Height = new GridLength(this.ActualHeight / 9.2, GridUnitType.Pixel);
@@ -228,25 +209,6 @@ public sealed partial class New : Page // #if DESKTOP for all of skia desktop, #
         };
         this.SizeChanged += (s,e) =>
         {
-            App.MainDispatcher?.TryEnqueue(async () =>
-            {
-                List<int> Is = new(0);
-                foreach (var todo in MainPage.TODOS)
-                {
-                    if (todo.Date == null || todo.Time == null) continue;
-
-                    DateTime scheduledTime = todo.Date.Value.Date + todo.Time.Value.ToTimeSpan();
-
-                    if (scheduledTime < DateTime.Now)
-                    {
-                        Is.Add(MainPage.TODOS.IndexOf(todo));
-                    }
-                }
-                for (int i = 0; i < Is.Count; i++)
-                {
-                    await MainPage.TODOS[Is[i]].Delete();
-                }
-            });
             var bounds = App.MainWindow.Bounds;
             all.Width = this.ActualWidth;
             space.Height = new GridLength(this.ActualHeight / 9.2, GridUnitType.Pixel);

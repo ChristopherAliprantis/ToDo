@@ -54,27 +54,24 @@ public sealed partial class MainPage : Page // #if DESKTOP for all of skia deskt
 #endif
             Content = todos
         };
-        this.SizeChanged += (s, e) =>
+        this.SizeChanged += async(s, e) =>
         {
-            App.MainDispatcher?.TryEnqueue(async () =>
+            List<int> Is = new(0);
+            foreach (var todo in MainPage.TODOS)
             {
-                List<int> Is = new(0);
-                foreach (var todo in MainPage.TODOS)
-                {
-                    if (todo.Date == null || todo.Time == null) continue;
+                if (todo.Date == null || todo.Time == null) continue;
 
-                    DateTime scheduledTime = todo.Date.Value.Date + todo.Time.Value.ToTimeSpan();
+                DateTime scheduledTime = todo.Date.Value.Date + todo.Time.Value.ToTimeSpan();
 
-                    if (scheduledTime < DateTime.Now)
-                    {
-                        Is.Add(MainPage.TODOS.IndexOf(todo));
-                    }
-                }
-                for (int i = 0; i < Is.Count; i++)
+                if (scheduledTime < DateTime.Now)
                 {
-                    await MainPage.TODOS[Is[i]].Delete();
+                    Is.Add(MainPage.TODOS.IndexOf(todo));
                 }
-            });
+            }
+            for (int i = 0; i < Is.Count; i++)
+            {
+                await MainPage.TODOS[Is[i]].Delete();
+            }
             w = this.ActualWidth;
             h = this.ActualHeight;
 
@@ -127,27 +124,24 @@ public sealed partial class MainPage : Page // #if DESKTOP for all of skia deskt
             NEW.FontSize = Bar.Width / 3.2;
             RebuildTodos();
         };
-        this.Loaded += (s, e) =>
+        this.Loaded += async(s, e) =>
         {
-            App.MainDispatcher?.TryEnqueue(async () =>
+            List<int> Is = new(0);
+            foreach (var todo in MainPage.TODOS)
             {
-                List<int> Is = new(0);
-                foreach (var todo in MainPage.TODOS)
-                {
-                    if (todo.Date == null || todo.Time == null) continue;
+                if (todo.Date == null || todo.Time == null) continue;
 
-                    DateTime scheduledTime = todo.Date.Value.Date + todo.Time.Value.ToTimeSpan();
+                DateTime scheduledTime = todo.Date.Value.Date + todo.Time.Value.ToTimeSpan();
 
-                    if (scheduledTime < DateTime.Now)
-                    {
-                        Is.Add(MainPage.TODOS.IndexOf(todo));
-                    }
-                }
-                for (int i = 0; i < Is.Count; i++)
+                if (scheduledTime < DateTime.Now)
                 {
-                    await MainPage.TODOS[Is[i]].Delete();
+                    Is.Add(MainPage.TODOS.IndexOf(todo));
                 }
-            });
+            }
+            for (int i = 0; i < Is.Count; i++)
+            {
+                await MainPage.TODOS[Is[i]].Delete();
+            }
             w = this.ActualWidth;
             h = this.ActualHeight;
 

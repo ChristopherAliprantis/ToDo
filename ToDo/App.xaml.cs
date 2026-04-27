@@ -14,11 +14,8 @@ public partial class App : Application
     public IHost? Host { get; private set; }
     public static Frame? rootFrame;
     public static INotificationService NotificationService { get; private set; }
-    public static Microsoft.UI.Dispatching.DispatcherQueue? MainDispatcher { get; private set; }
-
     protected override void OnLaunched(LaunchActivatedEventArgs args)
     {
-        MainDispatcher = Microsoft.UI.Dispatching.DispatcherQueue.GetForCurrentThread();
 
         Resources.Build(r => r.Merged(new XamlControlsResources()));
         Resources.Build(r => r.Merged(new ToolkitResources()));
