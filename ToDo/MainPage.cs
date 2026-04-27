@@ -58,17 +58,21 @@ public sealed partial class MainPage : Page // #if DESKTOP for all of skia deskt
         {
             App.MainDispatcher?.TryEnqueue(async () =>
             {
+                List<int> Is = new(0);
                 foreach (var todo in MainPage.TODOS)
                 {
                     if (todo.Date == null || todo.Time == null) continue;
 
                     DateTime scheduledTime = todo.Date.Value.Date + todo.Time.Value.ToTimeSpan();
 
-                    // If the task is older than right now, wipe it
                     if (scheduledTime < DateTime.Now)
                     {
-                        await ToDos.ToDo.DeleteById(todo.ID);
+                        Is.Add(MainPage.TODOS.IndexOf(todo));
                     }
+                }
+                for (int i = 0; i < Is.Count; i++)
+                {
+                    await MainPage.TODOS[Is[i]].Delete();
                 }
             });
             w = this.ActualWidth;
@@ -127,17 +131,21 @@ public sealed partial class MainPage : Page // #if DESKTOP for all of skia deskt
         {
             App.MainDispatcher?.TryEnqueue(async () =>
             {
+                List<int> Is = new(0);
                 foreach (var todo in MainPage.TODOS)
                 {
                     if (todo.Date == null || todo.Time == null) continue;
 
                     DateTime scheduledTime = todo.Date.Value.Date + todo.Time.Value.ToTimeSpan();
 
-                    // If the task is older than right now, wipe it
                     if (scheduledTime < DateTime.Now)
                     {
-                        await ToDos.ToDo.DeleteById(todo.ID);
+                        Is.Add(MainPage.TODOS.IndexOf(todo));
                     }
+                }
+                for (int i = 0; i < Is.Count; i++)
+                {
+                    await MainPage.TODOS[Is[i]].Delete();
                 }
             });
             w = this.ActualWidth;
