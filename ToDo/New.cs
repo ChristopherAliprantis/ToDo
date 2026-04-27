@@ -152,6 +152,21 @@ public sealed partial class New : Page // #if DESKTOP for all of skia desktop, #
         };
         this.Loaded += (s, e) =>
         {
+            App.MainDispatcher?.TryEnqueue(async () =>
+            {
+                foreach (var todo in MainPage.TODOS)
+                {
+                    if (todo.Date == null || todo.Time == null) continue;
+
+                    DateTime scheduledTime = todo.Date.Value.Date + todo.Time.Value.ToTimeSpan();
+
+                    // If the task is older than right now, wipe it
+                    if (scheduledTime < DateTime.Now)
+                    {
+                        await ToDos.ToDo.DeleteById(todo.ID);
+                    }
+                }
+            });
             var bounds = App.MainWindow.Bounds;
             all.Width = this.ActualWidth;
             space.Height = new GridLength(this.ActualHeight / 9.2, GridUnitType.Pixel);
@@ -209,6 +224,21 @@ public sealed partial class New : Page // #if DESKTOP for all of skia desktop, #
         };
         this.SizeChanged += (s,e) =>
         {
+            App.MainDispatcher?.TryEnqueue(async () =>
+            {
+                foreach (var todo in MainPage.TODOS)
+                {
+                    if (todo.Date == null || todo.Time == null) continue;
+
+                    DateTime scheduledTime = todo.Date.Value.Date + todo.Time.Value.ToTimeSpan();
+
+                    // If the task is older than right now, wipe it
+                    if (scheduledTime < DateTime.Now)
+                    {
+                        await ToDos.ToDo.DeleteById(todo.ID);
+                    }
+                }
+            });
             var bounds = App.MainWindow.Bounds;
             all.Width = this.ActualWidth;
             space.Height = new GridLength(this.ActualHeight / 9.2, GridUnitType.Pixel);

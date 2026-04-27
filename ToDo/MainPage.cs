@@ -56,6 +56,21 @@ public sealed partial class MainPage : Page // #if DESKTOP for all of skia deskt
         };
         this.SizeChanged += (s, e) =>
         {
+            App.MainDispatcher?.TryEnqueue(async () =>
+            {
+                foreach (var todo in MainPage.TODOS)
+                {
+                    if (todo.Date == null || todo.Time == null) continue;
+
+                    DateTime scheduledTime = todo.Date.Value.Date + todo.Time.Value.ToTimeSpan();
+
+                    // If the task is older than right now, wipe it
+                    if (scheduledTime < DateTime.Now)
+                    {
+                        await ToDos.ToDo.DeleteById(todo.ID);
+                    }
+                }
+            });
             w = this.ActualWidth;
             h = this.ActualHeight;
 
@@ -110,6 +125,21 @@ public sealed partial class MainPage : Page // #if DESKTOP for all of skia deskt
         };
         this.Loaded += (s, e) =>
         {
+            App.MainDispatcher?.TryEnqueue(async () =>
+            {
+                foreach (var todo in MainPage.TODOS)
+                {
+                    if (todo.Date == null || todo.Time == null) continue;
+
+                    DateTime scheduledTime = todo.Date.Value.Date + todo.Time.Value.ToTimeSpan();
+
+                    // If the task is older than right now, wipe it
+                    if (scheduledTime < DateTime.Now)
+                    {
+                        await ToDos.ToDo.DeleteById(todo.ID);
+                    }
+                }
+            });
             w = this.ActualWidth;
             h = this.ActualHeight;
 
@@ -348,7 +378,7 @@ public partial class ToDos : StackPanel
             {
                 ((StackPanel)MainPage.todos.Children[i]).Children.Clear();
             }
-            if (ID != null) await Notifications.CancelNotif(this.ID);
+            if (ID is not null) await Notifications.CancelNotif(this.ID);
             MainPage.TODOS.Remove(this);
             await MainPage.todos.Save();
             await MainPage.todos.Load();

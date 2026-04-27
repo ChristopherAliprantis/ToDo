@@ -57,9 +57,6 @@
     <AndroidResgenExtraArgs>--no-version-vectors</AndroidResgenExtraArgs>
 </PropertyGroup>
     <Import Project="keystore.targets" /> <!-- for people that downloaded this from github, this is a file where I had keystore properties, I .gitignored it, because it has private info.-->
-    <ItemGroup>
-      <Compile Include="Platforms\Desktop\Win32NotificationService.cs.cs" />
-    </ItemGroup>
 
     <ItemGroup>
         <Folder Include="Platforms\Android\Resources\mipmap-mdpi" />

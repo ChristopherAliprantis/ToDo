@@ -9,9 +9,6 @@ public partial class App : Application
         this.InitializeComponent();
     }
 
-#if __UNO_SKIA_WIN32__
-    private System.IO.FileSystemWatcher? _clickWatcher;
-#endif
 
     public static Window? MainWindow { get; private set; }
     public IHost? Host { get; private set; }
@@ -37,30 +34,27 @@ public partial class App : Application
                 )
                 .UseLocalization()
             );
-
 #if __ANDROID__
         NotificationService = new global::ToDo.Droid.AndroidNotificationService();
 #elif __UNO_SKIA_WIN32__
         NotificationService = new global::ToDo.Win32.Win32NotificationService();
-        StartWindowsNotificationListener();
-
-        // --- HOUSEKEEPING: Clear old Windows Task Scheduler entries ---
-        try
-        {
-            System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo 
-            { 
-                FileName = "schtasks.exe", 
-                Arguments = "/Delete /TN ToDo_Notif_* /F", 
-                CreateNoWindow = true 
-            });
-        }
-        catch { }
 #endif
 
         // --- CLEANUP: Auto-delete tasks that expired while app was closed ---
-        MainDispatcher?.TryEnqueue(async () =>
+        MainDispatcher?.TryEnqueue(async() =>
         {
-            await Notifications.CleanupPastTasks();
+            foreach (var todo in MainPage.TODOS)
+            {
+                if (todo.Date == null || todo.Time == null) continue;
+
+                DateTime scheduledTime = todo.Date.Value.Date + todo.Time.Value.ToTimeSpan();
+
+                // If the task is older than right now, wipe it
+                if (scheduledTime < DateTime.Now)
+                {
+                    await ToDos.ToDo.DeleteById(todo.ID);
+                }
+            }
         });
 
         MainWindow = builder.Window;
@@ -76,29 +70,5 @@ public partial class App : Application
         }
 
         MainWindow.Activate();
-    }
-
-    private void StartWindowsNotificationListener()
-    {
-#if __UNO_SKIA_WIN32__
-        string tempPath = System.IO.Path.GetTempPath();
-
-        _clickWatcher = new System.IO.FileSystemWatcher(tempPath, "todo_click_*.txt");
-        
-        _clickWatcher.Created += (s, e) =>
-        {
-            string id = System.IO.Path.GetFileNameWithoutExtension(e.Name)
-                            .Replace("todo_click_", "");
-
-            try { System.IO.File.Delete(e.FullPath); } catch { }
-
-            MainDispatcher?.TryEnqueue(async () => 
-            {
-                await global::ToDo.Notifications.CancelNotif(id);
-            });
-        };
-
-        _clickWatcher.EnableRaisingEvents = true;
-#endif
     }
 }
