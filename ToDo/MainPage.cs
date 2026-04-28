@@ -13,7 +13,13 @@ public sealed partial class MainPage : Page // #if DESKTOP for all of skia deskt
     public static Grid? H;
     public MainPage()
     {
-        todos.Load();
+        App.MainDispatcher.TryEnqueue(async() =>
+        {
+            await todos.Load();
+            await Helpers.DeleteExpiredNotifs();
+            await todos.Save();
+        });
+        
         var Bar = new StackPanel
         {
             Height = 0,
@@ -56,22 +62,6 @@ public sealed partial class MainPage : Page // #if DESKTOP for all of skia deskt
         };
         this.SizeChanged += async(s, e) =>
         {
-            List<int> Is = new(0);
-            foreach (var todo in MainPage.TODOS)
-            {
-                if (todo.Date == null || todo.Time == null) continue;
-
-                DateTime scheduledTime = todo.Date.Value.Date + todo.Time.Value.ToTimeSpan();
-
-                if (scheduledTime < DateTime.Now)
-                {
-                    Is.Add(MainPage.TODOS.IndexOf(todo));
-                }
-            }
-            for (int i = 0; i < Is.Count; i++)
-            {
-                await MainPage.TODOS[Is[i]].Delete();
-            }
             w = this.ActualWidth;
             h = this.ActualHeight;
 
@@ -126,22 +116,6 @@ public sealed partial class MainPage : Page // #if DESKTOP for all of skia deskt
         };
         this.Loaded += async(s, e) =>
         {
-            List<int> Is = new(0);
-            foreach (var todo in MainPage.TODOS)
-            {
-                if (todo.Date == null || todo.Time == null) continue;
-
-                DateTime scheduledTime = todo.Date.Value.Date + todo.Time.Value.ToTimeSpan();
-
-                if (scheduledTime < DateTime.Now)
-                {
-                    Is.Add(MainPage.TODOS.IndexOf(todo));
-                }
-            }
-            for (int i = 0; i < Is.Count; i++)
-            {
-                await MainPage.TODOS[Is[i]].Delete();
-            }
             w = this.ActualWidth;
             h = this.ActualHeight;
 
@@ -267,6 +241,26 @@ public class Helpers
         grid.Children.Add(which);
         Grid.SetRow(which, row);
         Grid.SetColumn(which, col);
+    }
+
+    public static async Task DeleteExpiredNotifs()
+    {
+        List<int> Is = new(0);
+        foreach (var todo in MainPage.TODOS)
+        {
+            if (todo.Date == null || todo.Time == null) continue;
+
+            DateTime scheduledTime = todo.Date.Value.Date + todo.Time.Value.ToTimeSpan();
+
+            if (scheduledTime < DateTime.Now)
+            {
+                Is.Add(MainPage.TODOS.IndexOf(todo));
+            }
+        }
+        for (int i = 0; i < Is.Count; i++)
+        {
+            await MainPage.TODOS[Is[i]].Delete();
+        }
     }
 
 }
@@ -409,7 +403,7 @@ public partial class ToDos : StackPanel
             await Notifications.SendNotif(N);
         }
         MainPage.TODOS.Add(N);
-        MainPage.todos.Save();
+        await MainPage.todos.Save();
     }
     public void AddBack(ToDo? thing)
     {
