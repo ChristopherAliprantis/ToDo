@@ -5,7 +5,7 @@ public sealed partial class MainPage : Page // #if DESKTOP for all of skia deskt
 {
     public static Windows.Foundation.Rect bounds;
     public static ToDos todos = new();
-    public static List<ToDos.ToDo?>? TODOS = new();
+    public static List<ToDos.ToDo?>? TODOS = new(0);
     public static double h;
     public static double w;
     public static double avail;
@@ -13,13 +13,8 @@ public sealed partial class MainPage : Page // #if DESKTOP for all of skia deskt
     public static Grid? H;
     public MainPage()
     {
-        App.MainDispatcher.TryEnqueue(async() =>
-        {
-            await todos.Load();
-            await Helpers.DeleteExpiredNotifs();
-            await todos.Save();
-        });
         
+
         var Bar = new StackPanel
         {
             Height = 0,
@@ -116,6 +111,13 @@ public sealed partial class MainPage : Page // #if DESKTOP for all of skia deskt
         };
         this.Loaded += async(s, e) =>
         {
+            if (TODOS.Count != 0) await todos.Load();
+            else await todos.Save();
+            await Task.Run(async () =>
+            {
+                await Helpers.DeleteExpiredNotifs();
+                await todos.Save();
+            });
             w = this.ActualWidth;
             h = this.ActualHeight;
 
@@ -245,7 +247,8 @@ public class Helpers
 
     public static async Task DeleteExpiredNotifs()
     {
-        List<int> Is = new(0);
+        var toDelete = new List<ToDos.ToDo>();
+
         foreach (var todo in MainPage.TODOS)
         {
             if (todo.Date == null || todo.Time == null) continue;
@@ -254,12 +257,13 @@ public class Helpers
 
             if (scheduledTime < DateTime.Now)
             {
-                Is.Add(MainPage.TODOS.IndexOf(todo));
+                toDelete.Add(todo);
             }
         }
-        for (int i = 0; i < Is.Count; i++)
+
+        foreach (var todo in toDelete)
         {
-            await MainPage.TODOS[Is[i]].Delete();
+            await todo.Delete();
         }
     }
 
@@ -374,7 +378,7 @@ public partial class ToDos : StackPanel
             {
                 ((StackPanel)MainPage.todos.Children[i]).Children.Clear();
             }
-            if (ID is not null) await Notifications.CancelNotif(this.ID);
+            if (!string.IsNullOrWhiteSpace(ID)) await Notifications.CancelNotif(this.ID);
             MainPage.TODOS.Remove(this);
             await MainPage.todos.Save();
             await MainPage.todos.Load();
