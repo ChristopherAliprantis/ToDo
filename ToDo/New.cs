@@ -129,7 +129,7 @@ public sealed partial class New : Page // #if DESKTOP for all of skia desktop, #
         {
             if (date.Visibility == Visibility.Collapsed && time.Visibility == Visibility.Collapsed)
             {
-                MainPage.todos.ADD(title.Text, describe.Text, null, null, null);
+                await MainPage.todos.ADD(title.Text, describe.Text, null, null, null);
             }
             else
             {
