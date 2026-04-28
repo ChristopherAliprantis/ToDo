@@ -34,9 +34,9 @@
 
         <!-- Notification trigger -->
         <receiver
-          android:name="ToDo.Droid.AndroidNotificationService+NotificationReceiver"
-          android:enabled="true"
-          android:exported="false" />
+            android:name="ToDo.Droid.NotificationReceiver"
+            android:enabled="true"
+            android:exported="false" />
 
     </application>
 </manifest>
