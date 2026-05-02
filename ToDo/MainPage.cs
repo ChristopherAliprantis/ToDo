@@ -1,5 +1,4 @@
 namespace ToDo;
-
 using System.Text.Json;
 public sealed partial class MainPage : Page // #if DESKTOP for all of skia desktop, #if WINDOWS for windows, #if ANDROID for android.
 {
@@ -13,8 +12,9 @@ public sealed partial class MainPage : Page // #if DESKTOP for all of skia deskt
     public static Grid? H;
     public MainPage()
     {
-        
-
+        todos.Load();
+        Helpers.DeleteExpiredNotifs();
+        todos.Save();
         var Bar = new StackPanel
         {
             Height = 0,
@@ -56,7 +56,7 @@ public sealed partial class MainPage : Page // #if DESKTOP for all of skia deskt
             Content = todos
         };
         this.SizeChanged += async(s, e) =>
-        {
+        { 
             w = this.ActualWidth;
             h = this.ActualHeight;
 
@@ -111,13 +111,6 @@ public sealed partial class MainPage : Page // #if DESKTOP for all of skia deskt
         };
         this.Loaded += async(s, e) =>
         {
-            if (TODOS.Count != 0) await todos.Load();
-            else await todos.Save();
-            await Task.Run(async () =>
-            {
-                await Helpers.DeleteExpiredNotifs();
-                await todos.Save();
-            });
             w = this.ActualWidth;
             h = this.ActualHeight;
 

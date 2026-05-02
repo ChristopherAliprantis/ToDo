@@ -29,7 +29,7 @@ public class Win32NotificationService : INotificationService
         {
             FileName = "schtasks.exe",
             Arguments = $"/Create /SC ONCE /TN \"ToDo_Notif_{id}\" /TR \"{ps}\" /ST {st} /SD {sd} /F",
-            UseShellExecute = false,
+            UseShellExecute = true,
             CreateNoWindow = true
         });
     }
@@ -42,7 +42,7 @@ public class Win32NotificationService : INotificationService
         {
             FileName = "schtasks.exe",
             Arguments = $"/Delete /TN \"ToDo_Notif_{id}\" /F",
-            UseShellExecute = false,
+            UseShellExecute = true,
             CreateNoWindow = true
         });
     }
