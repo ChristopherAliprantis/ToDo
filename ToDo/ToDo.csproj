@@ -66,8 +66,9 @@
         <Folder Include="Platforms\Android\Resources\mipmap-xxhdpi" />
         <Folder Include="Platforms\Android\Resources\mipmap-xxxhdpi" />
     </ItemGroup>
-    <ItemGroup Condition="$(TargetFramework.Contains('-desktop'))">
-        <PackageReference Include="Microsoft.Toolkit.Uwp.Notifications" Version="7.1.3" />
+
+    <ItemGroup>
+      <PackageReference Include="Microsoft.Toolkit.Uwp.Notifications" Version="7.1.3" />
     </ItemGroup>
 
 
