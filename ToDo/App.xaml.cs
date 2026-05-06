@@ -1,4 +1,7 @@
 using Uno.Resizetizer;
+#if WIN32 || __UNO_SKIA_WIN32__ || DESKTOP
+using Microsoft.Toolkit.Uwp.Notifications;
+#endif
 
 namespace ToDo;
 
@@ -8,7 +11,6 @@ public partial class App : Application
     {
         this.InitializeComponent();
     }
-
 
     public static Window? MainWindow { get; private set; }
     public IHost? Host { get; private set; }
@@ -34,17 +36,51 @@ public partial class App : Application
                 )
                 .UseLocalization()
             );
+
 #if __ANDROID__
         NotificationService = new global::ToDo.Droid.AndroidNotificationService();
-#elif __UNO_SKIA_WIN32__
+#elif WIN32 || __UNO_SKIA_WIN32__
+        try
+        {
+            // 1. Dynamic registration to avoid namespace collision at compile time
+            var toastType = Type.GetType("Microsoft.Toolkit.Uwp.Notifications.ToastNotificationManagerCompat, Microsoft.Toolkit.Uwp.Notifications");
+            if (toastType != null)
+            {
+                // Register identity
+                var registerMethod = toastType.GetMethod("RegisterAppIdentifier");
+                registerMethod?.Invoke(null, new object[] { "com.christopheraliprantis.todo" });
+
+                // Set up click handler
+                var onActivatedEvent = toastType.GetEvent("OnActivated");
+                if (onActivatedEvent != null)
+                {
+                    // Note: You can also use 'dynamic' here for easier access
+                    toastType.GetProperty("OnActivated")?.SetValue(null, (Action<dynamic>)(args => {
+                        MainDispatcher?.TryEnqueue(() => HandleNotificationClick(args.Argument));
+                    }));
+                }
+            }
+        }
+        catch { /* Fallback if library isn't loaded */ }
+
         NotificationService = new global::ToDo.Win32.Win32NotificationService();
 #endif
+
+
+
         MainWindow = builder.Window;
         MainWindow.SetWindowIcon();
         MainWindow.Title = "ToDo";
         Host = builder.Build();
+        
         rootFrame = MainWindow.Content as Frame ?? new Frame();
         MainWindow.Content = rootFrame;
+
+        // 3. Handle click if the app was launched FROM a closed state
+        if (!string.IsNullOrEmpty(args.Arguments))
+        {
+            HandleNotificationClick(args.Arguments);
+        }
 
         if (rootFrame.Content == null)
         {
@@ -52,5 +88,15 @@ public partial class App : Application
         }
 
         MainWindow.Activate();
+    }
+
+    private void HandleNotificationClick(string arguments)
+    {
+        // Simple logic to navigate or act on the notification data
+        if (arguments.Contains("id="))
+        {
+            // You can implement your navigation logic here
+            // e.g., rootFrame?.Navigate(typeof(TaskDetailPage), arguments);
+        }
     }
 }
