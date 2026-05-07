@@ -7,6 +7,12 @@ namespace ToDo;
 
 public partial class App : Application
 {
+    [DllImport("WinRTapis.dll",
+    CallingConvention = CallingConvention.StdCall,
+    CharSet = CharSet.Unicode)]
+    public static extern void RegisterAppForToasts(
+    string AppId,
+    string AppName);
     public App()
     {
         this.InitializeComponent();
@@ -40,7 +46,7 @@ public partial class App : Application
 #if __ANDROID__
         NotificationService = new global::ToDo.Droid.AndroidNotificationService();
 #elif WIN32 || __UNO_SKIA_WIN32__
-        try
+        /*try
         {
             // 1. Dynamic registration to avoid namespace collision at compile time
             var toastType = Type.GetType("Microsoft.Toolkit.Uwp.Notifications.ToastNotificationManagerCompat, Microsoft.Toolkit.Uwp.Notifications");
@@ -61,8 +67,8 @@ public partial class App : Application
                 }
             }
         }
-        catch { /* Fallback if library isn't loaded */ }
-
+        catch {  Fallback if library isn't loaded } */
+        RegisterAppForToasts("com.christopheraliprantis.todo", "ToDo");
         NotificationService = new global::ToDo.Win32.Win32NotificationService();
 #endif
 

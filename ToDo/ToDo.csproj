@@ -34,6 +34,7 @@
         <!-- Global Build Fixes -->
         <SkipResourcesGenerator>true</SkipResourcesGenerator>
         <UnoDeployOptionalResources>false</UnoDeployOptionalResources>
+        <Platforms>AnyCPU;x64</Platforms>
     </PropertyGroup>
 
     <!-- DESKTOP ONLY: Fixes Original Filename and Metadata -->
@@ -58,6 +59,14 @@
     <AndroidResgenExtraArgs>--no-version-vectors</AndroidResgenExtraArgs>
 </PropertyGroup>
     <Import Project="keystore.targets" /> <!-- for people that downloaded this from github, this is a file where I had keystore properties, I .gitignored it, because it has private info.-->
+    <ItemGroup>
+      <None Remove="WinRTapis.dll" />
+    </ItemGroup>
+    <ItemGroup>
+      <Content Include="WinRTapis.dll">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+    </ItemGroup>
 
     <ItemGroup>
         <Folder Include="Platforms\Android\Resources\mipmap-mdpi" />
