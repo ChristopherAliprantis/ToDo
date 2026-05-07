@@ -22,7 +22,7 @@ public partial class App : Application
     public IHost? Host { get; private set; }
     
     public static Frame? rootFrame;
-    public static INotificationService NotificationService { get; private set; }
+    public static INotificationService? NotificationService { get; private set; }
     public static Microsoft.UI.Dispatching.DispatcherQueue? MainDispatcher { get; private set; }
 
     protected override void OnLaunched(LaunchActivatedEventArgs args)
@@ -70,6 +70,7 @@ public partial class App : Application
         catch {  Fallback if library isn't loaded } */
         RegisterAppForToasts("com.christopheraliprantis.todo", "ToDo");
         NotificationService = new global::ToDo.Win32.Win32NotificationService();
+        //global::ToDo.Win32.Win32NotificationService.ShowToast("Registered", "Your ToDo installation has registered with Windows");
 #endif
 
 
