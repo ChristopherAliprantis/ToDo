@@ -13,6 +13,7 @@
   </Folder>
   <Project Path="ToDo/ToDo.csproj">
     <Platform Solution="*|x64" Project="x64" />
-    <Deploy />
+    <Deploy Solution="*|x64" />
+    <Deploy Solution="Release|Any CPU" />
   </Project>
 </Solution>
