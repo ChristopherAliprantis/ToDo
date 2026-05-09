@@ -59,10 +59,7 @@
     <AndroidResgenExtraArgs>--no-version-vectors</AndroidResgenExtraArgs>
 </PropertyGroup>
     <Import Project="keystore.targets" /> <!-- for people that downloaded this from github, this is a file where I had keystore properties, I .gitignored it, because it has private info.-->
-    <ItemGroup>
-      <Compile Remove="Platforms\Desktop\Win32NotificationService.cs" />
-    </ItemGroup>
-    <ItemGroup>
+    <ItemGroup Condition="'$(TargetFramework)' == 'net10.0-desktop'">
       <None Remove="WinRTapis.dll" />
     </ItemGroup>
 
@@ -74,25 +71,25 @@
         <Folder Include="Platforms\Android\Resources\mipmap-xxxhdpi" />
     </ItemGroup>
 
-    <ItemGroup>
+    <ItemGroup Condition="'$(TargetFramework)' == 'net10.0-desktop'">
       <PackageReference Include="Microsoft.Toolkit.Uwp.Notifications" Version="7.1.3" />
     </ItemGroup>
 
-    <ItemGroup>
+    <ItemGroup Condition="'$(TargetFramework)' == 'net10.0-desktop'">
       <None Remove="Platforms\Desktop\WinRTapis.dll" />
     </ItemGroup>
 
-    <ItemGroup>
+    <ItemGroup Condition="'$(TargetFramework)' == 'net10.0-desktop'">
       <None Update="Assets\DLLs\WinRTapis.dll">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
     </ItemGroup>
 
-    <ItemGroup>
+    <ItemGroup Condition="'$(TargetFramework)' == 'net10.0-desktop'">
       <None Remove="Platforms\Desktop\WinRTapis.dll" />
     </ItemGroup>
 
-    <ItemGroup>
+    <ItemGroup Condition="'$(TargetFramework)' == 'net10.0-desktop'">
       <Content Update="Assets\DLLs\WinRTapis.dll">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </Content>

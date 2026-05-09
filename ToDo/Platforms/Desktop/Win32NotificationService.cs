@@ -6,7 +6,7 @@ using Path = System.IO.Path;
 
 namespace ToDo.Win32;
 
-public class Win32NotificationService : INotificationService
+public class Win32NotificationService : global::ToDo.INotificationService
 {
     private string IconPath =>
         Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets", "icons", "todoico.ico");
