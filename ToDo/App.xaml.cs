@@ -1,7 +1,4 @@
 using Uno.Resizetizer;
-#if WIN32 || __UNO_SKIA_WIN32__ || DESKTOP
-using Microsoft.Toolkit.Uwp.Notifications;
-#endif
 
 namespace ToDo;
 
