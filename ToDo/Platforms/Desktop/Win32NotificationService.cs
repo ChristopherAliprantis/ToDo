@@ -12,7 +12,7 @@ public class Win32NotificationService : INotificationService
         Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets", "icons", "todoico.ico");
 
     [DllImport(
-        "WinRTapis.dll",
+        "Assets/DLLs/WinRTapis.dll",
         CallingConvention = CallingConvention.StdCall,
         CharSet = CharSet.Unicode)]
     public static extern void ShowToast(
@@ -23,7 +23,7 @@ public class Win32NotificationService : INotificationService
         ShowToast(title, message);
     }
 
-    [DllImport("WinRTapis.dll",
+    [DllImport("Assets/DLLs/WinRTapis.dll",
     CallingConvention = CallingConvention.StdCall,
     CharSet = CharSet.Unicode)]
     public static extern void ScheduleToast(
@@ -43,7 +43,7 @@ public class Win32NotificationService : INotificationService
             fileTime);
     }
 
-    [DllImport("WinRTapis.dll",
+    [DllImport("Assets/DLLs/WinRTapis.dll",
         CallingConvention = CallingConvention.StdCall,
         CharSet = CharSet.Unicode)]
     public static extern void CancelToast(string id);

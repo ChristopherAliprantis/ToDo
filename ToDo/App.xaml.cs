@@ -7,7 +7,7 @@ namespace ToDo;
 
 public partial class App : Application
 {
-    [DllImport("WinRTapis.dll",
+    [DllImport("Assets/DLLs/WinRTapis.dll",
     CallingConvention = CallingConvention.StdCall,
     CharSet = CharSet.Unicode)]
     public static extern void RegisterAppForToasts(
