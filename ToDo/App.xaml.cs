@@ -46,28 +46,6 @@ public partial class App : Application
 #if __ANDROID__
         NotificationService = new global::ToDo.Droid.AndroidNotificationService();
 #elif WIN32 || __UNO_SKIA_WIN32__
-        /*try
-        {
-            // 1. Dynamic registration to avoid namespace collision at compile time
-            var toastType = Type.GetType("Microsoft.Toolkit.Uwp.Notifications.ToastNotificationManagerCompat, Microsoft.Toolkit.Uwp.Notifications");
-            if (toastType != null)
-            {
-                // Register identity
-                var registerMethod = toastType.GetMethod("RegisterAppIdentifier");
-                registerMethod?.Invoke(null, new object[] { "com.christopheraliprantis.todo" });
-
-                // Set up click handler
-                var onActivatedEvent = toastType.GetEvent("OnActivated");
-                if (onActivatedEvent != null)
-                {
-                    // Note: You can also use 'dynamic' here for easier access
-                    toastType.GetProperty("OnActivated")?.SetValue(null, (Action<dynamic>)(args => {
-                        MainDispatcher?.TryEnqueue(() => HandleNotificationClick(args.Argument));
-                    }));
-                }
-            }
-        }
-        catch {  Fallback if library isn't loaded } */
         RegisterAppForToasts("com.christopheraliprantis.todo", "ToDo");
         NotificationService = new global::ToDo.Win32.Win32NotificationService();
         //global::ToDo.Win32.Win32NotificationService.ShowToast("Registered", "Your ToDo installation has registered with\nWindows.");
