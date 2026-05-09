@@ -70,7 +70,7 @@ public partial class App : Application
         catch {  Fallback if library isn't loaded } */
         RegisterAppForToasts("com.christopheraliprantis.todo", "ToDo");
         NotificationService = new global::ToDo.Win32.Win32NotificationService();
-        //global::ToDo.Win32.Win32NotificationService.ShowToast("Registered", "Your ToDo installation has registered with Windows");
+        //global::ToDo.Win32.Win32NotificationService.ShowToast("Registered", "Your ToDo installation has registered with\nWindows.");
 #endif
 
 
