@@ -48,9 +48,6 @@
         <!-- This is what was causing Android errors; now it's isolated -->
         <UseAppHost>true</UseAppHost>
     </PropertyGroup>
-    <ItemGroup Condition="'$(TargetFramework)' == 'net10.0-desktop'">
-    </ItemGroup>
-
   <PropertyGroup Condition="'$(TargetFramework)' == 'net10.0-android'">
     <AndroidApplication>true</AndroidApplication>
     <AndroidIcon>appicon</AndroidIcon>
