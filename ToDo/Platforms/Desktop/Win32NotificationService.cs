@@ -1,7 +1,6 @@
 using System;
 using System.IO;
 using System.Diagnostics;
-using Microsoft.Toolkit.Uwp.Notifications;
 using Path = System.IO.Path;
 
 namespace ToDo.Win32;
