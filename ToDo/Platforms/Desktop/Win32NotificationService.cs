@@ -30,10 +30,15 @@ public class Win32NotificationService : global::ToDo.INotificationService
     string title,
     string message,
     long fileTime);
-    public void ScheduleNotification(string title, string message, DateTimeOffset scheduleTime, string actionData)
+
+    public void ScheduleNotification(
+        string title,
+        string message,
+        DateTimeOffset scheduleTime,
+        string actionData)
     {
         long fileTime =
-    scheduleTime.ToFileTime();
+            scheduleTime.UtcDateTime.ToFileTimeUtc();
 
         ScheduleToast(
             actionData,
