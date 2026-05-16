@@ -35,11 +35,7 @@ public class Win32NotificationService : global::ToDo.INotificationService
     {
         if (string.IsNullOrEmpty(s)) return string.Empty;
         var sb = new System.Text.StringBuilder(s.Length);
-        foreach (char c in s)
-        {
-            if (c >= 0x20 || c == '\t' || c == '\n' || c == '\r') sb.Append(c);
-            else sb.Append(' ');
-        }
+        foreach (char c in s) sb.Append((c >= 0x20 || c == '\t' || c == '\n' || c == '\r') ? c : ' ');
         return sb.ToString();
     }
 
