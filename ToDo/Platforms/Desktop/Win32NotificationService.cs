@@ -31,20 +31,37 @@ public class Win32NotificationService : global::ToDo.INotificationService
     string message,
     long fileTime);
 
-    public void ScheduleNotification(
-        string title,
-        string message,
-        DateTimeOffset scheduleTime,
-        string actionData)
+    static string Sanitize(string s)
     {
-        long fileTime =
-            scheduleTime.UtcDateTime.ToFileTimeUtc();
+        if (string.IsNullOrEmpty(s)) return string.Empty;
+        var sb = new System.Text.StringBuilder(s.Length);
+        foreach (char c in s)
+        {
+            if (c >= 0x20 || c == '\t' || c == '\n' || c == '\r') sb.Append(c);
+            else sb.Append(' ');
+        }
+        return sb.ToString();
+    }
 
-        ScheduleToast(
-            actionData,
-            title,
-            message,
-            fileTime);
+    public void ScheduleNotification(string title, string message, DateTimeOffset scheduleTime, string actionData)
+    {
+        // ensure at least 60s in future to avoid timing validation issues
+        var minTime = DateTimeOffset.UtcNow.AddSeconds(60);
+        if (scheduleTime < minTime) scheduleTime = minTime;
+
+        long fileTime = scheduleTime.UtcDateTime.ToFileTimeUtc();
+
+        // ensure non-empty content (fallback message)
+        title = Sanitize(title);
+        message = Sanitize(message);
+        if (string.IsNullOrEmpty(title) && string.IsNullOrEmpty(message))
+            message = "Scheduled notification";
+
+        // ensure small tag, or pass empty so native side won't set Tag
+        if (string.IsNullOrEmpty(actionData)) actionData = string.Empty;
+        if (actionData.Length > 63) actionData = actionData.Substring(0, 63);
+
+        ScheduleToast(actionData, title, message, fileTime);
     }
 
     [DllImport("Assets/DLLs/WinRTapis.dll",
