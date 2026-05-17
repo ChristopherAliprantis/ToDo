@@ -85,19 +85,22 @@
     </ItemGroup>
 
     <!-- 1. Stop generating PDB files completely in Release mode -->
+    <!-- 1. Ensure symbols generate normally during build so Uno doesn't crash -->
     <PropertyGroup Condition="'$(Configuration)' == 'Release'">
-        <DebugType>none</DebugType>
-        <DebugSymbols>false</DebugSymbols>
+        <DebugType>portable</DebugType>
+        <DebugSymbols>true</DebugSymbols>
     </PropertyGroup>
 
-    <!-- 2. Strip out .uprimarker files right before the build finishes publishing -->
-    <Target Name="DeleteUprimarkersAfterPublish" AfterTargets="Publish">
+    <!-- 2. Cleanly delete both PDBs and Uprimarkers from the final output folder -->
+    <Target Name="CleanReleaseOutput" AfterTargets="Publish">
         <ItemGroup>
-            <UprimarkerFiles Include="$(PublishDir)**\*.uprimarker" />
+            <FilesToRemove Include="$(PublishDir)**\*.uprimarker" />
+            <FilesToRemove Include="$(PublishDir)**\*.pdb" />
         </ItemGroup>
-        <Delete Files="@(UprimarkerFiles)" ContinueOnError="true" />
-        <Message Text="Successfully stripped all .uprimarker files from the publish directory." Importance="high" />
+        <Delete Files="@(FilesToRemove)" ContinueOnError="true" />
+        <Message Text="Successfully stripped all .pdb and .uprimarker files from the publish directory!" Importance="high" />
     </Target>
+
 
 
 
