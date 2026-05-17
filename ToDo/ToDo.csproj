@@ -84,5 +84,21 @@
       </Content>
     </ItemGroup>
 
+    <!-- 1. Stop generating PDB files completely in Release mode -->
+    <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+        <DebugType>none</DebugType>
+        <DebugSymbols>false</DebugSymbols>
+    </PropertyGroup>
+
+    <!-- 2. Strip out .uprimarker files right before the build finishes publishing -->
+    <Target Name="DeleteUprimarkersAfterPublish" AfterTargets="Publish">
+        <ItemGroup>
+            <UprimarkerFiles Include="$(PublishDir)**\*.uprimarker" />
+        </ItemGroup>
+        <Delete Files="@(UprimarkerFiles)" ContinueOnError="true" />
+        <Message Text="Successfully stripped all .uprimarker files from the publish directory." Importance="high" />
+    </Target>
+
+
 
 </Project>
