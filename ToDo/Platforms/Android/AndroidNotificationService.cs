@@ -8,11 +8,23 @@ using AndroidX.Core.App;
 public class AndroidNotificationService : INotificationService
 {
     private int GetId(string id) => id.GetHashCode();
-
     public void ScheduleNotification(string title, string message, DateTimeOffset scheduleTime, string actionData)
     {
         var context = Android.App.Application.Context;
+        var alarmManager = (AlarmManager)context.GetSystemService(Context.AlarmService);
 
+        // 1. Android 12+ Safety Check: Redirect if permission is missing
+        if (Build.VERSION.SdkInt >= BuildVersionCodes.S && !alarmManager.CanScheduleExactAlarms())
+        {
+            var uri = Android.Net.Uri.Parse($"package:{context.PackageName}");
+            var settingsIntent = new Intent(Android.Provider.Settings.ActionRequestScheduleExactAlarm, uri);
+            settingsIntent.AddFlags(ActivityFlags.NewTask);
+
+            context.StartActivity(settingsIntent);
+            return; // Exit out early to prevent the crash/freeze
+        }
+
+        // 2. Build the standard Notification Intent
         var intent = new Intent(context, typeof(NotificationReceiver));
         intent.PutExtra("id", actionData);
         intent.PutExtra("title", title);
@@ -25,16 +37,18 @@ public class AndroidNotificationService : INotificationService
             PendingIntentFlags.Immutable | PendingIntentFlags.UpdateCurrent
         );
 
-        var alarmManager = (AlarmManager)context.GetSystemService(Context.AlarmService);
+        long triggerTimeMs = scheduleTime.ToUnixTimeMilliseconds();
 
+        // 3. Fire the Exact Alarm safely
         alarmManager.SetExactAndAllowWhileIdle(
             AlarmType.RtcWakeup,
-            scheduleTime.ToUnixTimeMilliseconds(),
+            triggerTimeMs,
             pending
         );
     }
 
-    public void CancelNotification(string actionData)
+
+public void CancelNotification(string actionData)
     {
         var context = Android.App.Application.Context;
 
