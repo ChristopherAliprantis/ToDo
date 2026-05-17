@@ -68,13 +68,9 @@
         <Folder Include="Platforms\Android\Resources\mipmap-xxxhdpi" />
     </ItemGroup>
 
-    <ItemGroup Condition="'$(TargetFramework)' == 'net10.0-desktop'">
-      <None Remove="Platforms\Desktop\WinRTapis.dll" />
-    </ItemGroup>
-
-    <ItemGroup Condition="'$(TargetFramework)' == 'net10.0-desktop'">
+    <ItemGroup Condition="'$(TargetFramework)' == 'net10.0-android'">
       <None Update="Assets\DLLs\WinRTapis.dll">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        <CopyToOutputDirectory>Do Not Copy</CopyToOutputDirectory>
       </None>
     </ItemGroup>
 
