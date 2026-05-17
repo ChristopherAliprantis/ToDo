@@ -238,7 +238,7 @@ public class Helpers
         Grid.SetColumn(which, col);
     }
 
-    public static async Task DeleteExpiredNotifs()
+    public static void DeleteExpiredNotifs()
     {
         var toDelete = new List<ToDos.ToDo>();
 
@@ -256,7 +256,7 @@ public class Helpers
 
         foreach (var todo in toDelete)
         {
-            await todo.Delete();
+            todo.Delete();
         }
     }
 
