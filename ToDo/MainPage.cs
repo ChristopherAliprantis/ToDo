@@ -13,7 +13,6 @@ public sealed partial class MainPage : Page // #if DESKTOP for all of skia deskt
     public MainPage()
     {
         todos.Load();
-        Helpers.DeleteExpiredNotifs();
         todos.Save();
         var Bar = new StackPanel
         {
@@ -237,29 +236,6 @@ public class Helpers
         Grid.SetRow(which, row);
         Grid.SetColumn(which, col);
     }
-
-    public static void DeleteExpiredNotifs()
-    {
-        var toDelete = new List<ToDos.ToDo>();
-
-        foreach (var todo in MainPage.TODOS)
-        {
-            if (todo.Date == null || todo.Time == null) continue;
-
-            DateTime scheduledTime = todo.Date.Value.Date + todo.Time.Value.ToTimeSpan();
-
-            if (scheduledTime < DateTime.Now)
-            {
-                toDelete.Add(todo);
-            }
-        }
-
-        foreach (var todo in toDelete)
-        {
-            todo.Delete();
-        }
-    }
-
 }
 
 public interface INotificationService
