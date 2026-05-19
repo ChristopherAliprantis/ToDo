@@ -4,12 +4,14 @@ namespace ToDo;
 
 public partial class App : Application
 {
+#if DESKTOP
     [DllImport("Assets/DLLs/WinRTapis.dll",
     CallingConvention = CallingConvention.StdCall,
     CharSet = CharSet.Unicode)]
     public static extern void RegisterAppForToasts(
     string AppId,
     string AppName);
+#endif
     public App()
     {
         this.InitializeComponent();
