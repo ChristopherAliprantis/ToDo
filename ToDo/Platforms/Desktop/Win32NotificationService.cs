@@ -51,7 +51,10 @@ public class Win32NotificationService : global::ToDo.INotificationService
         title = Sanitize(title);
         message = Sanitize(message);
         if (string.IsNullOrEmpty(title) && string.IsNullOrEmpty(message))
+        {    
             message = "";
+            title = "";
+        }
 
         // ensure small tag, or pass empty so native side won't set Tag
         if (string.IsNullOrEmpty(actionData)) actionData = string.Empty;
