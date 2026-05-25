@@ -19,7 +19,6 @@ public static class Notifications
 
     public static async Task CancelNotif(string todoId)
     {
-        App.NotificationService?.CancelNotification(todoId);
         await ToDos.ToDo.DeleteById(todoId);
     }
 
