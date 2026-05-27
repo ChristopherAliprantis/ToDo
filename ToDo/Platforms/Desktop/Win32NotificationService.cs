@@ -64,6 +64,7 @@ public class Win32NotificationService : global::ToDo.INotificationService
     public static extern void CancelToast(string id);
     public void CancelNotification(string actionData)
     {
+        Console.WriteLine($"Canceling notification with actionData: '{actionData}'");
         CancelToast(actionData);
     }
 }
