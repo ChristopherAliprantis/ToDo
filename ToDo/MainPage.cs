@@ -348,7 +348,7 @@ public partial class ToDos : StackPanel
                 ((StackPanel)MainPage.todos.Children[i]).Children.Clear();
             }
 
-            if (!string.IsNullOrWhiteSpace(ID)) await App.NotificationService.CancelNotification(ID);
+            if (!string.IsNullOrWhiteSpace(ID)) App.NotificationService.CancelNotification(ID);
             MainPage.TODOS.Remove(this);
             await MainPage.todos.Save();
             await MainPage.todos.Load();
