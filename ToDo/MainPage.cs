@@ -222,18 +222,6 @@ public sealed partial class MainPage : Page // #if DESKTOP for all of skia deskt
 
             ((Button)TODOS[i].content.Children[3]).Height = ((Button)TODOS[i].content.Children[3]).Width * 0.46;
             ((Button)TODOS[i].content.Children[3]).FontSize = ((Button)TODOS[i].content.Children[3]).Width / 4.86;
-            if (TODOS[i].ID != null)
-            {
-                if ((TODOS[i].Date.Value.Date + TODOS[i].Time.Value.ToTimeSpan()) < DateTime.Now)
-                {
-                    TODOS[i].Delete();
-                    Notifications.SendNotif(TODOS[i]);
-                }
-                else
-                {
-                    continue;
-                }
-            }
             todos.AddBack(TODOS[i]);
         }
     }
