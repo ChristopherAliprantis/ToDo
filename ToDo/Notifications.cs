@@ -13,13 +13,8 @@ public static class Notifications
         if (scheduledTime > DateTime.Now)
         {
             // Passes the 'todo.ID' as actionData
-            await Task.Run(()=> {App.NotificationService?.ScheduleNotification(todo.Title, todo.Descrip, new DateTimeOffset(scheduledTime), todo.ID); });
+            await Task.Run(() => { App.NotificationService?.ScheduleNotification(todo.Title, todo.Descrip, new DateTimeOffset(scheduledTime), todo.ID); });
         }
+        else await Task.CompletedTask;
     }
-
-    public static async Task CancelNotif(string todoId)
-    {
-        await ToDos.ToDo.DeleteById(todoId);
-    }
-
 }
