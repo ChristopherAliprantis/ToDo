@@ -343,7 +343,7 @@ public partial class ToDos : StackPanel
 
         public async Task Delete()
         {
-            Console.WriteLine($"Deleting ToDo: {this.ID.ToString()}");
+            Console.WriteLine($"Deleting ToDo: '{Convert.ToString(this.ID)}'");
             for (int i = 0; i < MainPage.todos.Children.Count; i++)
             {
                 ((StackPanel)MainPage.todos.Children[i]).Children.Clear();
