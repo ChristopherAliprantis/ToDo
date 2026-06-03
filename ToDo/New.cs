@@ -133,6 +133,7 @@ public sealed partial class New : Page // #if DESKTOP for all of skia desktop, #
             else
             {
                 string ID = System.Guid.NewGuid().ToString();
+                Console.WriteLine($"New ToDo ID: {ID}");
                 await MainPage.todos.ADD(title.Text, describe.Text, Date, Time, ID);
 
             }
