@@ -515,10 +515,12 @@ public partial class ToDos : StackPanel
 public class ToDoData
 {
     public string? Title { get; set; }
+
     public string? Descrip { get; set; }
 
     public DateTime? Date { get; set; }
 
     public TimeOnly? Time { get; set; }
+
     public string? ID { get; set; }
 }
