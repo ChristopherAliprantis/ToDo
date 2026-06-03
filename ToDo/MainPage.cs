@@ -499,7 +499,7 @@ public partial class ToDos : StackPanel
                         d.Descrip ?? "",
                         d.Date,
                         d.Time,
-                        d.ID ?? "" ));
+                        d.ID ));
             }
 
             MainPage.RebuildTodos();
