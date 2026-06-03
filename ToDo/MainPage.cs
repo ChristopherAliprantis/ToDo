@@ -520,5 +520,5 @@ public class ToDoData
     public DateTime? Date { get; set; }
 
     public TimeOnly? Time { get; set; }
-    public string? ID;
+    public string? ID { get; set; }
 }
