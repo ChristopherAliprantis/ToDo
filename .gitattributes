@@ -62,5 +62,5 @@
 #*.rtf   diff=astextplain
 #*.RTF   diff=astextplain
 
-ToDo/Assets/DLLs/winrtapis.dll linguist-language=C++ linguist-detectable=true
+ToDo/Assets/DLLs/WinRTapis.dll linguist-language=C++ linguist-detectable=true
 
