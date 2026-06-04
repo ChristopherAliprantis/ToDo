@@ -40,7 +40,7 @@ public class AndroidNotificationService : INotificationService
             .SetAutoCancel(true);
 
         // Generate a unique ID so multiple errors/alerts don't overwrite each other
-        int uniqueId = new Random().Next(1000, 9999);
+        int uniqueId = Random.Shared.Next(1000, 9999);
 
         NotificationManagerCompat.From(context)
             .Notify(uniqueId, builder.Build());

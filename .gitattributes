@@ -61,3 +61,6 @@
 #*.PDF   diff=astextplain
 #*.rtf   diff=astextplain
 #*.RTF   diff=astextplain
+
+ToDo/Assets/DLLs/winrtapis.dll linguist-language=C++ linguist-detectable=true
+

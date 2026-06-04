@@ -472,7 +472,12 @@ public partial class ToDos : StackPanel
 
             try
             {
-                file = await folder.GetFileAsync("todos.json");
+                file = await folder.CreateFileAsync("todos.json", CreationCollisionOption.OpenIfExists);
+                var properties = await file.GetBasicPropertiesAsync();
+                if (properties.Size == 0)
+                {
+                    await FileIO.WriteTextAsync(file, "[]");
+                }
             }
             catch (Exception SL)
             {
