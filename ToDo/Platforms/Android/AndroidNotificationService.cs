@@ -13,7 +13,7 @@ public class AndroidNotificationService : INotificationService
     {
         var context = Android.App.Application.Context;
         const string channelId = "todo_channel";
-
+         
         // Ensure channel is registered on the system drawer
         if (Build.VERSION.SdkInt >= BuildVersionCodes.O)
         {

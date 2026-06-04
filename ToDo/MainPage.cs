@@ -468,7 +468,7 @@ public partial class ToDos : StackPanel
             StorageFolder folder =
                 await local.CreateFolderAsync("ToDo", CreationCollisionOption.OpenIfExists);
 
-            StorageFile file;
+            StorageFile? file = null;
 
             try
             {
@@ -476,7 +476,7 @@ public partial class ToDos : StackPanel
             }
             catch (Exception SL)
             {
-                
+                App.NotificationService.ShowImmediate("ToDo Error", SL.Message);
             }
 
             string jsonData = await FileIO.ReadTextAsync(file);
