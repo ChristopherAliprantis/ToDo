@@ -62,5 +62,8 @@
 #*.rtf   diff=astextplain
 #*.RTF   diff=astextplain
 
-ToDo/Assets/DLLs/WinRTapis.dll linguist-language=C++ linguist-detectable=true
+# Tell Git and Linguist this specific file should be read as text
+ToDo/Assets/DLLs/WinRTapis.dll text linguist-language=C++ linguist-detectable=true
+
+
 
