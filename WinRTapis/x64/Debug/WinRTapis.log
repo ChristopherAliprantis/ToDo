@@ -1,0 +1,6 @@
+﻿  WinRT.cpp
+     Creating library C:\Users\alipr_1j0dfgh\source\repos\WinRTapis\x64\Debug\WinRTapis.lib and object C:\Users\alipr_1j0dfgh\source\repos\WinRTapis\x64\Debug\WinRTapis.exp
+WinRT.obj : error LNK2019: unresolved external symbol WINRT_IMPL_RoGetActivationFactory referenced in function "struct winrt::hresult __cdecl winrt::impl::get_runtime_activation_factory_impl<1>(struct winrt::param::hstring const &,struct winrt::guid const &,void * *)" (??$get_runtime_activation_factory_impl@$00@impl@winrt@@YA?AUhresult@1@AEBUhstring@param@1@AEBUguid@1@PEAPEAX@Z)
+WinRT.obj : error LNK2019: unresolved external symbol WINRT_IMPL_RoOriginateLanguageException referenced in function "private: void __cdecl winrt::hresult_error::originate(struct winrt::hresult,void *,struct winrt::impl::slim_source_location const &)" (?originate@hresult_error@winrt@@AEAAXUhresult@2@PEAXAEBUslim_source_location@impl@2@@Z)
+WinRT.obj : error LNK2019: unresolved external symbol __imp_SHCreateStreamOnFileEx referenced in function RegisterAppForToasts
+C:\Users\alipr_1j0dfgh\source\repos\WinRTapis\x64\Debug\WinRTapis.dll : fatal error LNK1120: 3 unresolved externals
