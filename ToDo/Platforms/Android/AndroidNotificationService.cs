@@ -8,6 +8,44 @@ using AndroidX.Core.App;
 public class AndroidNotificationService : INotificationService
 {
     private int GetId(string id) => id.GetHashCode();
+
+    public void ShowImmediate(string title, string message)
+    {
+        var context = Android.App.Application.Context;
+        const string channelId = "todo_channel";
+
+        // Ensure channel is registered on the system drawer
+        if (Build.VERSION.SdkInt >= BuildVersionCodes.O)
+        {
+            var channel = new NotificationChannel(channelId, "ToDo", NotificationImportance.High);
+            var manager = (NotificationManager)context.GetSystemService(Context.NotificationService);
+            manager.CreateNotificationChannel(channel);
+        }
+
+        // Route directly back to MainActivity when clicked
+        var clickIntent = new Intent(context, typeof(MainActivity));
+
+        var clickPending = PendingIntent.GetActivity(
+            context,
+            0,
+            clickIntent,
+            PendingIntentFlags.Immutable | PendingIntentFlags.UpdateCurrent
+        );
+
+        var builder = new NotificationCompat.Builder(context, channelId)
+            .SetContentTitle(title)
+            .SetContentText(message)
+            .SetSmallIcon(Android.Resource.Drawable.IcDialogInfo)
+            .SetContentIntent(clickPending)
+            .SetAutoCancel(true);
+
+        // Generate a unique ID so multiple errors/alerts don't overwrite each other
+        int uniqueId = new Random().Next(1000, 9999);
+
+        NotificationManagerCompat.From(context)
+            .Notify(uniqueId, builder.Build());
+    }
+
     public void ScheduleNotification(string title, string message, DateTimeOffset scheduleTime, string actionData)
     {
         var context = Android.App.Application.Context;

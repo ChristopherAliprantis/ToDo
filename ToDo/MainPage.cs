@@ -242,6 +242,8 @@ public interface INotificationService
 {
     void ScheduleNotification(string title, string message, DateTimeOffset scheduleTime, string actionData);
     void CancelNotification(string actionData);
+
+    void ShowImmediate(string title, string message);
 }
 
 
@@ -472,14 +474,9 @@ public partial class ToDos : StackPanel
             {
                 file = await folder.GetFileAsync("todos.json");
             }
-            catch
+            catch (Exception SL)
             {
-                file = await folder.CreateFileAsync(
-                    "todos.json",
-                    CreationCollisionOption.ReplaceExisting);
-
-                await FileIO.WriteTextAsync(file, "[]");
-                return;
+                
             }
 
             string jsonData = await FileIO.ReadTextAsync(file);
