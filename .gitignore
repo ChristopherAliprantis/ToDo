@@ -1,4 +1,4 @@
-.VS
-.packages
-.x64
-.WinRTapis
+*.VS
+*.packages
+*.x64
+*.WinRTapis
