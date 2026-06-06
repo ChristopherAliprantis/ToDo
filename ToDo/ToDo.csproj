@@ -38,34 +38,32 @@
     </PropertyGroup>
 
     <!-- DESKTOP ONLY: Fixes Original Filename and Metadata -->
+    <!-- DESKTOP ONLY -->
     <PropertyGroup Condition="'$(TargetFramework)' == 'net10.0-desktop'">
-        <ApplicationIcon>assets\icons\todoico.ico</ApplicationIcon>
-        <UnoIcon>assets\icons\todoico.ico</UnoIcon>
         <AssemblyName>ToDo</AssemblyName>
         <EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
         <TargetName>ToDo</TargetName>
         <AssemblyTitle>ToDo</AssemblyTitle>
-        <!-- This is what was causing Android errors; now it's isolated -->
         <UseAppHost>true</UseAppHost>
     </PropertyGroup>
-  <PropertyGroup Condition="'$(TargetFramework)' == 'net10.0-android'">
-    <AndroidApplication>true</AndroidApplication>
-    <AndroidIcon>appicon</AndroidIcon>
-    <UseAppHost>false</UseAppHost>
-    
-    <AndroidResgenExtraArgs>--no-version-vectors</AndroidResgenExtraArgs>
-</PropertyGroup>
+
+    <!-- ANDROID ONLY -->
+    <PropertyGroup Condition="'$(TargetFramework)' == 'net10.0-android'">
+        <AndroidApplication>true</AndroidApplication>
+        <UseAppHost>false</UseAppHost>
+        <AndroidResgenExtraArgs>--no-version-vectors</AndroidResgenExtraArgs>
+    </PropertyGroup>
+
     <Import Project="keystore.targets" /> <!-- for people that downloaded this from github, this is a file where I had keystore properties, I .gitignored it, because it has private info.-->
     <ItemGroup Condition="'$(TargetFramework)' == 'net10.0-desktop'">
       <None Remove="WinRTapis.dll" />
     </ItemGroup>
+    <ItemGroup>
+      <None Remove="Assets\Icons\todoico.svg" />
+    </ItemGroup>
 
     <ItemGroup>
-        <Folder Include="Platforms\Android\Resources\mipmap-mdpi" />
-        <Folder Include="Platforms\Android\Resources\mipmap-hdpi" />
-        <Folder Include="Platforms\Android\Resources\mipmap-xhdpi" />
-        <Folder Include="Platforms\Android\Resources\mipmap-xxhdpi" />
-        <Folder Include="Platforms\Android\Resources\mipmap-xxxhdpi" />
+        <Folder Include="Platforms\Android\Resources\" />
     </ItemGroup>
 
     <ItemGroup Condition="'$(TargetFramework)' == 'net10.0-android'">
@@ -83,6 +81,21 @@
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </Content>
     </ItemGroup>
+
+    <!-- App Icons Configuration via Uno.Resizetizer -->
+    <ItemGroup>
+        <!-- Android Icon: Centers the logo vector and adds a solid background color -->
+        <UnoIcon Condition="'$(TargetFramework)' == 'net10.0-android'"
+                 Include="Assets\Icons\todosvg.svg"
+                 ForegroundFile="Assets\Icons\todosvg.svg"
+                 ForegroundScale="0.65"
+                 Color="#FFFFFF" />
+
+        <!-- Desktop/Windows Icon: Maps natively to the WinUI packaging step -->
+        <UnoIcon Condition="'$(TargetFramework)' == 'net10.0-desktop'"
+                 Include="Assets\Icons\todoico.svg" />
+    </ItemGroup>
+
 
     <!-- 1. Stop generating PDB files completely in Release mode -->
     <!-- 1. Ensure symbols generate normally during build so Uno doesn't crash -->
