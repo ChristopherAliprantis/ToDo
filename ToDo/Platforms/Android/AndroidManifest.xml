@@ -18,7 +18,7 @@
         android:supportsRtl="true"
         android:label="ToDo"
         android:theme="@style/UnoAppTheme"
-        android:icon="@mipmap/appicon">
+        android:icon="@android:mipmap/appicon">
 
         <!-- Notification trigger -->
         <receiver
