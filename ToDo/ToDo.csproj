@@ -39,8 +39,8 @@
 
     <!-- DESKTOP ONLY: Fixes Original Filename and Metadata -->
     <PropertyGroup Condition="'$(TargetFramework)' == 'net10.0-desktop'">
-        <ApplicationIcon>assets\icons\todoico.ico</ApplicationIcon>
-        <UnoIcon>assets\icons\todoico.ico</UnoIcon>
+        <ApplicationIcon>Assets\Icons\todoico.ico</ApplicationIcon>
+        <UnoIcon>Assets\Icons\todoico.ico</UnoIcon>
         <AssemblyName>ToDo</AssemblyName>
         <EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
         <TargetName>ToDo</TargetName>

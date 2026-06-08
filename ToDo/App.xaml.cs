@@ -1,4 +1,6 @@
 using Uno.Resizetizer;
+using Microsoft.UI.Windowing;
+using Path = System.IO.Path;
 
 namespace ToDo;
 
