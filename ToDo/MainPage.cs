@@ -435,7 +435,7 @@ public partial class ToDos : StackPanel
                     Title = t.Title,
                     Descrip = t.Descrip,
                     Date = t.Date,
-                    Time = t.Time,
+                    Time = t.Time?.ToString("HH:mm:ss"),
                     ID = t.ID
                 });
             }
@@ -457,7 +457,6 @@ public partial class ToDos : StackPanel
             Console.WriteLine(e.Message);
         }
     }
-
 
     public async Task Load()
     {
@@ -495,13 +494,19 @@ public partial class ToDos : StackPanel
 
             foreach (var d in todos)
             {
+                TimeOnly? parsedTime = null;
+                if (!string.IsNullOrEmpty(d.Time) && TimeOnly.TryParse(d.Time, out TimeOnly t))
+                {
+                    parsedTime = t;
+                }
+
                 MainPage.TODOS.Add(
                     new ToDos.ToDo(
                         d.Title ?? "",
                         d.Descrip ?? "",
                         d.Date,
-                        d.Time,
-                        d.ID ));
+                        parsedTime,
+                        d.ID));
             }
 
             MainPage.RebuildTodos();
@@ -512,17 +517,15 @@ public partial class ToDos : StackPanel
         }
     }
 
+
 }
 
 public class ToDoData
 {
     public string? Title { get; set; }
-
     public string? Descrip { get; set; }
-
     public DateTime? Date { get; set; }
-
-    public TimeOnly? Time { get; set; }
-
+    public string? Time { get; set; }
     public string? ID { get; set; }
 }
+
