@@ -1,4 +1,5 @@
 namespace ToDo;
+using Path = System.IO.Path;
 using System.Text.Json;
 public sealed partial class MainPage : Page // #if DESKTOP for all of skia desktop, #if WINDOWS for windows, #if ANDROID for android.
 {
@@ -425,9 +426,8 @@ public partial class ToDos : StackPanel
         {
             List<ToDoData> todos = new();
 
-            for (int i = 0; i < MainPage.TODOS.Count; i++)
+            foreach (var t in MainPage.TODOS)
             {
-                var t = MainPage.TODOS[i];
                 if (t == null) continue;
 
                 todos.Add(new ToDoData
@@ -442,15 +442,15 @@ public partial class ToDos : StackPanel
 
             string jsonData = JsonSerializer.Serialize(todos);
 
-            StorageFolder local = ApplicationData.Current.LocalFolder;
+            string folderPath = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                "ToDo");
 
-            StorageFolder folder =
-                await local.CreateFolderAsync("ToDo", CreationCollisionOption.OpenIfExists);
+            Directory.CreateDirectory(folderPath);
 
-            StorageFile file =
-                await folder.CreateFileAsync("todos.json", CreationCollisionOption.ReplaceExisting);
+            string filePath = Path.Combine(folderPath, "todos.json");
 
-            await FileIO.WriteTextAsync(file, jsonData);
+            await File.WriteAllTextAsync(filePath, jsonData);
         }
         catch (Exception e)
         {
@@ -458,38 +458,29 @@ public partial class ToDos : StackPanel
         }
     }
 
-
     public async Task Load()
     {
         try
         {
-            StorageFolder local = ApplicationData.Current.LocalFolder;
+            string folderPath = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                "ToDo");
 
-            StorageFolder folder =
-                await local.CreateFolderAsync("ToDo", CreationCollisionOption.OpenIfExists);
+            Directory.CreateDirectory(folderPath);
 
-            StorageFile? file = null;
+            string filePath = Path.Combine(folderPath, "todos.json");
 
-            try
+            if (!File.Exists(filePath))
             {
-                file = await folder.CreateFileAsync("todos.json", CreationCollisionOption.OpenIfExists);
-                var properties = await file.GetBasicPropertiesAsync();
-                if (properties.Size == 0)
-                {
-                    await FileIO.WriteTextAsync(file, "[]");
-                }
-            }
-            catch (Exception SL)
-            {
-                App.NotificationService.ShowImmediate("ToDo Error", SL.Message);
+                await File.WriteAllTextAsync(filePath, "[]");
             }
 
-            string jsonData = await FileIO.ReadTextAsync(file);
+            string jsonData = await File.ReadAllTextAsync(filePath);
 
-            var todos =
-                JsonSerializer.Deserialize<List<ToDoData>>(jsonData);
+            var todos = JsonSerializer.Deserialize<List<ToDoData>>(jsonData);
 
-            if (todos == null) return;
+            if (todos == null)
+                return;
 
             MainPage.TODOS.Clear();
 
@@ -501,7 +492,7 @@ public partial class ToDos : StackPanel
                         d.Descrip ?? "",
                         d.Date,
                         d.Time,
-                        d.ID ));
+                        d.ID));
             }
 
             MainPage.RebuildTodos();
