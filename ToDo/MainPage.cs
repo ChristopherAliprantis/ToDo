@@ -1,6 +1,8 @@
 namespace ToDo;
-using Path = System.IO.Path;
 using System.Text.Json;
+using Microsoft.UI.Xaml.Media.Imaging;
+using Path = System.IO.Path;
+
 public sealed partial class MainPage : Page // #if DESKTOP for all of skia desktop, #if WINDOWS for windows, #if ANDROID for android.
 {
     public static Windows.Foundation.Rect bounds;
@@ -35,8 +37,14 @@ public sealed partial class MainPage : Page // #if DESKTOP for all of skia deskt
         };
         var content = new StackPanel
         {
+            Spacing = 0,
             Children =
             {
+                new Button
+                {
+                    Background = Color.Transparent,
+                    Content = new Image().Source = new BitmapImage(new Uri("ms-appx://Assets/reload.svg"))
+                },
                 todos,
             }
 
