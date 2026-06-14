@@ -45,8 +45,6 @@ public partial class App : Application
             );
 
 #if __ANDROID__
-        var materialTheme = new Uno.Material.MaterialTheme();
-        this.Resources.MergedDictionaries.Add(materialTheme);
         NotificationService = new global::ToDo.Droid.AndroidNotificationService();
 #elif DESKTOP
         RegisterAppForToasts("com.christopheraliprantis.todo", "ToDo");

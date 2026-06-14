@@ -75,7 +75,6 @@
             Localization;
             ThemeService;
             SkiaRenderer;
-            Material;
         </UnoFeatures>
     </PropertyGroup>
 
