@@ -19,17 +19,6 @@
 
         <UnoDisableHotDesign>true</UnoDisableHotDesign>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-        <UnoFeatures>
-            CSharpMarkup;
-            Lottie;
-            Hosting;
-            Toolkit;
-            MVUX;
-            Configuration;
-            Localization;
-            ThemeService;
-            SkiaRenderer;
-        </UnoFeatures>
 
         <!-- Global Build Fixes -->
         <SkipResourcesGenerator>true</SkipResourcesGenerator>
@@ -60,6 +49,35 @@
     <ItemGroup Condition="'$(TargetFramework)' == 'net10.0-desktop'">
         <None Remove="WinRTapis.dll" />
     </ItemGroup>
+
+    <PropertyGroup Condition="'$(TargetFramework)' == 'net10.0-desktop'">
+        <UnoFeatures>
+            CSharpMarkup;
+            Lottie;
+            Hosting;
+            Toolkit;
+            MVUX;
+            Configuration;
+            Localization;
+            ThemeService;
+            SkiaRenderer;
+        </UnoFeatures>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(TargetFramework)' == 'net10.0-android'">
+        <UnoFeatures>
+            CSharpMarkup;
+            Lottie;
+            Hosting;
+            Toolkit;
+            MVUX;
+            Configuration;
+            Localization;
+            ThemeService;
+            SkiaRenderer;
+            Material;
+        </UnoFeatures>
+    </PropertyGroup>
 
     <ItemGroup>
         <Folder Include="Platforms\Android\Resources\mipmap-mdpi" />
