@@ -109,7 +109,7 @@ public sealed partial class MainPage : Page // #if DESKTOP for all of skia deskt
             Bar.Height = h;
             
 
-            Scroll.Margin = new Thickness(h / 96 * 2.7, h / 9.2, 0, 0);
+            todos.Margin = new Thickness(h / 96 * 2.7, h / 9.2, 0, 0);
 
 
             NEW.Width = Bar.Width - (Bar.Width / 55 * 2);
