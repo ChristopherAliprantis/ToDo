@@ -25,6 +25,7 @@ public sealed partial class MainPage : Page // #if DESKTOP for all of skia deskt
         {
             RowDefinitions =
             {
+                new  RowDefinition { Height = new GridLength(0, GridUnitType.Pixel)},
                 new RowDefinition{ Height = new GridLength(1, GridUnitType.Star) },
             },
             ColumnDefinitions =
@@ -59,7 +60,7 @@ public sealed partial class MainPage : Page // #if DESKTOP for all of skia deskt
         { 
             w = this.ActualWidth;
             h = this.ActualHeight;
-
+            H.RowDefinitions[0].Height = new GridLength(h / 9.2, GridUnitType.Pixel);
             bounds = App.MainWindow.Bounds;
             if (bounds.Width > bounds.Height == false) todos.currentcol = 1;
             else todos.currentcol = 0;
@@ -100,7 +101,7 @@ public sealed partial class MainPage : Page // #if DESKTOP for all of skia deskt
             Bar.Height = h;
             
 
-            Scroll.Margin = new Thickness(h / 96 * 2.7, h / 9.2, 0, 0);
+            Scroll.Margin = new Thickness(h / 96 * 2.7, 0, 0, 0);
 
 
             NEW.Width = Bar.Width - (Bar.Width / 55 * 2);
@@ -113,7 +114,7 @@ public sealed partial class MainPage : Page // #if DESKTOP for all of skia deskt
         {
             w = this.ActualWidth;
             h = this.ActualHeight;
-
+            H.RowDefinitions[0].Height = new GridLength(h / 9.2, GridUnitType.Pixel);
             bounds = App.MainWindow.Bounds;
             if (bounds.Width > bounds.Height == false) todos.currentcol = 1;
             else todos.currentcol = 0;
@@ -129,13 +130,14 @@ public sealed partial class MainPage : Page // #if DESKTOP for all of skia deskt
             {
                 Bar.Width = w / 4.8;
             }
+
             if (bounds.Width > bounds.Height)
             {
-                avail = H.ColumnDefinitions[1].ActualWidth / 4 - h / 96 * 2.7 * 1.20;
+                avail = (w - Bar.Width) / 4 - h / 96 * 2.7 * 1.20;
             }
             else
             {
-                avail = H.ColumnDefinitions[1].ActualWidth - (h / 96 * 2.7 * 2.16);
+                avail = (w - Bar.Width) - (h / 96 * 2.7 * 2.20);
             }
             todos.col1.Children.Clear();
             todos.col2.Children.Clear();
@@ -151,15 +153,17 @@ public sealed partial class MainPage : Page // #if DESKTOP for all of skia deskt
                 todos.col4.Spacing = h / 96 * 2.7;
             }
             Bar.Height = h;
-            NEW.Width = Bar.ActualWidth - (Bar.ActualWidth / 55 * 2);
-            NEW.Margin = new Thickness(Bar.ActualWidth / 55, Bar.ActualHeight / 18, 0, 0);
-            NEW.Height = NEW.Width * 0.463757;
-            NEW.FontSize = Bar.ActualWidth / 3.2;
 
-            Scroll.Margin = new Thickness(h / 96 * 2.7, h / 9.2, 0, 0);
-            
+
+            Scroll.Margin = new Thickness(h / 96 * 2.7, 0, 0, 0);
+
+
+            NEW.Width = Bar.Width - (Bar.Width / 55 * 2);
+            NEW.Margin = new Thickness(Bar.Width / 55, Bar.Height / 18, 0, 0);
+            NEW.Height = NEW.Width * 0.463757;
+            NEW.FontSize = Bar.Width / 3.2;
             RebuildTodos();
-            
+
         };
         Helpers.Add(H, Scroll, 1, 1);
         Helpers.Add(H, Bar, 0, 0);
