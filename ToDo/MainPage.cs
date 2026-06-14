@@ -33,6 +33,15 @@ public sealed partial class MainPage : Page // #if DESKTOP for all of skia deskt
                 new ColumnDefinition { Width = new GridLength(1,GridUnitType.Star) }
             }
         };
+        var content = new StackPanel
+        {
+            Children =
+            {
+                todos,
+            }
+
+        };
+
         NEW = new Button
         {
             BorderThickness = new Thickness(0),
@@ -53,7 +62,7 @@ public sealed partial class MainPage : Page // #if DESKTOP for all of skia deskt
 #else
             VerticalScrollBarVisibility = ScrollBarVisibility.Hidden,
 #endif
-            Content = todos
+            Content = content
         };
         this.SizeChanged += async(s, e) =>
         { 
