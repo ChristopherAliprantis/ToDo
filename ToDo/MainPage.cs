@@ -12,10 +12,10 @@ public sealed partial class MainPage : Page // #if DESKTOP for all of skia deskt
     public static double w;
     public static double avail;
     public static Button? NEW;
+    public RotateTransform rotationTransform = new Microsoft.UI.Xaml.Media.RotateTransform();
     public static Grid? H;
     public MainPage()
     {
-        var rotationTransform = new Microsoft.UI.Xaml.Media.RotateTransform();
         todos.Load();
         todos.Save();
         var Bar = new StackPanel
@@ -65,28 +65,7 @@ public sealed partial class MainPage : Page // #if DESKTOP for all of skia deskt
         };
         ((Button)content.Children[0]).Click += (s, e) =>
         {
-            rotationTransform.Angle = 0;
-
-            var spinAnimation = new Microsoft.UI.Xaml.Media.Animation.DoubleAnimation
-            {
-                From = 0,
-                To = 360,
-                Duration = new Microsoft.UI.Xaml.Duration(TimeSpan.FromSeconds(0.4)),
-                EasingFunction = new Microsoft.UI.Xaml.Media.Animation.QuadraticEase
-                {
-                    EasingMode = Microsoft.UI.Xaml.Media.Animation.EasingMode.EaseInOut
-                }
-            };
-
-            Microsoft.UI.Xaml.Media.Animation.Storyboard.SetTarget(spinAnimation, rotationTransform);
-            Microsoft.UI.Xaml.Media.Animation.Storyboard.SetTargetProperty(spinAnimation, new Microsoft.UI.Xaml.PropertyPath("(RotateTransform.Angle)"));
-
-            var storyboard = new Microsoft.UI.Xaml.Media.Animation.Storyboard();
-            storyboard.Children.Add(spinAnimation);
-            storyboard.Begin();
-
-            todos.Load();
-            RebuildTodos();
+            Reload();
         };
         NEW = new Button
         {
@@ -236,11 +215,37 @@ public sealed partial class MainPage : Page // #if DESKTOP for all of skia deskt
             NEW.Margin = new Thickness(Bar.Width / 55, Bar.Height / 18, 0, 0);
             NEW.Height = NEW.Width * 0.463757;
             NEW.FontSize = Bar.Width / 3.2;
-            RebuildTodos();
+            await Task.Delay(150);
+            Reload();
         };
         Helpers.Add(H, Scroll, 0, 1);
         Helpers.Add(H, Bar, 0, 0);
         this.Content = H;
+    }
+
+    public void Reload()
+    {
+        todos.Load();
+        RebuildTodos();
+        this.rotationTransform.Angle = 0;
+
+        var spinAnimation = new Microsoft.UI.Xaml.Media.Animation.DoubleAnimation
+        {
+            From = 0,
+            To = 360,
+            Duration = new Microsoft.UI.Xaml.Duration(TimeSpan.FromSeconds(0.4)),
+            EasingFunction = new Microsoft.UI.Xaml.Media.Animation.QuadraticEase
+            {
+                EasingMode = Microsoft.UI.Xaml.Media.Animation.EasingMode.EaseInOut
+            }
+        };
+
+        Microsoft.UI.Xaml.Media.Animation.Storyboard.SetTarget(spinAnimation, rotationTransform);
+        Microsoft.UI.Xaml.Media.Animation.Storyboard.SetTargetProperty(spinAnimation, new Microsoft.UI.Xaml.PropertyPath("(RotateTransform.Angle)"));
+
+        var storyboard = new Microsoft.UI.Xaml.Media.Animation.Storyboard();
+        storyboard.Children.Add(spinAnimation);
+        storyboard.Begin();
     }
     public static void RebuildTodos()
     {
