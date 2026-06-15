@@ -65,6 +65,10 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <None Remove="Assets\reload.svg" />
+    </ItemGroup>
+
+    <ItemGroup>
         <Folder Include="Platforms\Android\Resources\mipmap-mdpi" />
         <Folder Include="Platforms\Android\Resources\mipmap-hdpi" />
         <Folder Include="Platforms\Android\Resources\mipmap-xhdpi" />
@@ -104,4 +108,9 @@
         <Delete Files="@(FilesToRemove)" ContinueOnError="true" />
         <Message Text="Successfully stripped all .pdb and .uprimarker files from the publish directory!" Importance="high" />
     </Target>
+    <ItemGroup>
+      <Content Update="Assets\SharedAssets.md">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+    </ItemGroup>
 </Project>

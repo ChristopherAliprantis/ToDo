@@ -35,6 +35,11 @@ public sealed partial class MainPage : Page // #if DESKTOP for all of skia deskt
                 new ColumnDefinition { Width = new GridLength(1,GridUnitType.Star) }
             }
         };
+        var svgSource = new Microsoft.UI.Xaml.Media.Imaging.SvgImageSource(new Uri("ms-appx:///Assets/reload.svg"));
+        var reloadpic = new Microsoft.UI.Xaml.Controls.Image
+        {
+            Source = svgSource
+        };
         var content = new StackPanel
         {
             Spacing = 0,
@@ -42,8 +47,8 @@ public sealed partial class MainPage : Page // #if DESKTOP for all of skia deskt
             {
                 new Button
                 {
-                    Background = Color.Transparent,
-                    Content = new Image().Source = new BitmapImage(new Uri("ms-appx://Assets/reload.svg"))
+                    Background = new SolidColorBrush(Color.Transparent),
+                    Content = reloadpic
                 },
                 todos,
             }
@@ -101,6 +106,9 @@ public sealed partial class MainPage : Page // #if DESKTOP for all of skia deskt
             {
                 avail = (w - Bar.Width) - (h / 96 * 2.7 * 2.20);
             }
+            ((Button)content.Children[0]).Width = h / (1.0 / 11.0);
+            ((Button)content.Children[0]).Height = ((Button)content.Children[0]).Width;
+            ((Button)content.Children[0]).Margin = new Thickness(h / 96 * 2.7, h / (1.0 / 11.0) / 6,0,0);
             todos.col1.Children.Clear();
             todos.col2.Children.Clear();
             todos.col3.Children.Clear();
@@ -117,7 +125,7 @@ public sealed partial class MainPage : Page // #if DESKTOP for all of skia deskt
             Bar.Height = h;
             
 
-            todos.Margin = new Thickness(h / 96 * 2.7, h / 9.2, 0, 0);
+            todos.Margin = new Thickness(h / 96 * 2.7, h / (1.0 / 11.0) / 6, 0, 0);
 
 
             NEW.Width = Bar.Width - (Bar.Width / 55 * 2);
@@ -146,14 +154,18 @@ public sealed partial class MainPage : Page // #if DESKTOP for all of skia deskt
             {
                 Bar.Width = w / 4.8;
             }
+
             if (bounds.Width > bounds.Height)
             {
-                avail = H.ColumnDefinitions[1].ActualWidth / 4 - h / 96 * 2.7 * 1.20;
+                avail = (w - Bar.Width) / 4 - h / 96 * 2.7 * 1.20;
             }
             else
             {
-                avail = H.ColumnDefinitions[1].ActualWidth - (h / 96 * 2.7 * 2.16);
+                avail = (w - Bar.Width) - (h / 96 * 2.7 * 2.20);
             }
+            ((Button)content.Children[0]).Width = h / (1.0 / 11.0);
+            ((Button)content.Children[0]).Height = ((Button)content.Children[0]).Width;
+            ((Button)content.Children[0]).Margin = new Thickness(h / 96 * 2.7, h / (1.0 / 11.0) / 6, 0, 0);
             todos.col1.Children.Clear();
             todos.col2.Children.Clear();
             todos.col3.Children.Clear();
@@ -168,15 +180,17 @@ public sealed partial class MainPage : Page // #if DESKTOP for all of skia deskt
                 todos.col4.Spacing = h / 96 * 2.7;
             }
             Bar.Height = h;
-            NEW.Width = Bar.ActualWidth - (Bar.ActualWidth / 55 * 2);
-            NEW.Margin = new Thickness(Bar.ActualWidth / 55, Bar.ActualHeight / 18, 0, 0);
-            NEW.Height = NEW.Width * 0.463757;
-            NEW.FontSize = Bar.ActualWidth / 3.2;
 
-            todos.Margin = new Thickness(h / 96 * 2.7, h / 9.2, 0, 0);
-            
+
+            todos.Margin = new Thickness(h / 96 * 2.7, h / (1.0 / 11.0) / 6, 0, 0);
+
+
+            NEW.Width = Bar.Width - (Bar.Width / 55 * 2);
+            NEW.Margin = new Thickness(Bar.Width / 55, Bar.Height / 18, 0, 0);
+            NEW.Height = NEW.Width * 0.463757;
+            NEW.FontSize = Bar.Width / 3.2;
             RebuildTodos();
-            
+
         };
         Helpers.Add(H, Scroll, 0, 1);
         Helpers.Add(H, Bar, 0, 0);
