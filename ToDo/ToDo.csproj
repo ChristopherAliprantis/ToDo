@@ -117,4 +117,21 @@
         <Delete Files="@(FilesToRemove)" ContinueOnError="true" />
         <Message Text="Successfully stripped all .pdb and .uprimarker files from the publish directory!" Importance="high" />
     </Target>
+    <Target Name="ForceCopyRawSvgToOutput" AfterTargets="Build">
+        <ItemGroup>
+            <!-- Define the exact file you want to smuggle past Uno -->
+            <RawSvgFile Include="Assets\reload.svg" />
+        </ItemGroup>
+
+        <!-- Copy it directly to the local bin output directory -->
+        <Copy SourceFiles="@(RawSvgFile)"
+              DestinationFolder="$(TargetDir)Assets\"
+              SkipUnchangedFiles="true" />
+
+        <!-- Force copy it to AppX/Publish folders for mobile/Wasm packaging targets -->
+        <Copy SourceFiles="@(RawSvgFile)"
+              DestinationFolder="$(AppxPackageDir)Assets\"
+              Condition="'$(AppxPackageDir)' != ''"
+              SkipUnchangedFiles="true" />
+    </Target>
 </Project>
