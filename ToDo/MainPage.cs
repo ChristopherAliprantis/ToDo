@@ -46,6 +46,7 @@ public sealed partial class MainPage : Page // #if DESKTOP for all of skia deskt
             RenderTransformOrigin = new Windows.Foundation.Point(0.5, 0.5),
             RenderTransform = rotationTransform
         };
+
         var content = new StackPanel
         {
             Spacing = 0,
