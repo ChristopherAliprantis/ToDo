@@ -110,7 +110,7 @@ public sealed partial class MainPage : Page // #if DESKTOP for all of skia deskt
 #if ANDROID
             ((Button)content.Children[0]).Width = h / 13.0;
 #elif DESKTOP || WINDOWS
-    ((Button)content.Children[0]).Width = h / 19.0;
+    ((Button)content.Children[0]).Width = h / 24.0;
 #endif
             ((Button)content.Children[0]).Height = ((Button)content.Children[0]).Width;
 
@@ -172,7 +172,7 @@ public sealed partial class MainPage : Page // #if DESKTOP for all of skia deskt
 #if ANDROID
             ((Button)content.Children[0]).Width = h / 13.0;
 #elif DESKTOP || WINDOWS
-    ((Button)content.Children[0]).Width = h / 19.0;
+    ((Button)content.Children[0]).Width = h / 24.0;
 #endif
             ((Button)content.Children[0]).Height = ((Button)content.Children[0]).Width;
 
@@ -193,7 +193,7 @@ public sealed partial class MainPage : Page // #if DESKTOP for all of skia deskt
             Bar.Height = h;
 
 
-            todos.Margin = new Thickness(h / 96 * 2.7, h / 13.0 / 6, 0, 0);
+            todos.Margin = new Thickness(h / 96 * 2.7, h / 11.0 / 6, 0, 0);
 
 
             NEW.Width = Bar.Width - (Bar.Width / 55 * 2);
