@@ -15,6 +15,7 @@ public sealed partial class MainPage : Page // #if DESKTOP for all of skia deskt
     public static Grid? H;
     public MainPage()
     {
+        var rotationTransform = new Microsoft.UI.Xaml.Media.RotateTransform();
         todos.Load();
         todos.Save();
         var Bar = new StackPanel
@@ -39,9 +40,11 @@ public sealed partial class MainPage : Page // #if DESKTOP for all of skia deskt
         var reloadpic = new Microsoft.UI.Xaml.Controls.Image
         {
             Source = rs,
-            Height = 0,
-            Width = 0,
-            Stretch = Microsoft.UI.Xaml.Media.Stretch.Fill
+            Height = 40,
+            Width = 40,
+            Stretch = Microsoft.UI.Xaml.Media.Stretch.Uniform,
+            RenderTransformOrigin = new Windows.Foundation.Point(0.5, 0.5),
+            RenderTransform = rotationTransform
         };
         var content = new StackPanel
         {
@@ -52,13 +55,38 @@ public sealed partial class MainPage : Page // #if DESKTOP for all of skia deskt
                 {
                     Background = new SolidColorBrush(Color.Transparent),
                     Content = reloadpic,
-                    BorderThickness = new Thickness(0),
+                    BorderThickness = new Thickness(0.46),
+                    Padding = new Thickness(0),
                 },
                 todos,
             }
 
         };
+        ((Button)content.Children[0]).Click += (s, e) =>
+        {
+            rotationTransform.Angle = 0;
 
+            var spinAnimation = new Microsoft.UI.Xaml.Media.Animation.DoubleAnimation
+            {
+                From = 0,
+                To = 360,
+                Duration = new Microsoft.UI.Xaml.Duration(TimeSpan.FromSeconds(0.4)),
+                EasingFunction = new Microsoft.UI.Xaml.Media.Animation.QuadraticEase
+                {
+                    EasingMode = Microsoft.UI.Xaml.Media.Animation.EasingMode.EaseInOut
+                }
+            };
+
+            Microsoft.UI.Xaml.Media.Animation.Storyboard.SetTarget(spinAnimation, rotationTransform);
+            Microsoft.UI.Xaml.Media.Animation.Storyboard.SetTargetProperty(spinAnimation, new Microsoft.UI.Xaml.PropertyPath("(RotateTransform.Angle)"));
+
+            var storyboard = new Microsoft.UI.Xaml.Media.Animation.Storyboard();
+            storyboard.Children.Add(spinAnimation);
+            storyboard.Begin();
+
+            todos.Load();
+            RebuildTodos();
+        };
         NEW = new Button
         {
             BorderThickness = new Thickness(0),
