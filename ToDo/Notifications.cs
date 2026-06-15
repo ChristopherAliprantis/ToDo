@@ -8,7 +8,7 @@ public static class Notifications
     public static async Task SendNotif(ToDos.ToDo todo)
     {
         if (todo.Date == null || todo.Time == null || string.IsNullOrEmpty(todo.ID)) return;
-        DateTime scheduledTime = todo.Date.Value.Date + todo.Time.Value.ToTimeSpan();
+        DateTime scheduledTime = todo.Date.Value.ToDateTime(todo.Time.Value);
 
         if (scheduledTime > DateTime.Now)
         {

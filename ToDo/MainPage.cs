@@ -56,7 +56,7 @@ public sealed partial class MainPage : Page // #if DESKTOP for all of skia deskt
                 {
                     Background = new SolidColorBrush(Color.Transparent),
                     Content = reloadpic,
-                    BorderThickness = new Thickness(0.46),
+                    BorderThickness = new Thickness(0),
                     Padding = new Thickness(0),
                 },
                 todos,
@@ -225,8 +225,6 @@ public sealed partial class MainPage : Page // #if DESKTOP for all of skia deskt
 
     public void Reload()
     {
-        todos.Load();
-        RebuildTodos();
         this.rotationTransform.Angle = 0;
 
         var spinAnimation = new Microsoft.UI.Xaml.Media.Animation.DoubleAnimation
@@ -246,6 +244,14 @@ public sealed partial class MainPage : Page // #if DESKTOP for all of skia deskt
         var storyboard = new Microsoft.UI.Xaml.Media.Animation.Storyboard();
         storyboard.Children.Add(spinAnimation);
         storyboard.Begin();
+        var tlist = new List<ToDos.ToDo>(MainPage.TODOS);
+        foreach (var ToDo in MainPage.TODOS)
+        {
+            
+        }
+
+        todos.Save();
+        RebuildTodos();
     }
     public static void RebuildTodos()
     {
@@ -351,7 +357,7 @@ public partial class ToDos : StackPanel
     {
         public Border border;
         public StackPanel content;
-        public DateTime? Date { get; set; }
+        public DateOnly? Date { get; set; }
         public TimeOnly? Time { get; set; }
         public string Title;
         public string Descrip;
@@ -359,7 +365,7 @@ public partial class ToDos : StackPanel
         public string? DTime;
         public string? DDate;
         public string? ID;
-        public ToDo(string title, string descrip, DateTime? date, TimeOnly? time, string? id)
+        public ToDo(string title, string descrip, DateOnly? date, TimeOnly? time, string? id)
         {
             Title = title;
             Descrip = descrip;
@@ -372,7 +378,7 @@ public partial class ToDos : StackPanel
             }
             else
             {
-                DDate = ((DateTime)Date).ToString("yyyy-MM-dd");
+                DDate = ((DateOnly)Date).ToString("yyyy-MM-dd");
             }
             if (Time == null)
             {
@@ -460,7 +466,7 @@ public partial class ToDos : StackPanel
             await MainPage.TODOS[pos].Delete();
         }
     }
-    public async Task ADD(string title, string descrip, DateTime? date, TimeOnly? time, string? id)
+    public async Task ADD(string title, string descrip, DateOnly? date, TimeOnly? time, string? id)
     {
         var N = new ToDo(title, descrip, date, time, id);
         if (N.ID != null)
@@ -593,7 +599,7 @@ public class ToDoData
 
     public string? Descrip { get; set; }
 
-    public DateTime? Date { get; set; }
+    public DateOnly? Date { get; set; }
 
     public TimeOnly? Time { get; set; }
 
