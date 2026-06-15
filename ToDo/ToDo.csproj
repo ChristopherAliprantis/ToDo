@@ -7,7 +7,6 @@
         <UnoSingleProject>true</UnoSingleProject>
 
         <ApplicationTitle>ToDo</ApplicationTitle>
-        <EnableDefaultUnoItems>false</EnableDefaultUnoItems>
         <Product>ToDo</Product>
         <ApplicationId>com.christopheraliprantis.todo</ApplicationId>
 
@@ -71,6 +70,7 @@
     </ItemGroup>
 
     <ItemGroup>
+        <UnoImage Remove="Assets\reload.svg" />
         <Content Update="Assets\reload.svg">
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </Content>
