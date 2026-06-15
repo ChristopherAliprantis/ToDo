@@ -61,6 +61,7 @@
             Localization;
             ThemeService;
             SkiaRenderer;
+            Svg;
         </UnoFeatures>
     </PropertyGroup>
 
@@ -69,7 +70,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Content Update="Assets\reload.svg" >
+        <Content Update="Assets\reload.svg">
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </Content>
         
@@ -115,4 +116,9 @@
         <Delete Files="@(FilesToRemove)" ContinueOnError="true" />
         <Message Text="Successfully stripped all .pdb and .uprimarker files from the publish directory!" Importance="high" />
     </Target>
+    <ItemGroup>
+      <UnoImage Update="Assets\reload.svg">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </UnoImage>
+    </ItemGroup>
 </Project>
