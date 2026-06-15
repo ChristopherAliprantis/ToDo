@@ -106,9 +106,9 @@ public sealed partial class MainPage : Page // #if DESKTOP for all of skia deskt
             {
                 avail = (w - Bar.Width) - (h / 96 * 2.7 * 2.20);
             }
-            ((Button)content.Children[0]).Width = h / (1.0 / 11.0);
+            ((Button)content.Children[0]).Width = h / 11.0;
             ((Button)content.Children[0]).Height = ((Button)content.Children[0]).Width;
-            ((Button)content.Children[0]).Margin = new Thickness(h / 96 * 2.7, h / (1.0 / 11.0) / 6,0,0);
+            ((Button)content.Children[0]).Margin = new Thickness(h / 96 * 2.7, h / 11.0 / 6,0,0);
             todos.col1.Children.Clear();
             todos.col2.Children.Clear();
             todos.col3.Children.Clear();
@@ -125,7 +125,7 @@ public sealed partial class MainPage : Page // #if DESKTOP for all of skia deskt
             Bar.Height = h;
             
 
-            todos.Margin = new Thickness(h / 96 * 2.7, h / (1.0 / 11.0) / 6, 0, 0);
+            todos.Margin = new Thickness(h / 96 * 2.7, h / 11.0 / 6, 0, 0);
 
 
             NEW.Width = Bar.Width - (Bar.Width / 55 * 2);
@@ -163,9 +163,9 @@ public sealed partial class MainPage : Page // #if DESKTOP for all of skia deskt
             {
                 avail = (w - Bar.Width) - (h / 96 * 2.7 * 2.20);
             }
-            ((Button)content.Children[0]).Width = h / (1.0 / 11.0);
+            ((Button)content.Children[0]).Width = h / 11.0;
             ((Button)content.Children[0]).Height = ((Button)content.Children[0]).Width;
-            ((Button)content.Children[0]).Margin = new Thickness(h / 96 * 2.7, h / (1.0 / 11.0) / 6, 0, 0);
+            ((Button)content.Children[0]).Margin = new Thickness(h / 96 * 2.7, h / 11.0 / 6, 0, 0);
             todos.col1.Children.Clear();
             todos.col2.Children.Clear();
             todos.col3.Children.Clear();
@@ -182,7 +182,7 @@ public sealed partial class MainPage : Page // #if DESKTOP for all of skia deskt
             Bar.Height = h;
 
 
-            todos.Margin = new Thickness(h / 96 * 2.7, h / (1.0 / 11.0) / 6, 0, 0);
+            todos.Margin = new Thickness(h / 96 * 2.7, h / 11.0 / 6, 0, 0);
 
 
             NEW.Width = Bar.Width - (Bar.Width / 55 * 2);
