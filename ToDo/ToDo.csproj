@@ -50,21 +50,7 @@
         <None Remove="WinRTapis.dll" />
     </ItemGroup>
 
-    <PropertyGroup Condition="'$(TargetFramework)' == 'net10.0-desktop'">
-        <UnoFeatures>
-            CSharpMarkup;
-            Lottie;
-            Hosting;
-            Toolkit;
-            MVUX;
-            Configuration;
-            Localization;
-            ThemeService;
-            SkiaRenderer;
-        </UnoFeatures>
-    </PropertyGroup>
-
-    <PropertyGroup Condition="'$(TargetFramework)' == 'net10.0-android'">
+    <PropertyGroup>
         <UnoFeatures>
             CSharpMarkup;
             Lottie;
