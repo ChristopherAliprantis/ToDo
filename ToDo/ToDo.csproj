@@ -7,6 +7,7 @@
         <UnoSingleProject>true</UnoSingleProject>
 
         <ApplicationTitle>ToDo</ApplicationTitle>
+        <EnableDefaultUnoItems>false</EnableDefaultUnoItems>
         <Product>ToDo</Product>
         <ApplicationId>com.christopheraliprantis.todo</ApplicationId>
 
@@ -116,9 +117,4 @@
         <Delete Files="@(FilesToRemove)" ContinueOnError="true" />
         <Message Text="Successfully stripped all .pdb and .uprimarker files from the publish directory!" Importance="high" />
     </Target>
-    <ItemGroup>
-      <UnoImage Update="Assets\reload.svg">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </UnoImage>
-    </ItemGroup>
 </Project>

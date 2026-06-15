@@ -2,9 +2,9 @@
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
 
 <svg
-   width="518.20001"
-   height="500"
-   viewBox="0 0 518.20001 500"
+   width="294"
+   height="279.70001"
+   viewBox="0 0 294 279.70002"
    version="1.1"
    id="svg1"
    inkscape:version="1.4.3 (0d15f75, 2025-12-25)"
@@ -23,9 +23,9 @@
      inkscape:pagecheckerboard="0"
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="px"
-     inkscape:zoom="1.0721378"
-     inkscape:cx="319.92156"
-     inkscape:cy="237.3762"
+     inkscape:zoom="4.2885512"
+     inkscape:cx="59.46064"
+     inkscape:cy="306.28059"
      inkscape:window-width="1920"
      inkscape:window-height="1111"
      inkscape:window-x="-9"
@@ -36,13 +36,13 @@
   <defs
      id="defs1" />
   <rect
-     style="fill:#808080;fill-opacity:0;stroke:#000000;stroke-opacity:0"
+     style="fill:#808080;fill-opacity:0;stroke:#000000;stroke-width:0.987414;stroke-opacity:0"
      id="rect6"
-     width="88.608017"
-     height="68.088264"
-     x="-117.8343"
-     y="36.366974"
-     transform="rotate(-17.19181)" />
+     width="88.245804"
+     height="66.657616"
+     x="-113.46188"
+     y="22.440937"
+     transform="matrix(0.95702302,-0.29001196,0.3012169,0.95355565,0,0)" />
   <rect
      style="fill:#000000;fill-opacity:0;stroke:#000000;stroke-opacity:0"
      id="rect7"
@@ -68,29 +68,29 @@
      y="506.45584"
      transform="rotate(-17.19181)" />
   <ellipse
-     style="fill:#808080;fill-opacity:1;stroke:#000000;stroke-opacity:0"
+     style="fill:#808080;fill-opacity:1;stroke:#000000;stroke-width:0.569617;stroke-opacity:0"
      id="path9"
-     cx="162.32205"
-     cy="312.49612"
-     rx="246.23701"
-     ry="248.10245"
-     transform="rotate(-17.19181)" />
+     cx="66.917374"
+     cy="187.16832"
+     rx="141.58217"
+     ry="140.00398"
+     transform="matrix(0.90466899,-0.42611502,0.43679244,0.89956232,0,0)" />
   <ellipse
-     style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:0.88974;stroke-opacity:0"
+     style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:0.506778;stroke-opacity:0"
      id="path11"
-     cx="159.78398"
-     cy="311.90552"
-     rx="184.61203"
-     ry="196.05698"
-     transform="matrix(0.95373861,-0.30063709,0.29057514,0.95685218,0,0)" />
+     cx="65.510498"
+     cy="186.68654"
+     rx="106.14224"
+     ry="110.62787"
+     transform="matrix(0.90243743,-0.43082094,0.43199634,0.90187536,0,0)" />
   <rect
-     style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-opacity:0"
+     style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:0.544321;stroke-opacity:0"
      id="rect24"
-     width="149.40189"
-     height="195.87152"
-     x="-133.67171"
-     y="413.40201"
-     transform="rotate(-59.232179)" />
+     width="83.617561"
+     height="103.69067"
+     x="-95.01123"
+     y="224.1118"
+     transform="matrix(0.36055447,-0.93273816,0.91549557,0.40232806,0,0)" />
   <path
      sodipodi:type="star"
      style="fill:#808080;fill-opacity:1;stroke:#000000;stroke-opacity:0"
@@ -106,7 +106,7 @@
      inkscape:rounded="0"
      inkscape:randomized="0"
      d="m 466.358,-84.877153 -22.48563,35.367269 -22.48564,35.367269 -19.38613,-37.156763 -19.38614,-37.156764 41.87177,1.789494 z"
-     inkscape:transform-center-x="-14.502483"
-     inkscape:transform-center-y="1.1896168"
-     transform="matrix(-0.128211,-1.3156787,1.318774,-0.10543641,590.1309,836.4853)" />
+     inkscape:transform-center-x="-5.9559184"
+     inkscape:transform-center-y="3.352907"
+     transform="matrix(-0.18057167,-0.72253347,0.74279679,-0.16957404,379.90766,434.71816)" />
 </svg>

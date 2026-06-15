@@ -41,7 +41,7 @@ public sealed partial class MainPage : Page // #if DESKTOP for all of skia deskt
             Source = rs,
             Height = 0,
             Width = 0,
-            Stretch = Microsoft.UI.Xaml.Media.Stretch.Uniform
+            Stretch = Microsoft.UI.Xaml.Media.Stretch.Fill
         };
         var content = new StackPanel
         {
