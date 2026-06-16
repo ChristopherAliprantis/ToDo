@@ -1,6 +1,8 @@
 namespace ToDo;
 using System.Text.Json;
 using Microsoft.UI.Xaml.Media.Imaging;
+using static global::ToDos;
+using static ToDo.ToDos;
 using Path = System.IO.Path;
 
 public sealed partial class MainPage : Page // #if DESKTOP for all of skia desktop, #if WINDOWS for windows, #if ANDROID for android.
@@ -215,7 +217,7 @@ public sealed partial class MainPage : Page // #if DESKTOP for all of skia deskt
             NEW.Margin = new Thickness(Bar.Width / 55, Bar.Height / 18, 0, 0);
             NEW.Height = NEW.Width * 0.463757;
             NEW.FontSize = Bar.Width / 3.2;
-            await Task.Delay(150);
+            await Task.Delay(100);
             Reload();
         };
         Helpers.Add(H, Scroll, 0, 1);
@@ -245,9 +247,19 @@ public sealed partial class MainPage : Page // #if DESKTOP for all of skia deskt
         storyboard.Children.Add(spinAnimation);
         storyboard.Begin();
         var tlist = new List<ToDos.ToDo>(MainPage.TODOS);
-        foreach (var ToDo in MainPage.TODOS)
+        for (int i = tlist.Count - 1; i >= 0; i--)
         {
-            
+            var t = tlist[i];
+
+            if (t.Date.HasValue && t.Time.HasValue)
+            {
+                var dt = t.Date.Value.ToDateTime(t.Time.Value);
+
+                if (dt < DateTime.Now)
+                {
+                    MainPage.TODOS[i].Delete();
+                }
+            }
         }
 
         todos.Save();
