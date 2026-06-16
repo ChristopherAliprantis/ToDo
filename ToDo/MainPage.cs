@@ -154,7 +154,6 @@ public sealed partial class MainPage : Page // #if DESKTOP for all of skia deskt
         };
         this.Loaded += async(s, e) =>
         {
-            App.rootFrame.Navigate(typeof(MainPage));
             w = this.ActualWidth;
             h = this.ActualHeight;
 
