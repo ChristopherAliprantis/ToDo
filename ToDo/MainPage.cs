@@ -143,7 +143,6 @@ public sealed partial class MainPage : Page // #if DESKTOP for all of skia deskt
             }
             Bar.Height = h;
 
-
             todos.Margin = new Thickness(h / 96 * 2.7, h / 13.0 / 6, 0, 0);
 
 
@@ -155,6 +154,7 @@ public sealed partial class MainPage : Page // #if DESKTOP for all of skia deskt
         };
         this.Loaded += async(s, e) =>
         {
+            App.rootFrame.Navigate(typeof(MainPage));
             w = this.ActualWidth;
             h = this.ActualHeight;
 
