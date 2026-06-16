@@ -1,4 +1,6 @@
 
+using static ToDo.ToDos;
+
 namespace ToDo;
 
 
@@ -86,27 +88,39 @@ public sealed partial class New : Page // #if DESKTOP for all of skia desktop, #
         };
         time.up.Click += (s, e) =>
         {
-            Time = Time.AddMinutes(1);
-            time.Text = Time.ToString("hh:mm tt");
-            time.text.Text = time.Text;
+            if (Time != TimeOnly.MaxValue)
+            {
+                Time = Time.AddMinutes(1);
+                time.Text = Time.ToString("hh:mm tt");
+                time.text.Text = time.Text;
+            }
         };
         time.down.Click += (s, e) =>
         {
-            Time = Time.AddMinutes(-1);
-            time.Text = Time.ToString("hh:mm tt");
-            time.text.Text = time.Text;
+            if (Time != TimeOnly.MinValue)
+            {
+                Time = Time.AddMinutes(-1);
+                time.Text = Time.ToString("hh:mm tt");
+                time.text.Text = time.Text;
+            }
         };
         date.up.Click += (s, e) =>
         {
-            Date = Date.AddDays(1);
-            date.Text = Date.ToString("yyyy-MM-dd");
-            date.text.Text = date.Text;
+            if (Date != DateOnly.MaxValue)
+            {
+                Date = Date.AddDays(1);
+                date.Text = Date.ToString("yyyy-MM-dd");
+                date.text.Text = date.Text;
+            }
         };
         date.down.Click += (s, e) =>
         {
-            Date = Date.AddDays(-1);
-            date.Text = Date.ToString("yyyy-MM-dd");
-            date.text.Text = date.Text;
+            if (Date != DateOnly.MinValue)
+            {
+                Date = Date.AddDays(-1);
+                date.Text = Date.ToString("yyyy-MM-dd");
+                date.text.Text = date.Text;
+            }
         };
         op.Click += (s, e) =>
         {
@@ -132,6 +146,7 @@ public sealed partial class New : Page // #if DESKTOP for all of skia desktop, #
             }
             else
             {
+                if (Date.ToDateTime(Time) < DateTime.Now) return;
                 string ID = System.Guid.NewGuid().ToString();
                 Console.WriteLine($"New ToDo ID: {ID}");
                 await MainPage.todos.ADD(title.Text, describe.Text, Date, Time, ID);

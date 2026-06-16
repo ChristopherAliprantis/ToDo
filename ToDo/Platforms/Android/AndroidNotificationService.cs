@@ -17,7 +17,7 @@ public class AndroidNotificationService : INotificationService
         // Ensure channel is registered on the system drawer
         if (Build.VERSION.SdkInt >= BuildVersionCodes.O)
         {
-            var channel = new NotificationChannel(channelId, "ToDo", NotificationImportance.High);
+            var channel = new NotificationChannel(channelId, "ToDo", NotificationImportance.Default);
             var manager = (NotificationManager)context.GetSystemService(Context.NotificationService);
             manager.CreateNotificationChannel(channel);
         }
@@ -135,7 +135,7 @@ public class NotificationReceiver : BroadcastReceiver
             context,
             0,
             clickIntent,
-            PendingIntentFlags.Immutable | PendingIntentFlags.UpdateCurrent
+            PendingIntentFlags.Mutable | PendingIntentFlags.UpdateCurrent
         );
 
         var builder = new NotificationCompat.Builder(context, channelId)
