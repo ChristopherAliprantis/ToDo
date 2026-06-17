@@ -57,35 +57,15 @@ public sealed partial class MainPage : Page // #if DESKTOP for all of skia deskt
                     Background = new SolidColorBrush(Color.Transparent),
                     Content = reloadpic,
                     BorderThickness = new Thickness(0),
-                    Padding = new Thickness(2.6),
+                    Padding = new Thickness(0.1),
                     BorderBrush = new SolidColorBrush(Color.Transparent),
                 },
                 todos,
             }
 
         };
-        var shinyHoverBrush = new LinearGradientBrush
-        {
-            StartPoint = new Windows.Foundation.Point(0, 0),
-            EndPoint = new Windows.Foundation.Point(0, 1)    
-        };
-
-        shinyHoverBrush.GradientStops.Add(new GradientStop
-        {
-            Color = Colors.White,
-            Offset = 0.0
-        });
-        shinyHoverBrush.GradientStops.Add(new GradientStop
-        {
-            Color = ColorHelper.FromArgb(255, 250, 250, 250),
-            Offset = 0.3
-        });
-        shinyHoverBrush.GradientStops.Add(new GradientStop
-        {
-            Color = ColorHelper.FromArgb(255, 242, 242, 242),
-            Offset = 1.0
-        });
-        ((Button)content.Children[0]).Resources["ButtonBackgroundPointerOver"] = shinyHoverBrush;
+        var hoverBrush = new SolidColorBrush(ColorHelper.FromArgb(132,235, 235, 235));
+        ((Button)content.Children[0]).Resources["ButtonBackgroundPointerOver"] = hoverBrush;
         ((Button)content.Children[0]).Click += (s, e) =>
         {
             Reload();
