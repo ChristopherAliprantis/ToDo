@@ -58,7 +58,7 @@ public sealed partial class MainPage : Page // #if DESKTOP for all of skia deskt
                     Content = reloadpic,
                     BorderThickness = new Thickness(0),
                     Padding = new Thickness(3),
-                    
+                    BorderBrush = new SolidColorBrush(Color.Transparent),
                 },
                 todos,
             }
