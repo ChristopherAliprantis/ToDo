@@ -219,14 +219,15 @@ public sealed partial class MainPage : Page // #if DESKTOP for all of skia deskt
             NEW.Height = NEW.Width * 0.463757;
             NEW.FontSize = Bar.Width / 3.2;
             await Task.Delay(100);
-            Reload();
+            await Reload();
+            await Reload();
         };
         Helpers.Add(H, Scroll, 0, 1);
         Helpers.Add(H, Bar, 0, 0);
         this.Content = H;
     }
 
-    public void Reload()
+    public async Task Reload()
     {
         this.rotationTransform.Angle = 0;
 
@@ -260,13 +261,13 @@ public sealed partial class MainPage : Page // #if DESKTOP for all of skia deskt
 
                     if (dt < DateTime.Now)
                     {
-                        MainPage.TODOS[i].Delete();
+                        await MainPage.TODOS[i].Delete();
                     }
                 }
                 RebuildTodos();
             }
         }
-        todos.Save();
+        await todos.Save();
     }
     public static void RebuildTodos()
     {
