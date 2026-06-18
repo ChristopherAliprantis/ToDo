@@ -262,10 +262,10 @@ public sealed partial class MainPage : Page // #if DESKTOP for all of skia deskt
                         MainPage.TODOS[i].Delete();
                     }
                 }
+                RebuildTodos();
             }
         }
         todos.Save();
-        RebuildTodos();
     }
     public static void RebuildTodos()
     {
@@ -553,6 +553,7 @@ public partial class ToDos : StackPanel
             string filePath = Path.Combine(folderPath, "todos.json");
 
             await File.WriteAllTextAsync(filePath, jsonData);
+            Console.WriteLine("ToDos saved");
         }
         catch (Exception e)
         {
@@ -598,6 +599,7 @@ public partial class ToDos : StackPanel
             }
 
             MainPage.RebuildTodos();
+            Console.WriteLine("ToDos loaded");
         }
         catch (Exception e)
         {
