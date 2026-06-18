@@ -15,9 +15,7 @@ public sealed partial class MainPage : Page // #if DESKTOP for all of skia deskt
     public RotateTransform rotationTransform = new Microsoft.UI.Xaml.Media.RotateTransform();
     public static Grid? H;
     public MainPage()
-    {
-        todos.Load();
-        todos.Save();
+    { 
         var Bar = new StackPanel
         {
             Height = 0,
@@ -157,6 +155,9 @@ public sealed partial class MainPage : Page // #if DESKTOP for all of skia deskt
         };
         this.Loaded += async(s, e) =>
         {
+            // Ensure stored todos are loaded before rebuilding UI
+            await MainPage.todos.Load();
+            await MainPage.todos.Save();
             w = this.ActualWidth;
             h = this.ActualHeight;
 
