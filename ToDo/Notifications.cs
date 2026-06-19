@@ -9,13 +9,8 @@ public static class Notifications
     {
         if (todo.Date == null || todo.Time == null || string.IsNullOrEmpty(todo.ID)) return;
         DateTime scheduledTime = todo.Date.Value.ToDateTime(todo.Time.Value);
-
-        if (scheduledTime > DateTime.Now)
-        {
-            // Passes the 'todo.ID' as actionData
-            await Task.Run(() => { App.NotificationService?.ScheduleNotification(todo.Title, todo.Descrip, new DateTimeOffset(scheduledTime), todo.ID); });
-        }
-        else await Task.CompletedTask;
+        await Task.Run(() => { App.NotificationService?.ScheduleNotification(todo.Title, todo.Descrip, new DateTimeOffset(scheduledTime), todo.ID); });
+        
     }
 
     public static void CancelNotif(ToDos.ToDo todo)

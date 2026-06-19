@@ -66,6 +66,7 @@ public class BootReceiver : BroadcastReceiver
 
                             if (scheduledTime > DateTime.Now)
                             {
+                                notifs.CancelNotification(todo.ID);
                                 notifs.ScheduleNotification(todo.Title, todo.Descrip, new DateTimeOffset(scheduledTime), todo.ID);
                             }
                         }
