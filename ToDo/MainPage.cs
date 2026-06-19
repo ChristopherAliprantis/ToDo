@@ -271,6 +271,7 @@ public sealed partial class MainPage : Page // #if DESKTOP for all of skia deskt
             }
         }
         await todos.Save();
+        await todos.Load();
     }
     public static void RebuildTodos()
     {
