@@ -153,12 +153,12 @@
         <!-- 3. Android: Injection into intermediate build assets -->
         <Copy SourceFiles="@(RawSvgFile)"
               DestinationFolder="$(IntermediateOutputPath)android\assets\Assets\"
-              Condition="'$(TargetFramework)' == 'net10.0-android' AndExists('$(IntermediateOutputPath)android\assets\')"
+              Condition="'$(TargetFramework)' == 'net10.0-android'"
               SkipUnchangedFiles="true" />
 
         <Copy SourceFiles="@(RawSvgFile)"
               DestinationFolder="$(AndroidIntermediateOutputPath)assets\Assets\"
-              Condition="'$(TargetFramework)' == 'net10.0-android' And '$(AndroidIntermediateOutputPath)' != '' And Exists('$(AndroidIntermediateOutputPath)assets\')"
+              Condition="'$(TargetFramework)' == 'net10.0-android'"
               SkipUnchangedFiles="true" />
     </Target>
 
