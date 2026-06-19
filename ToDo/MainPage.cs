@@ -101,7 +101,7 @@ public sealed partial class MainPage : Page // #if DESKTOP for all of skia deskt
             if (bounds.Width > bounds.Height)
             {
 #if DESKTOP || WINDOWS
-                Bar.Width = w / 14.0;
+                Bar.Width = w / 13.7;
 #else
                 Bar.Width = w / 8.53;
 #endif
@@ -167,7 +167,7 @@ public sealed partial class MainPage : Page // #if DESKTOP for all of skia deskt
             if (bounds.Width > bounds.Height)
             {
 #if DESKTOP || WINDOWS
-                Bar.Width = w / 14.0;
+                Bar.Width = w / 13.7;
 #else
                 Bar.Width = w / 8.53;
 #endif
