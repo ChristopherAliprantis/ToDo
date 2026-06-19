@@ -17,4 +17,9 @@ public static class Notifications
         }
         else await Task.CompletedTask;
     }
+
+    public static void CancelNotif(ToDos.ToDo todo)
+    {
+        App.NotificationService.CancelNotification(todo.ID);
+    }
 }

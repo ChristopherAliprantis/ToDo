@@ -64,9 +64,9 @@ public sealed partial class MainPage : Page // #if DESKTOP for all of skia deskt
         };
         var hoverBrush = new SolidColorBrush(ColorHelper.FromArgb(132,235, 235, 235));
         ((Button)content.Children[0]).Resources["ButtonBackgroundPointerOver"] = hoverBrush;
-        ((Button)content.Children[0]).Click += (s, e) =>
+        ((Button)content.Children[0]).Click += async(s, e) =>
         {
-            Reload();
+            await Reload();
         };
         NEW = new Button
         {
@@ -155,7 +155,6 @@ public sealed partial class MainPage : Page // #if DESKTOP for all of skia deskt
         };
         this.Loaded += async(s, e) =>
         {
-            // Ensure stored todos are loaded before rebuilding UI
             await MainPage.todos.Load();
             await MainPage.todos.Save();
             w = this.ActualWidth;
@@ -220,7 +219,6 @@ public sealed partial class MainPage : Page // #if DESKTOP for all of skia deskt
             NEW.FontSize = Bar.Width / 3.2;
             await Task.Delay(100);
             await Reload();
-            await Reload();
         };
         Helpers.Add(H, Scroll, 0, 1);
         Helpers.Add(H, Bar, 0, 0);
@@ -262,6 +260,11 @@ public sealed partial class MainPage : Page // #if DESKTOP for all of skia deskt
                     if (dt < DateTime.Now)
                     {
                         await MainPage.TODOS[i].Delete();
+                    }
+                    else
+                    {
+                        Notifications.CancelNotif(TODOS[i]);
+                        await Notifications.SendNotif(TODOS[i]);
                     }
                 }
                 RebuildTodos();
@@ -460,7 +463,7 @@ public partial class ToDos : StackPanel
             if (!string.IsNullOrWhiteSpace(ID))
             {
                 Console.WriteLine($"Cancelling notification with ID: {ID}");
-                await Task.Run(() => App.NotificationService.CancelNotification(ID));
+                await Task.Run(() => Notifications.CancelNotif(this));
             }
             MainPage.TODOS.Remove(this);
             await MainPage.todos.Save();
