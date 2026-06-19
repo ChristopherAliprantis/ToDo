@@ -133,18 +133,33 @@
               SkipUnchangedFiles="true" />
     </Target>
 
-    <ItemGroup Condition="'$(TargetFramework)' == 'net10.0-desktop'">
-        <Content Include="Assets\reload.svg">
-            <Pack>true</Pack>
-            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-            <PublishState>Include</PublishState>
-        </Content>
-    </ItemGroup>
+    <Target Name="ForceCopyRawSvgToOutput" AfterTargets="Build;Publish">
+        <ItemGroup>
+            <RawSvgFile Include="Assets\reload.svg" />
+        </ItemGroup>
 
-    <!-- For Android targets: Force .NET Android to compile it into the APK assets -->
-    <ItemGroup Condition="'$(TargetFramework)' == 'net10.0-android'">
-        <AndroidAsset Include="Assets\reload.svg">
-            <Link>Assets\reload.svg</Link>
-        </AndroidAsset>
-    </ItemGroup>
+        <!-- 1. Desktop: Standard Output -->
+        <Copy SourceFiles="@(RawSvgFile)"
+              DestinationFolder="$(TargetDir)Assets\"
+              Condition="'$(TargetFramework)' == 'net10.0-desktop' And '$(TargetDir)' != ''"
+              SkipUnchangedFiles="true" />
+
+        <!-- 2. Desktop: Publish Output -->
+        <Copy SourceFiles="@(RawSvgFile)"
+              DestinationFolder="$(PublishDir)Assets\"
+              Condition="'$(TargetFramework)' == 'net10.0-desktop' And '$(PublishDir)' != ''"
+              SkipUnchangedFiles="true" />
+
+        <!-- 3. Android: Injection into intermediate build assets -->
+        <Copy SourceFiles="@(RawSvgFile)"
+              DestinationFolder="$(IntermediateOutputPath)android\assets\Assets\"
+              Condition="'$(TargetFramework)' == 'net10.0-android' AndExists('$(IntermediateOutputPath)android\assets\')"
+              SkipUnchangedFiles="true" />
+
+        <Copy SourceFiles="@(RawSvgFile)"
+              DestinationFolder="$(AndroidIntermediateOutputPath)assets\Assets\"
+              Condition="'$(TargetFramework)' == 'net10.0-android' And '$(AndroidIntermediateOutputPath)' != '' And Exists('$(AndroidIntermediateOutputPath)assets\')"
+              SkipUnchangedFiles="true" />
+    </Target>
+
 </Project>
