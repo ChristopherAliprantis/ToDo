@@ -132,4 +132,19 @@
               Condition="'$(AppxPackageDir)' != ''"
               SkipUnchangedFiles="true" />
     </Target>
+
+    <ItemGroup Condition="'$(TargetFramework)' == 'net10.0-desktop'">
+        <Content Include="Assets\reload.svg">
+            <Pack>true</Pack>
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+            <PublishState>Include</PublishState>
+        </Content>
+    </ItemGroup>
+
+    <!-- For Android targets: Force .NET Android to compile it into the APK assets -->
+    <ItemGroup Condition="'$(TargetFramework)' == 'net10.0-android'">
+        <AndroidAsset Include="Assets\reload.svg">
+            <Link>Assets\reload.svg</Link>
+        </AndroidAsset>
+    </ItemGroup>
 </Project>
