@@ -86,7 +86,7 @@ public sealed partial class New : Page // #if DESKTOP for all of skia desktop, #
             }
 
         };
-        time.up.Tapped += (s, e) =>
+        time.up.Click += (s, e) =>
         {
             if (Time != TimeOnly.MaxValue)
             {
@@ -95,7 +95,7 @@ public sealed partial class New : Page // #if DESKTOP for all of skia desktop, #
                 time.text.Text = time.Text;
             }
         };
-        time.down.Tapped += (s, e) =>
+        time.down.Click += (s, e) =>
         {
             if (Time != TimeOnly.MinValue)
             {
@@ -104,7 +104,7 @@ public sealed partial class New : Page // #if DESKTOP for all of skia desktop, #
                 time.text.Text = time.Text;
             }
         };
-        date.up.Tapped += (s, e) =>
+        date.up.Click += (s, e) =>
         {
             if (Date != DateOnly.MaxValue)
             {
@@ -113,7 +113,7 @@ public sealed partial class New : Page // #if DESKTOP for all of skia desktop, #
                 date.text.Text = date.Text;
             }
         };
-        date.down.Tapped += (s, e) =>
+        date.down.Click += (s, e) =>
         {
             if (Date != DateOnly.MinValue)
             {
@@ -288,8 +288,8 @@ public sealed partial class New : Page // #if DESKTOP for all of skia desktop, #
 partial class UpDownBox : UserControl
 {
     public string? Text;
-    public Button? up;
-    public Button? down;
+    public RepeatButton? up;
+    public RepeatButton? down;
     public TextBox? text;
 
     public UpDownBox()
@@ -309,11 +309,11 @@ partial class UpDownBox : UserControl
                     Orientation = Orientation.Horizontal,
                     Children =
                     {
-                        (up = new Button
+                        (up = new RepeatButton
                         {
                             Content = "+",
                         }),
-                        (down = new Button
+                        (down = new RepeatButton
                         {
                             Content = "\u2212",
                         })
