@@ -304,7 +304,7 @@ partial class UpDownBox : UserControl
 
     public UpDownBox()
     {
-        
+
         var c = new StackPanel
         {
             Orientation = Orientation.Horizontal,
@@ -322,10 +322,14 @@ partial class UpDownBox : UserControl
                         (up = new RepeatButton
                         {
                             Content = "+",
+                            Delay = 100,
+                            Interval = 32
                         }),
                         (down = new RepeatButton
                         {
                             Content = "\u2212",
+                            Delay = 100,
+                            Interval = 32
                         })
                     }
                 }
