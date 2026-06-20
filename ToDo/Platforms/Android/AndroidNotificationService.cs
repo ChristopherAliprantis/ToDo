@@ -87,7 +87,7 @@ public class AndroidNotificationService : INotificationService
     }
 
 
-public void CancelNotification(string actionData)
+    public void CancelNotification(string actionData)
     {
         var context = Android.App.Application.Context;
 
@@ -107,7 +107,6 @@ public void CancelNotification(string actionData)
     }
 }
 [BroadcastReceiver(Enabled = true, Exported = false)]
-[Register("todo.droid.NotificationReceiver")]
 public class NotificationReceiver : BroadcastReceiver
 {
     public override void OnReceive(Context context, Intent intent)

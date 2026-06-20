@@ -8,8 +8,6 @@
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
-    <uses-sdk android:minSdkVersion="23" android:targetSdkVersion="34" />
-
     <application
         android:allowBackup="true"
         android:supportsRtl="true"
@@ -17,13 +15,11 @@
         android:theme="@style/UnoAppTheme"
         android:icon="@mipmap/appicon">
 
-        <!-- Updated to match the [Register] attribute -->
         <receiver
             android:name="todo.droid.NotificationReceiver"
             android:enabled="true"
             android:exported="false" />
 
-        <!-- Updated to match the [Register] attribute -->
         <receiver
             android:name="todo.droid.BootReceiver"
             android:enabled="true"

@@ -13,7 +13,6 @@ namespace ToDo.Droid;
 
 [BroadcastReceiver(Enabled = true, Exported = true, DirectBootAware = true)]
 [IntentFilter(new[] { Intent.ActionBootCompleted })]
-[Register("todo.droid.BootReceiver")]
 public class BootReceiver : BroadcastReceiver
 {
     public override void OnReceive(Context context, Intent intent)
