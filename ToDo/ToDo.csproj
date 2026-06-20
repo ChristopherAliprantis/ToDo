@@ -72,7 +72,7 @@
         <Content Update="Assets\reload.svg">
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </Content>
-        
+        <AndroidAsset Include="Assets\reload.svg" Link="Assets\reload.svg" />
     </ItemGroup>
 
     <ItemGroup>
@@ -91,6 +91,7 @@
 
     <ItemGroup Condition="'$(TargetFramework)' == 'net10.0-desktop'">
         <None Remove="Platforms\Desktop\WinRTapis.dll" />
+        <AndroidAsset Include="Assets\your-file.svg" Link="Assets\your-file.svg" />
     </ItemGroup>
 
     <ItemGroup Condition="'$(TargetFramework)' == 'net10.0-desktop'">
