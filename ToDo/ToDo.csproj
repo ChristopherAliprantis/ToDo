@@ -72,7 +72,6 @@
         <Content Update="Assets\reload.svg">
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </Content>
-        <AndroidAsset Include="Assets\reload.svg" Link="Assets\reload.svg" />
     </ItemGroup>
 
     <ItemGroup>
@@ -84,7 +83,7 @@
     </ItemGroup>
 
     <ItemGroup Condition="'$(TargetFramework)' == 'net10.0-android'">
-        <AndroidAsset Include="..\SharedProjectDirectoryName\Assets\**\*.svg" Link="assets\%(RecursiveDir)%(Filename)%(Extension)" />
+        <AndroidAsset Include="Assets\reload.svg" Link="assets\%(RecursiveDir)%(Filename)%(Extension)" />
         <None Update="Assets\DLLs\WinRTapis.dll">
             <CopyToOutputDirectory>Do Not Copy</CopyToOutputDirectory>
         </None>
