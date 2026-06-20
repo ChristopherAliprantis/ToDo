@@ -1,8 +1,11 @@
+using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
+using System.Threading.Tasks;
 using Android.App;
 using Android.Content;
-using System.Threading.Tasks;
+using Android.Runtime;
 using static ToDo.ToDos;
 using Path = System.IO.Path;
 
@@ -10,6 +13,7 @@ namespace ToDo.Droid;
 
 [BroadcastReceiver(Enabled = true, Exported = true, DirectBootAware = true)]
 [IntentFilter(new[] { Intent.ActionBootCompleted })]
+[Register("todo.droid.BootReceiver")]
 public class BootReceiver : BroadcastReceiver
 {
     public override void OnReceive(Context context, Intent intent)
@@ -28,7 +32,6 @@ public class BootReceiver : BroadcastReceiver
                         "ToDo");
 
                     Directory.CreateDirectory(folderPath);
-
                     string filePath = Path.Combine(folderPath, "todos.json");
 
                     if (!File.Exists(filePath))
@@ -44,19 +47,17 @@ public class BootReceiver : BroadcastReceiver
 
                     foreach (var d in todos)
                     {
-                        ts.Add(
-                            new ToDos.ToDo(
-                                d.Title ?? "",
-                                d.Descrip ?? "",
-                                d.Date,
-                                d.Time,
-                                d.ID));
+                        ts.Add(new ToDos.ToDo(
+                            d.Title ?? "",
+                            d.Descrip ?? "",
+                            d.Date,
+                            d.Time,
+                            d.ID));
                     }
 
                     INotificationService notifs = new AndroidNotificationService();
+                    List<ToDos.ToDo> itemsToRemove = new List<ToDos.ToDo>();
 
-                    List<int> todelete = new List<int>();
-                    int i = 0;
                     foreach (var todo in ts)
                     {
                         if (todo.Time != null)
@@ -73,27 +74,24 @@ public class BootReceiver : BroadcastReceiver
                             }
                             else
                             {
-                                todelete.Add(i);
+                                itemsToRemove.Add(todo);
                             }
                         }
-                        i++;
                     }
-                    for (int j = 0; j < todelete.Count; j++)
+
+                    foreach (var todo in itemsToRemove)
                     {
-                        var todo = ts[todelete[i]];
                         Console.WriteLine($"Deleting ToDo: '{todo.ID}'");
                         if (todo.ID != null) Console.WriteLine("ID is not null");
                         if (!string.IsNullOrWhiteSpace(todo.ID))
                         {
                             Console.WriteLine($"Cancelling notification with ID: {todo.ID}");
-                            await Task.Run(() => Notifications.CancelNotif(todo));
+                            await Task.Run(() => notifs.CancelNotification(todo.ID));
                         }
-                        MainPage.TODOS.Remove(todo);
-                        await MainPage.todos.Save();
-                        await MainPage.todos.Load();
+                        ts.Remove(todo);
                     }
-                    List<ToDoData> todoS = new();
 
+                    List<ToDoData> todoS = new();
                     foreach (var t in ts)
                     {
                         if (t == null) continue;
@@ -109,16 +107,7 @@ public class BootReceiver : BroadcastReceiver
                     }
 
                     string jsondata = JsonSerializer.Serialize(todoS);
-
-                    string folderpath = Path.Combine(
-                        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                        "ToDo");
-
-                    Directory.CreateDirectory(folderPath);
-
-                    string filepath = Path.Combine(folderPath, "todos.json");
-
-                    await File.WriteAllTextAsync(filepath, jsondata);
+                    await File.WriteAllTextAsync(filePath, jsondata);
                     Console.WriteLine("ToDos saved");
                 }
                 catch (System.Exception ex)

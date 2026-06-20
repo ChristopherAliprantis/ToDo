@@ -1,39 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+<manifest xmlns:android="http://android.com"
           package="com.christopheraliprantis.todo"
           android:versionCode="2"
           android:versionName="2.1.0">
 
-    <!-- Notifications (Android 13+) -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
-
-    <!-- Exact alarms (Android 12+) -->
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
-
-    <!-- Re-register alarms after reboot -->
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+
+    <uses-sdk android:minSdkVersion="23" android:targetSdkVersion="34" />
 
     <application
         android:allowBackup="true"
         android:supportsRtl="true"
         android:label="ToDo"
         android:theme="@style/UnoAppTheme"
-        android:icon="@android:mipmap/appicon">
+        android:icon="@mipmap/appicon">
 
-        <!-- Notification trigger -->
+        <!-- Updated to match the [Register] attribute -->
         <receiver
-            android:name="ToDo.Droid.NotificationReceiver"
+            android:name="todo.droid.NotificationReceiver"
             android:enabled="true"
             android:exported="false" />
 
-        <!-- Optional: restore alarms after reboot -->
+        <!-- Updated to match the [Register] attribute -->
         <receiver
-            android:name=".BootReceiver"
+            android:name="todo.droid.BootReceiver"
             android:enabled="true"
-            android:exported="true">
-
+            android:exported="true"
+            android:directBootAware="true">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.LOCKED_BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
 

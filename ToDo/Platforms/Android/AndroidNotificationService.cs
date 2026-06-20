@@ -3,6 +3,7 @@ namespace ToDo.Droid;
 using Android.App;
 using Android.Content;
 using Android.OS;
+using Android.Runtime;
 using AndroidX.Core.App;
 
 public class AndroidNotificationService : INotificationService
@@ -106,6 +107,7 @@ public void CancelNotification(string actionData)
     }
 }
 [BroadcastReceiver(Enabled = true, Exported = false)]
+[Register("todo.droid.NotificationReceiver")]
 public class NotificationReceiver : BroadcastReceiver
 {
     public override void OnReceive(Context context, Intent intent)
