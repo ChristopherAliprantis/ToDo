@@ -247,28 +247,24 @@ public sealed partial class MainPage : Page // #if DESKTOP for all of skia deskt
         var storyboard = new Microsoft.UI.Xaml.Media.Animation.Storyboard();
         storyboard.Children.Add(spinAnimation);
         storyboard.Begin();
-        for (int l = 0; l < 3; l++)
+        var tlist = new List<ToDos.ToDo>(MainPage.TODOS);
+        for (int i = tlist.Count - 1; i >= 0; i--)
         {
-            var tlist = new List<ToDos.ToDo>(MainPage.TODOS);
-            for (int i = tlist.Count - 1; i >= 0; i--)
+            var t = tlist[i];
+
+            if (t.Date.HasValue && t.Time.HasValue)
             {
-                var t = tlist[i];
+                var dt = t.Date.Value.ToDateTime(t.Time.Value);
 
-                if (t.Date.HasValue && t.Time.HasValue)
+                if (dt < DateTime.Now)
                 {
-                    var dt = t.Date.Value.ToDateTime(t.Time.Value);
-
-                    if (dt < DateTime.Now)
-                    {
-                        await MainPage.TODOS[i].Delete();
-                    }
-                    else
-                    {
-                        Notifications.CancelNotif(TODOS[i]);
-                        await Notifications.SendNotif(TODOS[i]);
-                    }
+                    await MainPage.TODOS[i].Delete();
                 }
-                RebuildTodos();
+                else
+                {
+                    Notifications.CancelNotif(TODOS[i]);
+                    await Notifications.SendNotif(TODOS[i]);
+                }
             }
         }
         await todos.Save();
