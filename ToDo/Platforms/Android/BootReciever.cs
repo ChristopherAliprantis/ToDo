@@ -80,7 +80,17 @@ public class BootReceiver : BroadcastReceiver
                     }
                     for (int j = 0; j < todelete.Count; j++)
                     {
-                        await ts[todelete[j]].Delete();
+                        var todo = ts[todelete[i]];
+                        Console.WriteLine($"Deleting ToDo: '{todo.ID}'");
+                        if (todo.ID != null) Console.WriteLine("ID is not null");
+                        if (!string.IsNullOrWhiteSpace(todo.ID))
+                        {
+                            Console.WriteLine($"Cancelling notification with ID: {todo.ID}");
+                            await Task.Run(() => Notifications.CancelNotif(todo));
+                        }
+                        MainPage.TODOS.Remove(todo);
+                        await MainPage.todos.Save();
+                        await MainPage.todos.Load();
                     }
                     List<ToDoData> todoS = new();
 
@@ -117,7 +127,7 @@ public class BootReceiver : BroadcastReceiver
                 }
                 finally
                 {
-                    pendingResult.Finish();
+                    pendingResult?.Finish();
                 }
             });
         }
