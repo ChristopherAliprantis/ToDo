@@ -86,7 +86,7 @@ public sealed partial class New : Page // #if DESKTOP for all of skia desktop, #
             }
 
         };
-        time.up.Click += (s, e) =>
+        time.up.Tapped += (s, e) =>
         {
             if (Time != TimeOnly.MaxValue)
             {
@@ -95,7 +95,7 @@ public sealed partial class New : Page // #if DESKTOP for all of skia desktop, #
                 time.text.Text = time.Text;
             }
         };
-        time.down.Click += (s, e) =>
+        time.down.Tapped += (s, e) =>
         {
             if (Time != TimeOnly.MinValue)
             {
@@ -104,7 +104,7 @@ public sealed partial class New : Page // #if DESKTOP for all of skia desktop, #
                 time.text.Text = time.Text;
             }
         };
-        date.up.Click += (s, e) =>
+        date.up.Tapped += (s, e) =>
         {
             if (Date != DateOnly.MaxValue)
             {
@@ -113,7 +113,7 @@ public sealed partial class New : Page // #if DESKTOP for all of skia desktop, #
                 date.text.Text = date.Text;
             }
         };
-        date.down.Click += (s, e) =>
+        date.down.Tapped += (s, e) =>
         {
             if (Date != DateOnly.MinValue)
             {
