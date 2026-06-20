@@ -149,17 +149,6 @@
               DestinationFolder="$(PublishDir)Assets\"
               Condition="'$(TargetFramework)' == 'net10.0-desktop'"
               SkipUnchangedFiles="true" />
-
-        <!-- 3. Android: Injection into intermediate build assets -->
-        <Copy SourceFiles="@(RawSvgFile)"
-              DestinationFolder="$(IntermediateOutputPath)android\assets\Assets\"
-              Condition="'$(TargetFramework)' == 'net10.0-android'"
-              SkipUnchangedFiles="true" />
-
-        <Copy SourceFiles="@(RawSvgFile)"
-              DestinationFolder="$(AndroidIntermediateOutputPath)assets\Assets\"
-              Condition="'$(TargetFramework)' == 'net10.0-android'"
-              SkipUnchangedFiles="true" />
     </Target>
 
 </Project>
