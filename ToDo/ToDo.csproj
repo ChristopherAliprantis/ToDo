@@ -64,15 +64,11 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <None Remove="Assets\Icons\todosvg.svg" />
       <None Remove="Assets\reload.svg" />
+      <None Remove="Assets\Splash\splash_screen.svg" />
     </ItemGroup>
 
-    <ItemGroup>
-        <UnoImage Remove="Assets\reload.svg" />
-        <Content Update="Assets\reload.svg">
-            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-        </Content>
-    </ItemGroup>
 
     <ItemGroup>
         <Folder Include="Platforms\Android\Resources\mipmap-mdpi" />
@@ -83,9 +79,6 @@
     </ItemGroup>
 
     <ItemGroup Condition="'$(TargetFramework)' == 'net10.0-android'">
-        <AndroidAsset Include="Assets\**\*.svg">
-            <Link>assets\Assets\%(RecursiveDir)%(Filename)%(Extension)</Link>
-        </AndroidAsset>
         <None Update="Assets\DLLs\WinRTapis.dll">
             <CopyToOutputDirectory>Do Not Copy</CopyToOutputDirectory>
         </None>
@@ -117,40 +110,10 @@
         <Delete Files="@(FilesToRemove)" ContinueOnError="true" />
         <Message Text="Successfully stripped all .pdb and .uprimarker files from the publish directory!" Importance="high" />
     </Target>
-    <Target Name="ForceCopyRawSvgToOutput" AfterTargets="Build">
-        <ItemGroup>
-            <!-- Define the exact file you want to smuggle past Uno -->
-            <RawSvgFile Include="Assets\reload.svg" />
-        </ItemGroup>
-
-        <!-- Copy it directly to the local bin output directory -->
-        <Copy SourceFiles="@(RawSvgFile)"
-              DestinationFolder="$(TargetDir)Assets\"
-              SkipUnchangedFiles="true" />
-
-        <!-- Force copy it to AppX/Publish folders for mobile/Wasm packaging targets -->
-        <Copy SourceFiles="@(RawSvgFile)"
-              DestinationFolder="$(AppxPackageDir)Assets\"
-              Condition="'$(AppxPackageDir)' != ''"
-              SkipUnchangedFiles="true" />
-    </Target>
-
-    <Target Name="ForceCopyRawSvgToOutput" AfterTargets="Build;Publish">
-        <ItemGroup>
-            <RawSvgFile Include="Assets\reload.svg" />
-        </ItemGroup>
-
-        <!-- 1. Desktop: Standard Output -->
-        <Copy SourceFiles="@(RawSvgFile)"
-              DestinationFolder="$(TargetDir)Assets\"
-              Condition="'$(TargetFramework)' == 'net10.0-desktop'"
-              SkipUnchangedFiles="true" />
-
-        <!-- 2. Desktop: Publish Output -->
-        <Copy SourceFiles="@(RawSvgFile)"
-              DestinationFolder="$(PublishDir)Assets\"
-              Condition="'$(TargetFramework)' == 'net10.0-desktop'"
-              SkipUnchangedFiles="true" />
-    </Target>
+    <ItemGroup>
+      <Content Update="Assets\reload">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+    </ItemGroup>
 
 </Project>

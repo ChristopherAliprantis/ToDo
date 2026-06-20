@@ -34,7 +34,7 @@ public sealed partial class MainPage : Page // #if DESKTOP for all of skia deskt
                 new ColumnDefinition { Width = new GridLength(1,GridUnitType.Star) }
             }
         };
-        var rs = new Microsoft.UI.Xaml.Media.Imaging.SvgImageSource(new Uri("ms-appx:///Assets/reload.svg"));
+        var rs = new Microsoft.UI.Xaml.Media.Imaging.SvgImageSource(new Uri("ms-appx:///Assets/reload"));
         var reloadpic = new Microsoft.UI.Xaml.Controls.Image
         {
             Source = rs,
