@@ -83,7 +83,9 @@
     </ItemGroup>
 
     <ItemGroup Condition="'$(TargetFramework)' == 'net10.0-android'">
-        <AndroidAsset Include="Assets\reload.svg" Link="assets\%(RecursiveDir)%(Filename)%(Extension)" />
+        <AndroidAsset Include="Assets\**\*.svg">
+            <Link>assets\Assets\%(RecursiveDir)%(Filename)%(Extension)</Link>
+        </AndroidAsset>
         <None Update="Assets\DLLs\WinRTapis.dll">
             <CopyToOutputDirectory>Do Not Copy</CopyToOutputDirectory>
         </None>
