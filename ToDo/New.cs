@@ -165,6 +165,16 @@ public sealed partial class New : Page // #if DESKTOP for all of skia desktop, #
 
             Content = all,
         };
+        if (Application.Current.Resources.TryGetValue("DefaultButtonStyle", out object styleObj))
+        {
+            if (styleObj is Style defaultStyle)
+            {
+                time.up.Style = defaultStyle;
+                time.down.Style = defaultStyle;
+                date.up.Style = defaultStyle;
+                date.down.Style = defaultStyle;
+            }
+        }
         this.Loaded += (s, e) =>
         {
             var bounds = App.MainWindow.Bounds;
@@ -333,12 +343,12 @@ partial class UpDownBox : UserControl
             ((StackPanel)c.Children[1]).Height = this.Height;
             ((StackPanel)c.Children[1]).Width = this.Width - c.Spacing - ((FrameworkElement)c.Children[0]).Width;
 
-            ((Button)((StackPanel)c.Children[1]).Children[0]).Width = this.Height;
-            ((Button)((StackPanel)c.Children[1]).Children[0]).Height = this.Height;
-            ((Button)((StackPanel)c.Children[1]).Children[0]).FontSize = this.Width * 0.13;
-            ((Button)((StackPanel)c.Children[1]).Children[1]).Width = this.Height;
-            ((Button)((StackPanel)c.Children[1]).Children[1]).Height = this.Height;
-            ((Button)((StackPanel)c.Children[1]).Children[1]).FontSize = this.Width * 0.13;
+            ((RepeatButton)((StackPanel)c.Children[1]).Children[0]).Width = this.Height;
+            ((RepeatButton)((StackPanel)c.Children[1]).Children[0]).Height = this.Height;
+            ((RepeatButton)((StackPanel)c.Children[1]).Children[0]).FontSize = this.Width * 0.13;
+            ((RepeatButton)((StackPanel)c.Children[1]).Children[1]).Width = this.Height;
+            ((RepeatButton)((StackPanel)c.Children[1]).Children[1]).Height = this.Height;
+            ((RepeatButton)((StackPanel)c.Children[1]).Children[1]).FontSize = this.Width * 0.13;
         };
         this.Loaded += (s, e) =>
         {
@@ -351,12 +361,12 @@ partial class UpDownBox : UserControl
             ((StackPanel)c.Children[1]).Height = this.Height;
             ((StackPanel)c.Children[1]).Width = this.Width - c.Spacing - ((FrameworkElement)c.Children[0]).Width;
 
-            ((Button)((StackPanel)c.Children[1]).Children[0]).Width = this.Height;
-            ((Button)((StackPanel)c.Children[1]).Children[0]).Height = this.Height;
-            ((Button)((StackPanel)c.Children[1]).Children[0]).FontSize = this.Width * 0.13;
-            ((Button)((StackPanel)c.Children[1]).Children[1]).Width = this.Height;
-            ((Button)((StackPanel)c.Children[1]).Children[1]).Height = this.Height;
-            ((Button)((StackPanel)c.Children[1]).Children[1]).FontSize = this.Width * 0.13;
+            ((RepeatButton)((StackPanel)c.Children[1]).Children[0]).Width = this.Height;
+            ((RepeatButton)((StackPanel)c.Children[1]).Children[0]).Height = this.Height;
+            ((RepeatButton)((StackPanel)c.Children[1]).Children[0]).FontSize = this.Width * 0.13;
+            ((RepeatButton)((StackPanel)c.Children[1]).Children[1]).Width = this.Height;
+            ((RepeatButton)((StackPanel)c.Children[1]).Children[1]).Height = this.Height;
+            ((RepeatButton)((StackPanel)c.Children[1]).Children[1]).FontSize = this.Width * 0.13;
         };
     }
 }
