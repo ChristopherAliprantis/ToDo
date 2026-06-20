@@ -120,7 +120,14 @@ public sealed partial class MainPage : Page // #if DESKTOP for all of skia deskt
                 avail = (w - Bar.Width) - (h / 96 * 2.7 * 2.20);
             }
 #if ANDROID
-            ((Button)content.Children[0]).Width = h / 18.0;
+            if (bounds.Width > bounds.Height)
+            {
+                ((Button)content.Children[0]).Width = h / 9.0;
+            }
+            else
+            {
+                ((Button)content.Children[0]).Width = h / 17.5;
+            }
 #elif DESKTOP || WINDOWS
     ((Button)content.Children[0]).Width = h / 24.0;
 #endif

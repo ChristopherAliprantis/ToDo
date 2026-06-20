@@ -141,13 +141,13 @@
         <!-- 1. Desktop: Standard Output -->
         <Copy SourceFiles="@(RawSvgFile)"
               DestinationFolder="$(TargetDir)Assets\"
-              Condition="'$(TargetFramework)' == 'net10.0-desktop' And '$(TargetDir)' != ''"
+              Condition="'$(TargetFramework)' == 'net10.0-desktop'"
               SkipUnchangedFiles="true" />
 
         <!-- 2. Desktop: Publish Output -->
         <Copy SourceFiles="@(RawSvgFile)"
               DestinationFolder="$(PublishDir)Assets\"
-              Condition="'$(TargetFramework)' == 'net10.0-desktop' And '$(PublishDir)' != ''"
+              Condition="'$(TargetFramework)' == 'net10.0-desktop'"
               SkipUnchangedFiles="true" />
 
         <!-- 3. Android: Injection into intermediate build assets -->
