@@ -242,34 +242,39 @@ public sealed partial class MainPage : Page // #if DESKTOP for all of skia deskt
         };
 
         Microsoft.UI.Xaml.Media.Animation.Storyboard.SetTarget(spinAnimation, rotationTransform);
-        Microsoft.UI.Xaml.Media.Animation.Storyboard.SetTargetProperty(spinAnimation, new Microsoft.UI.Xaml.PropertyPath("(RotateTransform.Angle)"));
+        Microsoft.UI.Xaml.Media.Animation.Storyboard.SetTargetProperty(spinAnimation, "Angle");
 
         var storyboard = new Microsoft.UI.Xaml.Media.Animation.Storyboard();
         storyboard.Children.Add(spinAnimation);
         storyboard.Begin();
-        var tlist = new List<ToDos.ToDo>(MainPage.TODOS);
-        for (int i = tlist.Count - 1; i >= 0; i--)
-        {
-            var t = tlist[i];
 
+        await Task.Delay(16);
+
+        var tlist = new List<ToDos.ToDo>(MainPage.TODOS);
+
+        foreach (var t in tlist)
+        {
             if (t.Date.HasValue && t.Time.HasValue)
             {
                 var dt = t.Date.Value.ToDateTime(t.Time.Value);
 
                 if (dt < DateTime.Now)
                 {
-                    await MainPage.TODOS[i].Delete();
+                    await t.Delete();
+                    MainPage.TODOS.Remove(t);
                 }
                 else
                 {
-                    Notifications.CancelNotif(TODOS[i]);
-                    await Notifications.SendNotif(TODOS[i]);
+                    Notifications.CancelNotif(t);
+                    await Notifications.SendNotif(t);
                 }
             }
         }
+
         await todos.Save();
         await todos.Load();
     }
+
     public static void RebuildTodos()
     {
         if (TODOS == null || TODOS.Count == 0 || TODOS[0]?.content == null)
