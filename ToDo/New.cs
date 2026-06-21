@@ -322,14 +322,14 @@ partial class UpDownBox : UserControl
                         (up = new RepeatButton
                         {
                             Content = "+",
-                            Delay = 100,
-                            Interval = 32
+                            Delay = 105,
+                            Interval = 35
                         }),
                         (down = new RepeatButton
                         {
                             Content = "\u2212",
-                            Delay = 100,
-                            Interval = 32
+                            Delay = 105,
+                            Interval = 35
                         })
                     }
                 }
