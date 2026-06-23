@@ -122,11 +122,11 @@ public sealed partial class MainPage : Page // #if DESKTOP for all of skia deskt
 #if ANDROID
             if (bounds.Width > bounds.Height)
             {
-                ((Button)content.Children[0]).Width = h / 12.0;
+                ((Button)content.Children[0]).Width = h / 11.6;
             }
             else
             {
-                ((Button)content.Children[0]).Width = h / 23.0;
+                ((Button)content.Children[0]).Width = h / 23.5;
             }
 #elif DESKTOP || WINDOWS
     ((Button)content.Children[0]).Width = h / 24.0;
@@ -195,11 +195,11 @@ public sealed partial class MainPage : Page // #if DESKTOP for all of skia deskt
 #if ANDROID
             if (bounds.Width > bounds.Height)
             {
-                ((Button)content.Children[0]).Width = h / 12.0;
+                ((Button)content.Children[0]).Width = h / 11.6;
             }
             else
             {
-                ((Button)content.Children[0]).Width = h / 23.0;
+                ((Button)content.Children[0]).Width = h / 23.5;
             }
 #elif DESKTOP || WINDOWS
     ((Button)content.Children[0]).Width = h / 24.0;
