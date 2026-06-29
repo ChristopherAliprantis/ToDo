@@ -6,6 +6,7 @@ namespace ToDo;
 
 public sealed partial class New : Page // #if DESKTOP for all of skia desktop, #if WINDOWS for windows, #if ANDROID for android.
 {
+    public static (ToDos.ToDo?, bool) edit;
     public New()
     {
         RowDefinition? space;

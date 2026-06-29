@@ -339,14 +339,18 @@ public sealed partial class MainPage : Page // #if DESKTOP for all of skia deskt
 
 #if DESKTOP || WINDOWS
             ((Button)TODOS[i].content.Children[3]).Width = avail * 0.32;
+            ((Button)TODOS[i].content.Children[4]).Width = avail * 0.32;
 #else
             ((Button)TODOS[i].content.Children[3]).Width = avail * 0.48;
+            ((Button)TODOS[i].content.Children[4]).Width = avail * 0.48;
 #endif
 
             ((TextBlock)TODOS[i].content.Children[2]).FontSize = ((TextBlock)TODOS[i].content.Children[1]).FontSize;
 
             ((Button)TODOS[i].content.Children[3]).Height = ((Button)TODOS[i].content.Children[3]).Width * 0.46;
             ((Button)TODOS[i].content.Children[3]).FontSize = ((Button)TODOS[i].content.Children[3]).Width / 4.86;
+            ((Button)TODOS[i].content.Children[4]).Height = ((Button)TODOS[i].content.Children[3]).Width * 0.46;
+            ((Button)TODOS[i].content.Children[4]).FontSize = ((Button)TODOS[i].content.Children[3]).Width / 4.86;
             todos.AddBack(TODOS[i]);
         }
     }
@@ -449,8 +453,13 @@ public partial class ToDos : StackPanel
                     new Button
                     {
                         Content = "Delete"
+                    },
+                    new Button
+                    {
+                        Content = "Edit"
                     }
                 }
+
             };
             Content = border = new Border
             {
