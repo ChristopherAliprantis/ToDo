@@ -96,7 +96,7 @@ public sealed partial class New : Page // #if DESKTOP for all of skia desktop, #
             if (edit.Item1.Date != null)
             {
                 time.Visibility = Visibility.Visible;
-                date.Visibility = Visibility.Collapsed;
+                date.Visibility = Visibility.Visible;
             }
         }
         time.up.Click += (s, e) =>
