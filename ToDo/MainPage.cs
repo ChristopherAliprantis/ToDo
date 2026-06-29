@@ -475,6 +475,11 @@ public partial class ToDos : StackPanel
             {
                 await Delete();
             };
+            ((Button)content.Children[4]).Click += async (s, e) =>
+            {
+                New.edit = (this, true);
+                App.rootFrame.Navigate(typeof(New));
+            };
         }
 
         public async Task Delete()

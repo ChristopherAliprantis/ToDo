@@ -6,7 +6,7 @@ namespace ToDo;
 
 public sealed partial class New : Page // #if DESKTOP for all of skia desktop, #if WINDOWS for windows, #if ANDROID for android.
 {
-    public static (ToDos.ToDo?, bool) edit;
+    public static (ToDos.ToDo?, bool) edit = (null, false);
     public New()
     {
         RowDefinition? space;
@@ -87,6 +87,18 @@ public sealed partial class New : Page // #if DESKTOP for all of skia desktop, #
             }
 
         };
+        if (edit.Item2 == true && edit.Item1 != null)
+        {
+            if (edit.Item1.Date != null) Date = edit.Item1.Date.Value;
+            if (edit.Item1.Time != null) Time = edit.Item1.Time.Value;
+            title.Text = edit.Item1.Title;
+            describe.Text = edit.Item1.Descrip;
+            if (edit.Item1.Date != null)
+            {
+                time.Visibility = Visibility.Visible;
+                date.Visibility = Visibility.Collapsed;
+            }
+        }
         time.up.Click += (s, e) =>
         {
             if (Time != TimeOnly.MaxValue)
@@ -143,11 +155,23 @@ public sealed partial class New : Page // #if DESKTOP for all of skia desktop, #
         {
             if (date.Visibility == Visibility.Collapsed && time.Visibility == Visibility.Collapsed)
             {
+                if (edit.Item2 == true && edit.Item1 != null)
+                {
+                    edit.Item2 = false;
+                    var t = edit.Item1;
+                    await t.Delete();
+                }
                 await MainPage.todos.ADD(title.Text, describe.Text, null, null, null);
             }
             else
             {
                 if (Date.ToDateTime(Time) < DateTime.Now) return;
+                if (edit.Item2 == true && edit.Item1 != null)
+                {
+                    edit.Item2 = false;
+                    var t = edit.Item1;
+                    await t.Delete();
+                }
                 string ID = System.Guid.NewGuid().ToString();
                 Console.WriteLine($"New ToDo ID: {ID}");
                 await MainPage.todos.ADD(title.Text, describe.Text, Date, Time, ID);
