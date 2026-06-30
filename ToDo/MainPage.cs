@@ -345,8 +345,9 @@ public sealed partial class MainPage : Page // #if DESKTOP for all of skia deskt
 
             ((TextBlock)TODOS[i].content.Children[2]).FontSize = ((TextBlock)TODOS[i].content.Children[1]).FontSize;
 
-            ((ComboBox)TODOS[i].content.Children[3]).Height = ((ComboBox)TODOS[i].content.Children[3]).Width * 0.46;
-            ((ComboBox)TODOS[i].content.Children[3]).FontSize = ((ComboBox)TODOS[i].content.Children[3]).Height / 3;
+            ((ComboBox)TODOS[i].content.Children[3]).Height = ((ComboBox)TODOS[i].content.Children[3]).Width * 0.387;
+            ((ComboBox)TODOS[i].content.Children[3]).FontSize = ((ComboBox)TODOS[i].content.Children[3]).Height / 2.1;
+            ((ComboBox)TODOS[i].content.Children[3]).Padding = new Thickness(((ComboBox)TODOS[i].content.Children[3]).Width / 5, 0, 0, 0);
             todos.AddBack(TODOS[i]);
         }
     }
@@ -450,6 +451,7 @@ public partial class ToDos : StackPanel
                     {
                         PlaceholderText = ". . .",
                         PlaceholderForeground = new SolidColorBrush(Colors.Black),
+                        
                         Items =
                         {
                             new ComboBoxItem
