@@ -155,28 +155,42 @@ public sealed partial class New : Page // #if DESKTOP for all of skia desktop, #
         };
         done.Click += async(s, e) =>
         {
+            int? ind = null;
             if (date.Visibility == Visibility.Collapsed && time.Visibility == Visibility.Collapsed)
             {
                 if (edit.Item2 == true && edit.Item1 != null)
                 {
                     edit.Item2 = false;
                     var t = edit.Item1;
+                    ind = MainPage.TODOS.IndexOf(edit.Item1);
+                    if (ind == -1)
+                    {
+                        ind = null;
+                    }
                     await t.Delete();
                 }
-                await MainPage.todos.ADD(title.Text, describe.Text, null, null, null);
+                if (ind != null) await MainPage.todos.ADD(title.Text, describe.Text, null, null, null);
+                else await MainPage.todos.ADD(title.Text, describe.Text, null,null, null, ind.Value);
             }
             else
             {
+                int? ind = null;
                 if (Date.ToDateTime(Time) < DateTime.Now) return;
                 if (edit.Item2 == true && edit.Item1 != null)
                 {
                     edit.Item2 = false;
                     var t = edit.Item1;
+                    ind = MainPage.TODOS.IndexOf(edit.Item1);
+                    if (ind == -1)
+                    {
+                        ind = null;
+                    }
                     await t.Delete();
                 }
                 string ID = System.Guid.NewGuid().ToString();
                 Console.WriteLine($"New ToDo ID: {ID}");
-                await MainPage.todos.ADD(title.Text, describe.Text, Date, Time, ID);
+                if (ind != null) await MainPage.todos.ADD(title.Text, describe.Text, Date, Time, ID);
+                else await MainPage.todos.ADD(title.Text, describe.Text, Date, Time, ID, ind.Value);
 
             }
             App.rootFrame.Navigate(typeof(MainPage));

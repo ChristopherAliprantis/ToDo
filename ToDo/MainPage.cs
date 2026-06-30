@@ -544,6 +544,17 @@ public partial class ToDos : StackPanel
         MainPage.TODOS.Add(N);
         await MainPage.todos.Save();
     }
+
+    public async Task ADD(string title, string descrip, DateOnly? date, TimeOnly? time, string? id, int index)
+    {
+        var N = new ToDo(title, descrip, date, time, id);
+        if (N.ID != null)
+        {
+            await Notifications.SendNotif(N);
+        }
+        MainPage.TODOS[index] = N;
+        await MainPage.todos.Save();
+    }
     public void AddBack(ToDo? thing)
     {
         if (thing == null)
