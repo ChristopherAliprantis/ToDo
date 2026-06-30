@@ -338,19 +338,15 @@ public sealed partial class MainPage : Page // #if DESKTOP for all of skia deskt
             ((TextBlock)TODOS[i].content.Children[1]).FontSize = NEW.FontSize - 6.28;
 
 #if DESKTOP || WINDOWS
-            ((Button)TODOS[i].content.Children[3]).Width = avail * 0.32;
-            ((Button)TODOS[i].content.Children[4]).Width = avail * 0.32;
+            ((ComboBox)TODOS[i].content.Children[3]).Width = avail * 0.32;
 #else
-            ((Button)TODOS[i].content.Children[3]).Width = avail * 0.48;
-            ((Button)TODOS[i].content.Children[4]).Width = avail * 0.48;
+            ((ComboBox)TODOS[i].content.Children[3]).Width = avail * 0.48;
 #endif
 
             ((TextBlock)TODOS[i].content.Children[2]).FontSize = ((TextBlock)TODOS[i].content.Children[1]).FontSize;
 
-            ((Button)TODOS[i].content.Children[3]).Height = ((Button)TODOS[i].content.Children[3]).Width * 0.46;
-            ((Button)TODOS[i].content.Children[3]).FontSize = ((Button)TODOS[i].content.Children[3]).Width / 4.86;
-            ((Button)TODOS[i].content.Children[4]).Height = ((Button)TODOS[i].content.Children[3]).Width * 0.46;
-            ((Button)TODOS[i].content.Children[4]).FontSize = ((Button)TODOS[i].content.Children[3]).Width / 4.86;
+            ((ComboBox)TODOS[i].content.Children[3]).Height = ((ComboBox)TODOS[i].content.Children[3]).Width * 0.46;
+            ((ComboBox)TODOS[i].content.Children[3]).FontSize = ((ComboBox)TODOS[i].content.Children[3]).Height / 3;
             todos.AddBack(TODOS[i]);
         }
     }
@@ -450,14 +446,22 @@ public partial class ToDos : StackPanel
                         TextWrapping = TextWrapping.Wrap,
                         Text = $"{DDate}\n{DTime}"
                     },
-                    new Button
+                    new ComboBox
                     {
-                        Content = "Delete"
+                        PlaceholderText = ". . .",
+                        PlaceholderForeground = new SolidColorBrush(Colors.Black),
+                        Items =
+                        {
+                            new ComboBoxItem
+                            {
+                                Content = "Delete",
+                            },
+                            new ComboBoxItem
+                            {
+                                Content = "Edit",
+                            }
+                        }
                     },
-                    new Button
-                    {
-                        Content = "Edit"
-                    }
                 }
 
             };
@@ -471,15 +475,27 @@ public partial class ToDos : StackPanel
                 Background = new SolidColorBrush(Color.White),
                 Child = content,
             };
-            ((Button)content.Children[3]).Click += async (s, e) =>
+            ((ComboBox)content.Children[3]).SelectionChanged += async (s, e) =>
             {
-                await Delete();
+                var combo = (s as ComboBox);
+                if (combo == null || combo.SelectedIndex == -1) return;
+
+                var item = combo.SelectedItem as ComboBoxItem;
+                string choice = item?.Content?.ToString();
+
+                combo.SelectedIndex = -1;
+
+                if (choice == "Edit")
+                {
+                    New.edit = (this, true);
+                    App.rootFrame.Navigate(typeof(New));
+                }
+                else if (choice == "Delete")
+                {
+                    await Delete();
+                }
             };
-            ((Button)content.Children[4]).Click += async (s, e) =>
-            {
-                New.edit = (this, true);
-                App.rootFrame.Navigate(typeof(New));
-            };
+
         }
 
         public async Task Delete()
