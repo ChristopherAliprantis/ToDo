@@ -9,7 +9,7 @@ public static class Notifications
     {
         if (todo.Date == null || todo.Time == null || string.IsNullOrEmpty(todo.ID)) return;
         DateTime scheduledTime = todo.Date.Value.ToDateTime(todo.Time.Value);
-        await Task.Run(() => { App.NotificationService?.ScheduleNotification(todo.Title, todo.Descrip, new DateTimeOffset(scheduledTime), todo.ID); });
+        App.NotificationService?.ScheduleNotification(todo.Title, todo.Descrip, new DateTimeOffset(scheduledTime), todo.ID);
         
     }
 

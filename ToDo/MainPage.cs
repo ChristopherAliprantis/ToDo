@@ -512,7 +512,7 @@ public partial class ToDos : StackPanel
             if (!string.IsNullOrWhiteSpace(ID))
             {
                 Console.WriteLine($"Cancelling notification with ID: {ID}");
-                await Task.Run(() => Notifications.CancelNotif(this));
+                Notifications.CancelNotif(this);
             }
             MainPage.TODOS.Remove(this);
             await MainPage.todos.Save();
