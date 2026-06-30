@@ -1,4 +1,3 @@
-
 using static ToDo.ToDos;
 
 namespace ToDo;
@@ -97,7 +96,10 @@ public sealed partial class New : Page // #if DESKTOP for all of skia desktop, #
             {
                 time.Visibility = Visibility.Visible;
                 date.Visibility = Visibility.Visible;
+                date.Text = Date.ToString("yyyy-MM-dd");
+                time.Text = Time.ToString("hh:mm tt");
             }
+            
         }
         time.up.Click += (s, e) =>
         {
