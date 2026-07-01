@@ -169,12 +169,11 @@ public sealed partial class New : Page // #if DESKTOP for all of skia desktop, #
                     }
                     await t.Delete();
                 }
-                if (ind != null) await MainPage.todos.ADD(title.Text, describe.Text, null, null, null);
+                if (ind == null) await MainPage.todos.ADD(title.Text, describe.Text, null, null, null);
                 else await MainPage.todos.ADD(title.Text, describe.Text, null,null, null, ind.Value);
             }
             else
             {
-                int? ind = null;
                 if (Date.ToDateTime(Time) < DateTime.Now) return;
                 if (edit.Item2 == true && edit.Item1 != null)
                 {
@@ -189,7 +188,7 @@ public sealed partial class New : Page // #if DESKTOP for all of skia desktop, #
                 }
                 string ID = System.Guid.NewGuid().ToString();
                 Console.WriteLine($"New ToDo ID: {ID}");
-                if (ind != null) await MainPage.todos.ADD(title.Text, describe.Text, Date, Time, ID);
+                if (ind == null) await MainPage.todos.ADD(title.Text, describe.Text, Date, Time, ID);
                 else await MainPage.todos.ADD(title.Text, describe.Text, Date, Time, ID, ind.Value);
 
             }
