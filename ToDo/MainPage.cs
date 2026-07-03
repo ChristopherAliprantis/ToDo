@@ -477,6 +477,11 @@ public partial class ToDos : StackPanel
                 Background = new SolidColorBrush(Color.White),
                 Child = content,
             };
+            this.SizeChanged += async(s, e) =>
+            {
+                ((ComboBoxItem)((ComboBox)content.Children[3]).Items[0]).FontSize = ((ComboBoxItem)((ComboBox)content.Children[3]).Items[0]).ActualHeight  *0.8;
+                ((ComboBoxItem)((ComboBox)content.Children[3]).Items[1]).FontSize = ((ComboBoxItem)((ComboBox)content.Children[3]).Items[1]).ActualHeight * 0.8;
+            };
             ((ComboBox)content.Children[3]).SelectionChanged += async (s, e) =>
             {
                 var combo = (s as ComboBox);
