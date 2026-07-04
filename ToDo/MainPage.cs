@@ -479,15 +479,15 @@ public partial class ToDos : StackPanel
             };
             this.SizeChanged += async(s, e) =>
             {
-                ((ComboBoxItem)((ComboBox)content.Children[3]).Items[0]).FontSize = ((ComboBoxItem)((ComboBox)content.Children[3]).Items[0]).ActualWidth  *0.14;
-                ((ComboBoxItem)((ComboBox)content.Children[3]).Items[1]).FontSize = ((ComboBoxItem)((ComboBox)content.Children[3]).Items[1]).ActualWidth * 0.14;
+                ((ComboBoxItem)((ComboBox)content.Children[3]).Items[0]).FontSize = ((ComboBoxItem)((ComboBox)content.Children[3]).Items[0]).ActualWidth  /5;
+                ((ComboBoxItem)((ComboBox)content.Children[3]).Items[1]).FontSize = ((ComboBoxItem)((ComboBox)content.Children[3]).Items[1]).ActualWidth /5;
                 ((ComboBoxItem)((ComboBox)content.Children[3]).Items[0]).Padding = new Thickness(0);
                 ((ComboBoxItem)((ComboBox)content.Children[3]).Items[1]).Padding = new Thickness(0);
             };
             this.Loaded += async (s, e) =>
             {
-                ((ComboBoxItem)((ComboBox)content.Children[3]).Items[0]).FontSize = ((ComboBoxItem)((ComboBox)content.Children[3]).Items[0]).ActualWidth * 0.14;
-                ((ComboBoxItem)((ComboBox)content.Children[3]).Items[1]).FontSize = ((ComboBoxItem)((ComboBox)content.Children[3]).Items[1]).ActualWidth * 0.14;
+                ((ComboBoxItem)((ComboBox)content.Children[3]).Items[0]).FontSize = ((ComboBoxItem)((ComboBox)content.Children[3]).Items[0]).ActualWidth / 5;
+                ((ComboBoxItem)((ComboBox)content.Children[3]).Items[1]).FontSize = ((ComboBoxItem)((ComboBox)content.Children[3]).Items[1]).ActualWidth / 5;
                 ((ComboBoxItem)((ComboBox)content.Children[3]).Items[0]).Padding = new Thickness(0);
                 ((ComboBoxItem)((ComboBox)content.Children[3]).Items[1]).Padding = new Thickness(0);
             };
