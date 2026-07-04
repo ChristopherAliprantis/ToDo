@@ -479,10 +479,10 @@ public partial class ToDos : StackPanel
             };
             ((ComboBox)content.Children[3]).DropDownOpened += async(s, e) =>
             {
-                ((ComboBoxItem)((ComboBox)content.Children[3]).Items[0]).FontSize = ((ComboBoxItem)((ComboBox)content.Children[3]).Items[0]).ActualWidth  /5;
-                ((ComboBoxItem)((ComboBox)content.Children[3]).Items[1]).FontSize = ((ComboBoxItem)((ComboBox)content.Children[3]).Items[1]).ActualWidth /5;
-                ((ComboBoxItem)((ComboBox)content.Children[3]).Items[0]).Padding = new Thickness(0);
-                ((ComboBoxItem)((ComboBox)content.Children[3]).Items[1]).Padding = new Thickness(0);
+                var combo = (ComboBox)content.Children[3];
+                
+                ((ComboBoxItem)((ComboBox)content.Children[3]).Items[0]).FontSize = combo.Width  /5;
+                ((ComboBoxItem)((ComboBox)content.Children[3]).Items[1]).FontSize = combo.Width /5;
             };
             ((ComboBox)content.Children[3]).SelectionChanged += async (s, e) =>
             {
