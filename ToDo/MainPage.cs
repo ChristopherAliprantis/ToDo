@@ -465,7 +465,6 @@ public partial class ToDos : StackPanel
                         }
                     },
                 }
-
             };
             Content = border = new Border
             {
