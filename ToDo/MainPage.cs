@@ -477,17 +477,10 @@ public partial class ToDos : StackPanel
                 Background = new SolidColorBrush(Color.White),
                 Child = content,
             };
-            this.SizeChanged += async(s, e) =>
+            ((ComboBox)content.Children[3]).DropDownOpened += async(s, e) =>
             {
                 ((ComboBoxItem)((ComboBox)content.Children[3]).Items[0]).FontSize = ((ComboBoxItem)((ComboBox)content.Children[3]).Items[0]).ActualWidth  /5;
                 ((ComboBoxItem)((ComboBox)content.Children[3]).Items[1]).FontSize = ((ComboBoxItem)((ComboBox)content.Children[3]).Items[1]).ActualWidth /5;
-                ((ComboBoxItem)((ComboBox)content.Children[3]).Items[0]).Padding = new Thickness(0);
-                ((ComboBoxItem)((ComboBox)content.Children[3]).Items[1]).Padding = new Thickness(0);
-            };
-            this.Loaded += async (s, e) =>
-            {
-                ((ComboBoxItem)((ComboBox)content.Children[3]).Items[0]).FontSize = ((ComboBoxItem)((ComboBox)content.Children[3]).Items[0]).ActualWidth / 5;
-                ((ComboBoxItem)((ComboBox)content.Children[3]).Items[1]).FontSize = ((ComboBoxItem)((ComboBox)content.Children[3]).Items[1]).ActualWidth / 5;
                 ((ComboBoxItem)((ComboBox)content.Children[3]).Items[0]).Padding = new Thickness(0);
                 ((ComboBoxItem)((ComboBox)content.Children[3]).Items[1]).Padding = new Thickness(0);
             };
