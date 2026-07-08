@@ -109,12 +109,24 @@ public sealed partial class New : Page // #if DESKTOP for all of skia desktop, #
                 time.Text = Time.ToString("hh:mm tt");
                 time.text.Text = time.Text;
             }
+            else
+            {
+                Time = TimeOnly.MinValue;
+                time.Text = Time.ToString("hh:mm tt");
+                time.text.Text = time.Text;
+            }
         };
         time.down.Click += (s, e) =>
         {
             if (Time != TimeOnly.MinValue)
             {
                 Time = Time.AddMinutes(-1);
+                time.Text = Time.ToString("hh:mm tt");
+                time.text.Text = time.Text;
+            }
+            else
+            {
+                Time = TimeOnly.MaxValue;
                 time.Text = Time.ToString("hh:mm tt");
                 time.text.Text = time.Text;
             }
