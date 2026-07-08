@@ -548,6 +548,7 @@ public partial class ToDos : StackPanel
             Notifications.SendNotif(N);
         }
         MainPage.TODOS.Add(N);
+        await MainPage.todos.Save();
     }
 
     public async Task ADD(string title, string descrip, DateOnly? date, TimeOnly? time, string? id, int index)
@@ -558,6 +559,7 @@ public partial class ToDos : StackPanel
             Notifications.SendNotif(N);
         }
         MainPage.TODOS[index] = N;
+        await MainPage.todos.Save();
     }
     public void AddBack(ToDo? thing)
     {
