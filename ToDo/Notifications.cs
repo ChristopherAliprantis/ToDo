@@ -5,7 +5,7 @@ namespace ToDo;
 
 public static class Notifications
 {
-    public static async Task SendNotif(ToDos.ToDo todo)
+    public static void SendNotif(ToDos.ToDo todo)
     {
         if (todo.Date == null || todo.Time == null || string.IsNullOrEmpty(todo.ID)) return;
         DateTime scheduledTime = todo.Date.Value.ToDateTime(todo.Time.Value);

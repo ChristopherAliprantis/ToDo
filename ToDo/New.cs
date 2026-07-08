@@ -172,6 +172,7 @@ public sealed partial class New : Page // #if DESKTOP for all of skia desktop, #
                 else await MainPage.todos.ADD(title.Text, describe.Text, null,null, null, ind.Value);
                 if (edit.Item2 == true && edit.Item1 != null) await edit.Item1.Delete();
                 edit = (null, false);
+                await MainPage.todos.Save();
             }
             else
             {
@@ -196,6 +197,7 @@ public sealed partial class New : Page // #if DESKTOP for all of skia desktop, #
                     await edit.Item1.Delete();
                 }
                 edit = (null, false);
+                await MainPage.todos.Save();
             }
             App.rootFrame.Navigate(typeof(MainPage));
         };

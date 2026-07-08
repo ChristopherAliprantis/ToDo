@@ -280,7 +280,7 @@ public sealed partial class MainPage : Page // #if DESKTOP for all of skia deskt
                 else
                 {
                     Notifications.CancelNotif(t);
-                    await Notifications.SendNotif(t);
+                    Notifications.SendNotif(t);
                 }
             }
         }
@@ -545,10 +545,9 @@ public partial class ToDos : StackPanel
         var N = new ToDo(title, descrip, date, time, id);
         if (N.ID != null)
         {
-            await Notifications.SendNotif(N);
+            Notifications.SendNotif(N);
         }
         MainPage.TODOS.Add(N);
-        await MainPage.todos.Save();
     }
 
     public async Task ADD(string title, string descrip, DateOnly? date, TimeOnly? time, string? id, int index)
@@ -556,10 +555,9 @@ public partial class ToDos : StackPanel
         var N = new ToDo(title, descrip, date, time, id);
         if (N.ID != null)
         {
-            await Notifications.SendNotif(N);
+            Notifications.SendNotif(N);
         }
         MainPage.TODOS[index] = N;
-        await MainPage.todos.Save();
     }
     public void AddBack(ToDo? thing)
     {
