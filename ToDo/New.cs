@@ -190,9 +190,12 @@ public sealed partial class New : Page // #if DESKTOP for all of skia desktop, #
                 Console.WriteLine($"New ToDo ID: {ID}");
                 if (ind == null) await MainPage.todos.ADD(title.Text, describe.Text, Date, Time, ID);
                 else await MainPage.todos.ADD(title.Text, describe.Text, Date, Time, ID, ind.Value);
-                if (edit.Item2 == true && edit.Item1 != null) await edit.Item1.Delete();
+                if (edit.Item2 == true && edit.Item1 != null)
+                {
+                    Notifications.CancelNotif(edit.Item1);
+                    await edit.Item1.Delete();
+                }
                 edit = (null, false);
-
             }
             App.rootFrame.Navigate(typeof(MainPage));
         };
