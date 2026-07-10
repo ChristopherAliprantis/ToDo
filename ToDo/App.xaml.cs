@@ -65,5 +65,7 @@ public partial class App : Application
         {
             rootFrame.Navigate(typeof(MainPage));
         }
+
+        MainWindow.Activate();
     }
 }
