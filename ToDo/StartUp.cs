@@ -20,7 +20,7 @@ public partial class Start : Page
         {
             splash.Height = this.ActualHeight / 2;
             splash.Width = this.ActualWidth / 4;
-            await Task.Delay(2000);
+            await Task.Delay(1500);
             App.rootFrame.Navigate(typeof(MainPage));
         };
         this.SizeChanged += async(s, e) =>
