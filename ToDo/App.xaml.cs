@@ -70,7 +70,7 @@ public partial class App : Application
 
         if (rootFrame.Content == null)
         {
-            rootFrame.Navigate(typeof(Start));
+            rootFrame.Navigate(typeof(Start), args);
         }
 
         MainWindow.Activate();
