@@ -21,7 +21,7 @@ public partial class App : Application
 
     public static Window? MainWindow { get; private set; }
     public IHost? Host { get; private set; }
-    
+
     public static Frame? rootFrame;
     public static INotificationService? NotificationService { get; private set; }
     public static Microsoft.UI.Dispatching.DispatcherQueue? MainDispatcher { get; private set; }
@@ -58,17 +58,25 @@ public partial class App : Application
         MainWindow.SetWindowIcon();
         MainWindow.Title = "ToDo";
         Host = builder.Build();
-        
-        rootFrame = MainWindow.Content as Frame ?? new Frame();
-        MainWindow.Content = rootFrame;
 
-        // 3. Handle click if the app was launched FROM a closed state
+        // 1. Check if the MainWindow already has a Frame initialized
+        if (MainWindow.Content is not Frame rootFrame)
+        {
+            // 2. Create the root frame to manage page navigation
+            rootFrame = new Frame();
 
+            // 3. Place the frame inside the Window's content area
+            MainWindow.Content = rootFrame;
+        }
+
+        // 4. Handle navigation if the app was launched from a fresh/closed state
         if (rootFrame.Content == null)
         {
+            // Navigate directly to your starting page
             rootFrame.Navigate(typeof(Start), args);
         }
 
+        // 5. Finally, make the window visible
         MainWindow.Activate();
     }
 }
