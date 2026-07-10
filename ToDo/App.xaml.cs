@@ -6,7 +6,7 @@ namespace ToDo;
 
 public partial class App : Application
 {
-#if DESKTOP
+#if DESKTOP || WINDOWS
     [DllImport("Assets/DLLs/WinRTapis.dll",
     CallingConvention = CallingConvention.StdCall,
     CharSet = CharSet.Unicode)]
