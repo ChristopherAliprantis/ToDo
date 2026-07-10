@@ -44,39 +44,26 @@ public partial class App : Application
                 .UseLocalization()
             );
 
-#if __ANDROID__
+#if ANDROID
         NotificationService = new global::ToDo.Droid.AndroidNotificationService();
-#elif DESKTOP
+#elif DESKTOP || WINDOWS
         RegisterAppForToasts("com.christopheraliprantis.todo", "ToDo");
         NotificationService = new global::ToDo.Win32.Win32NotificationService();
         //global::ToDo.Win32.Win32NotificationService.ShowToast("Registered", "Your ToDo installation has registered with\nWindows.");
 #endif
-
-
-
         MainWindow = builder.Window;
         MainWindow.SetWindowIcon();
         MainWindow.Title = "ToDo";
         Host = builder.Build();
 
-        // 1. Check if the MainWindow already has a Frame initialized
-        if (MainWindow.Content is not Frame rootFrame)
-        {
-            // 2. Create the root frame to manage page navigation
-            rootFrame = new Frame();
+        rootFrame = MainWindow.Content as Frame ?? new Frame();
+        MainWindow.Content = rootFrame;
 
-            // 3. Place the frame inside the Window's content area
-            MainWindow.Content = rootFrame;
-        }
+        // 3. Handle click if the app was launched FROM a closed state
 
-        // 4. Handle navigation if the app was launched from a fresh/closed state
         if (rootFrame.Content == null)
         {
-            // Navigate directly to your starting page
-            rootFrame.Navigate(typeof(Start), args);
+            rootFrame.Navigate(typeof(MainPage));
         }
-
-        // 5. Finally, make the window visible
-        MainWindow.Activate();
     }
 }
