@@ -63,10 +63,6 @@ public partial class App : Application
         MainWindow.Content = rootFrame;
 
         // 3. Handle click if the app was launched FROM a closed state
-        if (!string.IsNullOrEmpty(args.Arguments))
-        {
-            HandleNotificationClick(args.Arguments);
-        }
 
         if (rootFrame.Content == null)
         {
@@ -74,15 +70,5 @@ public partial class App : Application
         }
 
         MainWindow.Activate();
-    }
-
-    private void HandleNotificationClick(string arguments)
-    {
-        // Simple logic to navigate or act on the notification data
-        if (arguments.Contains("id="))
-        {
-            // You can implement your navigation logic here
-            // e.g., rootFrame?.Navigate(typeof(TaskDetailPage), arguments);
-        }
     }
 }
