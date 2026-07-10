@@ -62,3 +62,4 @@
 #*.rtf   diff=astextplain
 #*.RTF   diff=astextplain
 ToDo/Assets/reload binary diff=image linguist-language=SVG
+ToDo/Assets/Splash/splash_screen binary diff=image linguist-language=SVG

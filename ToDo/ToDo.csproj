@@ -66,7 +66,6 @@
     <ItemGroup>
       <None Remove="Assets\Icons\todosvg.svg" />
       <None Remove="Assets\reload" />
-      <None Remove="Assets\Splash\splash_screen.svg" />
     </ItemGroup>
 
 
@@ -114,6 +113,23 @@
       <Content Update="Assets\reload">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </Content>
+    </ItemGroup>
+    <ItemGroup>
+        <CopyToOutputDirectory Include="Assets\Splash\splash_screen.svg" />
+    </ItemGroup>
+    <ItemGroup>
+      <UnoImage Remove="Assets\Splash\splash_screen.svg" />
+    </ItemGroup>
+    <ItemGroup>
+      <UnoSplashScreen Include="Assets\Splash\splash_screen.svg">
+        <IsDefaultItem>true</IsDefaultItem>
+        <Color>$(UnoSplashScreenColor)</Color>
+        <BaseSize>$(UnoSplashScreenBaseSize)</BaseSize>
+      </UnoSplashScreen>
+    </ItemGroup>
+    <ItemGroup>
+      <Content Include="Assets\Splash\splash_screen" />
+      <CopyToOutputDirectory Include="Assets\Splash\splash_screen" />
     </ItemGroup>
 
 </Project>
