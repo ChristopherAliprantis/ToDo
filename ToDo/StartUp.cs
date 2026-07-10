@@ -13,7 +13,7 @@ public partial class Start : Page
             Width = 40,
             Stretch = Microsoft.UI.Xaml.Media.Stretch.Uniform,
             RenderTransformOrigin = new Windows.Foundation.Point(0.5, 0.5),
-            RenderTransform = rotationTransform
+            RenderTransform = rotationTransform,
             HorizontalAlignment = Microsoft.UI.Xaml.HorizontalAlignment.Center,
             VerticalAlignment = Microsoft.UI.Xaml.VerticalAlignment.Center
         };
@@ -28,6 +28,7 @@ public partial class Start : Page
             splash.Width = this.ActualWidth / 4;
         };
         this.Content = splash;
+        await Task.Delay(2500);
 #endif
         App.rootFrame.Navigate(typeof(MainPage));
     }
