@@ -74,7 +74,7 @@ public sealed partial class New : Page // #if DESKTOP for all of skia desktop, #
                 {
                     Visibility = Visibility.Collapsed,
                     HorizontalAlignment = HorizontalAlignment.Left,
-                    Text = Date.ToString("yyyy-MM-dd"),
+                    Text = Date.ToString("d"),
                 }),
                 (time = new UpDownBox
                 {
