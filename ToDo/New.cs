@@ -136,13 +136,13 @@ public sealed partial class New : Page // #if DESKTOP for all of skia desktop, #
             if (Date != DateOnly.MaxValue)
             {
                 Date = Date.AddDays(1);
-                date.Text = Date.ToString("yyyy-MM-dd");
+                date.Text = Date.ToString("d");
                 date.text.Text = date.Text;
             }
             else
             {
                 Date = DateOnly.MinValue;
-                date.Text = Date.ToString("yyyy-MM-dd");
+                date.Text = Date.ToString("d");
                 date.text.Text = date.Text;
             }
         };
