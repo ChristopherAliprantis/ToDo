@@ -560,27 +560,52 @@ extern "C"
         std::wcout << L"[ToastDLL] Success! All non-admin switches set to ON via dynamic toast injection." << std::endl;
         return true;
     }
-}==========================================
+}
 
 extern "C" __declspec(dllexport) bool __stdcall IsNotificationBlocked(const wchar_t* appId) {
-    try {
-        winrt::init_apartment();
+    std::wstring aumid = appId;
 
-        auto notifier = ToastNotificationManager::CreateToastNotifier(appId);
-        auto currentSetting = notifier.Setting();
+    // 1. First, check if the Windows GLOBAL main switch is turned off
+    std::wstring globalPushPath = L"Software\\Microsoft\\Windows\\CurrentVersion\\PushNotifications";
+    HKEY hGlobalKey;
+    DWORD globalEnabled = 1; // Default to assuming it's on
+    DWORD dwSize = sizeof(DWORD);
 
-        // Return true only if it is explicitly blocked by user or system
-        if (currentSetting == NotificationSetting::UserDisabled ||
-            currentSetting == NotificationSetting::DisabledBySystem ||
-            currentSetting == NotificationSetting::DisabledByGroupPolicy) {
-            return true;
-        }
+    if (RegOpenKeyExW(HKEY_CURRENT_USER, globalPushPath.c_str(), 0, KEY_READ, &hGlobalKey) == ERROR_SUCCESS) {
+        RegQueryValueExW(hGlobalKey, L"ToastEnabled", NULL, NULL, reinterpret_cast<LPBYTE>(&globalEnabled), &dwSize);
+        RegCloseKey(hGlobalKey);
     }
-    catch (...) {
-        // Fall through to false if WinRT fails to initialize
+
+    // If the master Windows notification toggle is explicitly 0, it's blocked!
+    if (globalEnabled == 0) {
+        return true;
     }
-    return false;
+
+    // 2. Next, check your individual app row settings
+    std::wstring settingsPath = L"Software\\Microsoft\\Windows\\CurrentVersion\\Notifications\\Settings\\" + aumid;
+    HKEY hAppKey;
+    LONG status = RegOpenKeyExW(HKEY_CURRENT_USER, settingsPath.c_str(), 0, KEY_READ, &hAppKey);
+
+    if (status != ERROR_SUCCESS) {
+        // The key doesn't even exist yet! This means your app is UNINITIALIZED, not blocked.
+        return false;
+    }
+
+    DWORD appEnabled = 1; // Assume enabled if key exists
+    dwSize = sizeof(DWORD);
+
+    // Query your specific app's toggle flag
+    status = RegQueryValueExW(hAppKey, L"Enabled", NULL, NULL, reinterpret_cast<LPBYTE>(&appEnabled), &dwSize);
+    RegCloseKey(hAppKey);
+
+    // If the key exists but the user intentionally set it to 0, it's blocked!
+    if (status == ERROR_SUCCESS && appEnabled == 0) {
+        return true;
+    }
+
+    return false; // Everything is clear!
 }
+
 
 BOOL WINAPI DllMain(
     HINSTANCE hinstDLL,
