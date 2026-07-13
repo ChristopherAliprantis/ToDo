@@ -385,25 +385,6 @@ bool SetRegistryDword(HKEY hRootKey, const std::wstring& subKey, const std::wstr
     return result == ERROR_SUCCESS;
 }
 
-std::wstring GetAbsoluteIconPath() {
-    wchar_t buffer[MAX_PATH];
-
-    // 1. Get the path to winrtapis.dll 
-    // (e.g., C:\YourProject\DLLs\winrtapis.dll)
-    DWORD length = GetModuleFileNameW(g_hModuleInstance, buffer, MAX_PATH);
-    if (length == 0) return L"";
-
-    std::filesystem::path dllFilePath(buffer);
-
-    // 2. .parent_path() gets the "DLLs" folder
-    // 3. .parent_path() again gets the project root folder (parent of DLLs)
-    std::filesystem::path projectRoot = dllFilePath.parent_path().parent_path();
-
-    // 4. Navigate forward: Root -> Assets -> Icons -> todoico.ico
-    std::filesystem::path iconPath = projectRoot / L"Assets" / L"Icons" / L"todoico.ico";
-
-    return iconPath.wstring();
-}
 
 extern "C"
 {
@@ -535,38 +516,34 @@ extern "C"
 
         std::wstring aumid = appId;
         std::wstring displayName = L"ToDo";
-        std::wstring iconPath = GetAbsoluteIconPath(); // Use the helper function to get the absolute path
 
         // 2. Paths to the target registry structures
         std::wstring classesPath = L"Software\\Classes\\AppUserModelId\\" + aumid;
         std::wstring settingsPath = L"Software\\Microsoft\\Windows\\CurrentVersion\\Notifications\\Settings\\" + aumid;
-        std::wstring globalSettingsPath = L"Software\\Microsoft\\Windows\\CurrentVersion\\Notifications\\Settings";
+        std::wstring globalPushPath = L"Software\\Microsoft\\Windows\\CurrentVersion\\PushNotifications";
 
-        std::wcout << L"[ToastDLL] Registering AUMID and enabling notification flags..." << std::endl;
+        std::wcout << L"[ToastDLL] Overriding global and app-specific notification states..." << std::endl;
 
-        // 3. Populate identity data (Crucial for AppUserModelId mapping)
-        bool identityOk = true;
-        identityOk &= SetRegistryString(HKEY_CURRENT_USER, classesPath, L"DisplayName", displayName);
-        identityOk &= SetRegistryString(HKEY_CURRENT_USER, classesPath, L"IconUri", iconPath);
+        // 3. Register standard display identity name
+        bool identityOk = SetRegistryString(HKEY_CURRENT_USER, classesPath, L"DisplayName", displayName);
 
-        // 4. Force global system notification switch to "On" state
-        bool globalOk = true;
-        globalOk &= SetRegistryDword(HKEY_CURRENT_USER, globalSettingsPath, L"NOC_GLOBAL_SETTING_TOASTS_ENABLED", 1);
-        globalOk &= SetRegistryDword(HKEY_CURRENT_USER, globalSettingsPath, L"NOC_GLOBAL_SETTING_ALLOW_CRITICAL_TOASTS", 1);
+        // 4. Force the system-wide MASTER notification toggle to "On"
+        bool globalOk = SetRegistryDword(HKEY_CURRENT_USER, globalPushPath, L"ToastEnabled", 1);
 
-        // 5. Force application-specific notification settings to active/working state 
+        // 5. Force your specific application toggles to "On"
         bool settingsOk = true;
-        settingsOk &= SetRegistryDword(HKEY_CURRENT_USER, settingsPath, L"Enabled", 1); // 1 = On, 0 = Off
+        settingsOk &= SetRegistryDword(HKEY_CURRENT_USER, settingsPath, L"Enabled", 1);
         settingsOk &= SetRegistryDword(HKEY_CURRENT_USER, settingsPath, L"ShowInActionCenter", 1);
 
         if (identityOk && globalOk && settingsOk) {
-            std::wcout << L"[ToastDLL] Success! Registry configured globally and for AUMID: " << aumid << std::endl;
+            std::wcout << L"[ToastDLL] Success! All toggles forced ON. Refreshing Settings app will now show them active." << std::endl;
         }
         else {
             std::wcerr << L"[ToastDLL] Failed to write complete configuration to registry." << std::endl;
         }
 
         return true;
+
 
     }
 }
