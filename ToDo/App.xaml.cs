@@ -13,6 +13,13 @@ public partial class App : Application
     public static extern void RegisterAppForToasts(
     string AppId,
     string AppName);
+
+    [DllImport("Assets/DLLs/WinRTapis.dll",
+    CallingConvention = CallingConvention.StdCall,
+    CharSet = CharSet.Unicode)]
+    public static extern bool IsNotificationBlocked(
+    string AppId,
+    string AppName);
 #endif
     public App()
     {
