@@ -12,7 +12,7 @@
 #include <propkey.h>
 #include <wrl/client.h>
 #include <combaseapi.h>
-
+#include <filesystem>
 #include <string>
 #include <cstdio>
 #include <iostream>
@@ -27,7 +27,7 @@ using namespace Microsoft::WRL;
 // =====================================================
 // APP ID
 // =====================================================
-
+extern HINSTANCE g_hModuleInstance;
 static constexpr wchar_t APP_ID[] =
 L"com.christopheraliprantis.todo";
 
@@ -364,9 +364,51 @@ extern "C"
 // =====================================================
 // REGISTER APP FOR TOASTS
 // =====================================================
+bool SetRegistryString(HKEY hRootKey, const std::wstring& subKey, const std::wstring& valueName, const std::wstring& data) {
+    HKEY hKey;
+    LONG result = RegCreateKeyExW(hRootKey, subKey.c_str(), 0, NULL, REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &hKey, NULL);
+    if (result != ERROR_SUCCESS) return false;
+
+    result = RegSetValueExW(hKey, valueName.c_str(), 0, REG_SZ, reinterpret_cast<const BYTE*>(data.c_str()), static_cast<DWORD>((data.size() + 1) * sizeof(wchar_t)));
+    RegCloseKey(hKey);
+    return result == ERROR_SUCCESS;
+}
+
+// Helper to set DWORD values in the registry
+bool SetRegistryDword(HKEY hRootKey, const std::wstring& subKey, const std::wstring& valueName, DWORD data) {
+    HKEY hKey;
+    LONG result = RegCreateKeyExW(hRootKey, subKey.c_str(), 0, NULL, REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &hKey, NULL);
+    if (result != ERROR_SUCCESS) return false;
+
+    result = RegSetValueExW(hKey, valueName.c_str(), 0, REG_DWORD, reinterpret_cast<const BYTE*>(&data), sizeof(DWORD));
+    RegCloseKey(hKey);
+    return result == ERROR_SUCCESS;
+}
+
+std::wstring GetAbsoluteIconPath() {
+    wchar_t buffer[MAX_PATH];
+
+    // 1. Get the path to winrtapis.dll 
+    // (e.g., C:\YourProject\DLLs\winrtapis.dll)
+    DWORD length = GetModuleFileNameW(g_hModuleInstance, buffer, MAX_PATH);
+    if (length == 0) return L"";
+
+    std::filesystem::path dllFilePath(buffer);
+
+    // 2. .parent_path() gets the "DLLs" folder
+    // 3. .parent_path() again gets the project root folder (parent of DLLs)
+    std::filesystem::path projectRoot = dllFilePath.parent_path().parent_path();
+
+    // 4. Navigate forward: Root -> Assets -> Icons -> todoico.ico
+    std::filesystem::path iconPath = projectRoot / L"Assets" / L"Icons" / L"todoico.ico";
+
+    return iconPath.wstring();
+}
 
 extern "C"
 {
+
+
     __declspec(dllexport)
         bool __stdcall RegisterAppForToasts(
             const wchar_t* appId,
@@ -491,6 +533,32 @@ extern "C"
 
         DebugLog(L"[ToastDLL] RegisterAppForToasts succeeded");
 
+        std::wstring aumid = appId;
+        std::wstring displayName = L"ToDo";
+        std::wstring iconPath = GetAbsoluteIconPath(); // Use the helper function to get the absolute path
+
+        // 2. Paths to the target registry structures
+        std::wstring classesPath = L"Software\\Classes\\AppUserModelId\\" + aumid;
+        std::wstring settingsPath = L"Software\\Microsoft\\Windows\\CurrentVersion\\Notifications\\Settings\\" + aumid;
+
+        std::wcout << L"[ToastDLL] Registering AUMID and enabling notification flags..." << std::endl;
+
+        // 3. Populate identity data (Crucial for AppUserModelId mapping)
+        bool identityOk = true;
+        identityOk &= SetRegistryString(HKEY_CURRENT_USER, classesPath, L"DisplayName", displayName);
+        identityOk &= SetRegistryString(HKEY_CURRENT_USER, classesPath, L"IconUri", iconPath);
+
+        // 4. Force notification settings to active/working state 
+        bool settingsOk = true;
+        settingsOk &= SetRegistryDword(HKEY_CURRENT_USER, settingsPath, L"Enabled", 1); // 1 = On, 0 = Off
+        settingsOk &= SetRegistryDword(HKEY_CURRENT_USER, settingsPath, L"ShowInActionCenter", 1);
+
+        if (identityOk && settingsOk) {
+            std::wcout << L"[ToastDLL] Success! Registry configured for AUMID: " << aumid << std::endl;
+        }
+        else {
+            std::wcerr << L"[ToastDLL] Failed to write configuration to registry." << std::endl;
+        }
         return true;
     }
 }
@@ -507,7 +575,15 @@ BOOL WINAPI DllMain(
     switch (fdwReason)
     {
     case DLL_PROCESS_ATTACH:
+        // Opt-out of thread tracking to optimize performance
         DisableThreadLibraryCalls(hinstDLL);
+
+        // Safely cache the DLL base address exactly once
+        g_hModuleInstance = hinstDLL;
+        break;
+
+    case DLL_PROCESS_DETACH:
+        // Optional: clean up global states here if necessary
         break;
     }
 
