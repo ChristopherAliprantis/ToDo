@@ -1,11 +1,12 @@
 #include <winrt/base.h>
-
 #include <winrt/Windows.Data.Xml.Dom.h>
 #include <winrt/Windows.UI.Notifications.h>
 #include <winrt/Windows.Foundation.h>
 #include <winrt/Windows.Foundation.Collections.h>
 
-#include <windows.h>
+#include <windows.h>   // 1. Move this ABOVE tlhelp32.h
+#include <tlhelp32.h>  // 2. This can now safely use the Windows types
+
 #include <shobjidl.h>
 #include <shlobj.h>
 #include <propvarutil.h>
@@ -21,6 +22,7 @@
 #pragma comment(lib, "runtimeobject.lib")
 #pragma comment(lib, "shlwapi.lib")
 #pragma comment(lib, "windowsapp.lib")
+
 
 using namespace Microsoft::WRL;
 
@@ -368,22 +370,49 @@ bool SetRegistryString(HKEY hRootKey, const std::wstring& subKey, const std::wst
     HKEY hKey;
     LONG result = RegCreateKeyExW(hRootKey, subKey.c_str(), 0, NULL, REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &hKey, NULL);
     if (result != ERROR_SUCCESS) return false;
-
     result = RegSetValueExW(hKey, valueName.c_str(), 0, REG_SZ, reinterpret_cast<const BYTE*>(data.c_str()), static_cast<DWORD>((data.size() + 1) * sizeof(wchar_t)));
     RegCloseKey(hKey);
     return result == ERROR_SUCCESS;
 }
 
-// Helper to set DWORD values in the registry
+// Helper to write DWORD keys to HKCU
 bool SetRegistryDword(HKEY hRootKey, const std::wstring& subKey, const std::wstring& valueName, DWORD data) {
     HKEY hKey;
     LONG result = RegCreateKeyExW(hRootKey, subKey.c_str(), 0, NULL, REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &hKey, NULL);
     if (result != ERROR_SUCCESS) return false;
-
     result = RegSetValueExW(hKey, valueName.c_str(), 0, REG_DWORD, reinterpret_cast<const BYTE*>(&data), sizeof(DWORD));
     RegCloseKey(hKey);
     return result == ERROR_SUCCESS;
 }
+
+// Bypasses Windows 11 cache bug by resetting user-level notification hosts
+// Bypasses Windows 11 cache bug by resetting user-level notification hosts
+void RefreshNotificationUiEngine() {
+    HANDLE hSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+    if (hSnap == INVALID_HANDLE_VALUE) return;
+
+    // Use standard PROCESSENTRY32 macro instead of explicit W suffix
+    PROCESSENTRY32 pe;
+    pe.dwSize = sizeof(PROCESSENTRY32);
+
+    // Use Process32First instead of Process32FirstW
+    if (Process32First(hSnap, &pe)) {
+        do {
+            // Added the missing || operator between your string comparisons
+            if (std::wstring(pe.szExeFile) == L"NotificationController.exe" ||
+                std::wstring(pe.szExeFile) == L"BackgroundTransferHost.exe") {
+
+                HANDLE hProc = OpenProcess(PROCESS_TERMINATE, FALSE, pe.th32ProcessID);
+                if (hProc) {
+                    TerminateProcess(hProc, 0);
+                    CloseHandle(hProc);
+                }
+            }
+        } while (Process32Next(hSnap, &pe)); // Use Process32Next instead of Process32NextW
+    }
+    CloseHandle(hSnap);
+}
+
 
 
 extern "C"
@@ -517,32 +546,43 @@ extern "C"
         std::wstring aumid = appId;
         std::wstring displayName = L"ToDo";
 
-        // 2. Paths to the target registry structures
+        // Registry subkey definitions (All mapped to HKEY_CURRENT_USER for non-admin support)
         std::wstring classesPath = L"Software\\Classes\\AppUserModelId\\" + aumid;
         std::wstring settingsPath = L"Software\\Microsoft\\Windows\\CurrentVersion\\Notifications\\Settings\\" + aumid;
-        std::wstring globalPushPath = L"Software\\Microsoft\\Windows\\CurrentVersion\\PushNotifications";
+        std::wstring pushNotificationsPath = L"Software\\Microsoft\\Windows\\CurrentVersion\\PushNotifications";
+        std::wstring notificationsSettingsPath = L"Software\\Microsoft\\Windows\\CurrentVersion\\Notifications\\Settings";
 
-        std::wcout << L"[ToastDLL] Overriding global and app-specific notification states..." << std::endl;
+        std::wcout << L"[ToastDLL] Writing non-admin settings overrides..." << std::endl;
 
-        // 3. Register standard display identity name
+        // 1. Establish App Identity registration 
         bool identityOk = SetRegistryString(HKEY_CURRENT_USER, classesPath, L"DisplayName", displayName);
 
-        // 4. Force the system-wide MASTER notification toggle to "On"
-        bool globalOk = SetRegistryDword(HKEY_CURRENT_USER, globalPushPath, L"ToastEnabled", 1);
+        // 2. Force the background Push Notification Engine to ON
+        bool engineOk = SetRegistryDword(HKEY_CURRENT_USER, pushNotificationsPath, L"ToastEnabled", 1);
 
-        // 5. Force your specific application toggles to "On"
-        bool settingsOk = true;
-        settingsOk &= SetRegistryDword(HKEY_CURRENT_USER, settingsPath, L"Enabled", 1);
-        settingsOk &= SetRegistryDword(HKEY_CURRENT_USER, settingsPath, L"ShowInActionCenter", 1);
+        // 3. Force modern Windows 11 Main Toggles (the UI header switch) to ON
+        bool uiToggleOk = true;
+        uiToggleOk &= SetRegistryDword(HKEY_CURRENT_USER, notificationsSettingsPath, L"NOC_GLOBAL_SETTING_TOASTS_ENABLED", 1);
+        uiToggleOk &= SetRegistryDword(HKEY_CURRENT_USER, notificationsSettingsPath, L"NOC_GLOBAL_SETTING_ALLOW_CRITICAL_TOASTS", 1);
 
-        if (identityOk && globalOk && settingsOk) {
-            std::wcout << L"[ToastDLL] Success! All toggles forced ON. Refreshing Settings app will now show them active." << std::endl;
+        // 4. Force individual ToDo application row switches to ON
+        bool appSettingsOk = true;
+        appSettingsOk &= SetRegistryDword(HKEY_CURRENT_USER, settingsPath, L"Enabled", 1);
+        appSettingsOk &= SetRegistryDword(HKEY_CURRENT_USER, settingsPath, L"ShowInActionCenter", 1);
+
+        if (identityOk && engineOk && uiToggleOk && appSettingsOk) {
+            std::wcout << L"[ToastDLL] Registry keys updated. Flushing Windows UI caches..." << std::endl;
+
+            // Force the environment to discard old visual memory structures
+            RefreshNotificationUiEngine();
+
+            std::wcout << L"[ToastDLL] Success! All switches forced active." << std::endl;
+            return true;
         }
         else {
-            std::wcerr << L"[ToastDLL] Failed to write complete configuration to registry." << std::endl;
+            std::wcerr << L"[ToastDLL] Error applying complete registry state layout." << std::endl;
+            return false;
         }
-
-        return true;
 
 
     }
