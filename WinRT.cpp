@@ -546,51 +546,41 @@ extern "C"
         std::wstring aumid = appId;
         std::wstring displayName = L"ToDo";
 
-        // Registry subkey definitions (All mapped to HKEY_CURRENT_USER for non-admin support)
+        // 1. Classic Registry Setup for individual row mappings (Non-Admin safe)
         std::wstring classesPath = L"Software\\Classes\\AppUserModelId\\" + aumid;
         std::wstring settingsPath = L"Software\\Microsoft\\Windows\\CurrentVersion\\Notifications\\Settings\\" + aumid;
-        std::wstring pushNotificationsPath = L"Software\\Microsoft\\Windows\\CurrentVersion\\PushNotifications";
-        std::wstring notificationsSettingsPath = L"Software\\Microsoft\\Windows\\CurrentVersion\\Notifications\\Settings";
 
-        std::wcout << L"[ToastDLL] Writing non-admin settings overrides..." << std::endl;
+        SetRegistryString(HKEY_CURRENT_USER, classesPath, L"DisplayName", displayName);
+        SetRegistryDword(HKEY_CURRENT_USER, settingsPath, L"Enabled", 1);
+        SetRegistryDword(HKEY_CURRENT_USER, settingsPath, L"ShowInActionCenter", 1);
 
-        // 1. Establish App Identity registration 
-        bool identityOk = SetRegistryString(HKEY_CURRENT_USER, classesPath, L"DisplayName", displayName);
+        // 3. Clear visual caches to synchronize everything instantly
+        RefreshNotificationUiEngine();
 
-        // 2. Force the background Push Notification Engine to ON
-        bool engineOk = SetRegistryDword(HKEY_CURRENT_USER, pushNotificationsPath, L"ToastEnabled", 1);
+        std::wcout << L"[ToastDLL] Success! All non-admin switches set to ON via dynamic toast injection." << std::endl;
+        return true;
+    }
+}==========================================
 
-        // 3. Force modern Windows 11 Main Toggles (the UI header switch) to ON
-        bool uiToggleOk = true;
-        uiToggleOk &= SetRegistryDword(HKEY_CURRENT_USER, notificationsSettingsPath, L"NOC_GLOBAL_SETTING_TOASTS_ENABLED", 1);
-        uiToggleOk &= SetRegistryDword(HKEY_CURRENT_USER, notificationsSettingsPath, L"NOC_GLOBAL_SETTING_ALLOW_CRITICAL_TOASTS", 1);
+extern "C" __declspec(dllexport) bool __stdcall IsNotificationBlocked(const wchar_t* appId) {
+    try {
+        winrt::init_apartment();
 
-        // 4. Force individual ToDo application row switches to ON
-        bool appSettingsOk = true;
-        appSettingsOk &= SetRegistryDword(HKEY_CURRENT_USER, settingsPath, L"Enabled", 1);
-        appSettingsOk &= SetRegistryDword(HKEY_CURRENT_USER, settingsPath, L"ShowInActionCenter", 1);
+        auto notifier = ToastNotificationManager::CreateToastNotifier(appId);
+        auto currentSetting = notifier.Setting();
 
-        if (identityOk && engineOk && uiToggleOk && appSettingsOk) {
-            std::wcout << L"[ToastDLL] Registry keys updated. Flushing Windows UI caches..." << std::endl;
-
-            // Force the environment to discard old visual memory structures
-            RefreshNotificationUiEngine();
-
-            std::wcout << L"[ToastDLL] Success! All switches forced active." << std::endl;
+        // Return true only if it is explicitly blocked by user or system
+        if (currentSetting == NotificationSetting::UserDisabled ||
+            currentSetting == NotificationSetting::DisabledBySystem ||
+            currentSetting == NotificationSetting::DisabledByGroupPolicy) {
             return true;
         }
-        else {
-            std::wcerr << L"[ToastDLL] Error applying complete registry state layout." << std::endl;
-            return false;
-        }
-
-
     }
+    catch (...) {
+        // Fall through to false if WinRT fails to initialize
+    }
+    return false;
 }
-
-// =====================================================
-// DLL MAIN
-// =====================================================
 
 BOOL WINAPI DllMain(
     HINSTANCE hinstDLL,
