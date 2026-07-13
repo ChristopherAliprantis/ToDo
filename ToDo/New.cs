@@ -27,7 +27,7 @@ public sealed partial class New : Page // #if DESKTOP for all of skia desktop, #
         TextBox? title;
         Button? done;
         TimeOnly Time = TimeOnly.FromDateTime(DateTime.Now);
-        DateOnly Date = DateOnly.FromDateTime(DateTime.Today);
+        DateOnly Date = DateOnly.FromDateTime(DateTime.Now);
         TextBox? describe;
         Button? op;
         UpDownBox? date;
