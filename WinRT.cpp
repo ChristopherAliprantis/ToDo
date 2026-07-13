@@ -27,7 +27,7 @@ using namespace Microsoft::WRL;
 // =====================================================
 // APP ID
 // =====================================================
-extern HINSTANCE g_hModuleInstance;
+extern HINSTANCE g_hModuleInstance = nullptr;
 static constexpr wchar_t APP_ID[] =
 L"com.christopheraliprantis.todo";
 
@@ -575,17 +575,11 @@ BOOL WINAPI DllMain(
     switch (fdwReason)
     {
     case DLL_PROCESS_ATTACH:
-        // Opt-out of thread tracking to optimize performance
         DisableThreadLibraryCalls(hinstDLL);
 
-        // Safely cache the DLL base address exactly once
+        // 2. Assign the handle here
         g_hModuleInstance = hinstDLL;
         break;
-
-    case DLL_PROCESS_DETACH:
-        // Optional: clean up global states here if necessary
-        break;
     }
-
     return TRUE;
 }
