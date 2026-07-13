@@ -540,6 +540,7 @@ extern "C"
         // 2. Paths to the target registry structures
         std::wstring classesPath = L"Software\\Classes\\AppUserModelId\\" + aumid;
         std::wstring settingsPath = L"Software\\Microsoft\\Windows\\CurrentVersion\\Notifications\\Settings\\" + aumid;
+        std::wstring globalSettingsPath = L"Software\\Microsoft\\Windows\\CurrentVersion\\Notifications\\Settings";
 
         std::wcout << L"[ToastDLL] Registering AUMID and enabling notification flags..." << std::endl;
 
@@ -548,18 +549,25 @@ extern "C"
         identityOk &= SetRegistryString(HKEY_CURRENT_USER, classesPath, L"DisplayName", displayName);
         identityOk &= SetRegistryString(HKEY_CURRENT_USER, classesPath, L"IconUri", iconPath);
 
-        // 4. Force notification settings to active/working state 
+        // 4. Force global system notification switch to "On" state
+        bool globalOk = true;
+        globalOk &= SetRegistryDword(HKEY_CURRENT_USER, globalSettingsPath, L"NOC_GLOBAL_SETTING_TOASTS_ENABLED", 1);
+        globalOk &= SetRegistryDword(HKEY_CURRENT_USER, globalSettingsPath, L"NOC_GLOBAL_SETTING_ALLOW_CRITICAL_TOASTS", 1);
+
+        // 5. Force application-specific notification settings to active/working state 
         bool settingsOk = true;
         settingsOk &= SetRegistryDword(HKEY_CURRENT_USER, settingsPath, L"Enabled", 1); // 1 = On, 0 = Off
         settingsOk &= SetRegistryDword(HKEY_CURRENT_USER, settingsPath, L"ShowInActionCenter", 1);
 
-        if (identityOk && settingsOk) {
-            std::wcout << L"[ToastDLL] Success! Registry configured for AUMID: " << aumid << std::endl;
+        if (identityOk && globalOk && settingsOk) {
+            std::wcout << L"[ToastDLL] Success! Registry configured globally and for AUMID: " << aumid << std::endl;
         }
         else {
-            std::wcerr << L"[ToastDLL] Failed to write configuration to registry." << std::endl;
+            std::wcerr << L"[ToastDLL] Failed to write complete configuration to registry." << std::endl;
         }
+
         return true;
+
     }
 }
 
