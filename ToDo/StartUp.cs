@@ -28,14 +28,13 @@ public partial class Start : Page
                 ContentDialog alert = new ContentDialog
                 {
                     Title = "Notifications Disabled",
-                    Content = "Please enable notifications in Settings, so the app works",
+                    Content = "Please enable notifications in Settings, so the app's ToDos with a set time work.",
                     CloseButtonText = "OK",
                     XamlRoot = this.XamlRoot
                 };
 
                 // 2. Open the dialog and capture the user's action asynchronously
                 ContentDialogResult result = await alert.ShowAsync();
-                Environment.Exit(0);
             }
             App.rootFrame.Navigate(typeof(MainPage));
         };
