@@ -101,19 +101,19 @@ static winrt::Windows::Data::Xml::Dom::XmlDocument CreateToastXml(
     std::wstring safeTitle = EscapeXml(title);
     std::wstring safeMessage = EscapeXml(message);
 
-    // Windows does not like completely empty toast text
     if (safeTitle.empty() && safeMessage.empty())
     {
         safeMessage = L" ";
-		safeTitle = L" ";
+        safeTitle = L" ";
     }
 
     std::wstring xml;
+    std::wstring aumidStr = APP_ID; // "com.christopheraliprantis.todo"
 
     if (launch.empty())
     {
         xml =
-            L"<toast>"
+            L"<toast appUserModelId=\"" + aumidStr + L"\">"
             L"<visual>"
             L"<binding template='ToastGeneric'>"
             L"<text>" + safeTitle + L"</text>"
@@ -125,7 +125,7 @@ static winrt::Windows::Data::Xml::Dom::XmlDocument CreateToastXml(
     else
     {
         xml =
-            L"<toast launch=\"" + EscapeXml(launch) + L"\">"
+            L"<toast launch=\"" + EscapeXml(launch) + L"\" appUserModelId=\"" + aumidStr + L"\">"
             L"<visual>"
             L"<binding template='ToastGeneric'>"
             L"<text>" + safeTitle + L"</text>"
@@ -135,13 +135,11 @@ static winrt::Windows::Data::Xml::Dom::XmlDocument CreateToastXml(
             L"</toast>";
     }
 
-    DebugLog((L"[ToastDLL] XML=" + xml).c_str());
-
     winrt::Windows::Data::Xml::Dom::XmlDocument doc;
     doc.LoadXml(xml);
-
     return doc;
 }
+
 
 // =====================================================
 // SHOW TOAST
