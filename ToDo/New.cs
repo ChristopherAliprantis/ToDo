@@ -184,7 +184,6 @@ public sealed partial class New : Page // #if DESKTOP for all of skia desktop, #
             {
                 if (edit.Item2 == true && edit.Item1 != null)
                 {
-                    edit.Item2 = false;
                     var t = edit.Item1;
                     ind = MainPage.TODOS.IndexOf(edit.Item1);
                     if (ind == -1)
@@ -204,7 +203,7 @@ public sealed partial class New : Page // #if DESKTOP for all of skia desktop, #
                 if (Date.ToDateTime(Time) < DateTime.Now) return;
                 if (edit.Item2 == true && edit.Item1 != null)
                 {
-                    edit.Item2 = false;
+                    
                     var t = edit.Item1;
                     ind = MainPage.TODOS.IndexOf(edit.Item1);
                     if (ind == -1)
