@@ -385,31 +385,6 @@ bool SetRegistryDword(HKEY hRootKey, const std::wstring& subKey, const std::wstr
 
 // Bypasses Windows 11 cache bug by resetting user-level notification hosts
 // Bypasses Windows 11 cache bug by resetting user-level notification hosts
-void RefreshNotificationUiEngine() {
-    HANDLE hSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
-    if (hSnap == INVALID_HANDLE_VALUE) return;
-
-    // Use standard PROCESSENTRY32 macro instead of explicit W suffix
-    PROCESSENTRY32 pe;
-    pe.dwSize = sizeof(PROCESSENTRY32);
-
-    // Use Process32First instead of Process32FirstW
-    if (Process32First(hSnap, &pe)) {
-        do {
-            // Added the missing || operator between your string comparisons
-            if (std::wstring(pe.szExeFile) == L"NotificationController.exe" ||
-                std::wstring(pe.szExeFile) == L"BackgroundTransferHost.exe") {
-
-                HANDLE hProc = OpenProcess(PROCESS_TERMINATE, FALSE, pe.th32ProcessID);
-                if (hProc) {
-                    TerminateProcess(hProc, 0);
-                    CloseHandle(hProc);
-                }
-            }
-        } while (Process32Next(hSnap, &pe)); // Use Process32Next instead of Process32NextW
-    }
-    CloseHandle(hSnap);
-}
 
 
 
@@ -531,31 +506,28 @@ extern "C"
 
         g_registeredAppId = appId;
 
-        HRESULT setHr =
-            SetCurrentProcessExplicitAppUserModelID(appId);
-
+        // Explicitly set the AppUserModelID for the current process
+        HRESULT setHr = SetCurrentProcessExplicitAppUserModelID(appId);
         if (FAILED(setHr))
         {
             DebugLog(L"[ToastDLL] Failed to set AppUserModelID");
         }
 
-        DebugLog(L"[ToastDLL] RegisterAppForToasts succeeded");
-
         std::wstring aumid = appId;
         std::wstring displayName = L"ToDo";
 
-        // 1. Classic Registry Setup for individual row mappings (Non-Admin safe)
+        // Paths strictly isolated to your specific app ID under HKCU
         std::wstring classesPath = L"Software\\Classes\\AppUserModelId\\" + aumid;
         std::wstring settingsPath = L"Software\\Microsoft\\Windows\\CurrentVersion\\Notifications\\Settings\\" + aumid;
 
+        // Only enable notifications for THIS specific app
         SetRegistryString(HKEY_CURRENT_USER, classesPath, L"DisplayName", displayName);
         SetRegistryDword(HKEY_CURRENT_USER, settingsPath, L"Enabled", 1);
         SetRegistryDword(HKEY_CURRENT_USER, settingsPath, L"ShowInActionCenter", 1);
 
-        // 3. Clear visual caches to synchronize everything instantly
-        RefreshNotificationUiEngine();
+        DebugLog(L"[ToastDLL] RegisterAppForToasts succeeded safely for this app only.");
+        std::wcout << L"[ToastDLL] Success! Target app notifications isolated and enabled." << std::endl;
 
-        std::wcout << L"[ToastDLL] Success! All non-admin switches set to ON via dynamic toast injection." << std::endl;
         return true;
     }
 }
