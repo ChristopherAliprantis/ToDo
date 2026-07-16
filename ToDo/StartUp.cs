@@ -22,7 +22,7 @@ public sealed partial class Start : Page
             splash.Width = this.ActualWidth / 4;
 
             await Task.Delay(1500);
-            bool t = App.IsNotificationBlocked("com.christopheraliprantis.todo", "ToDo");
+            bool t = App.Imports.IsNotificationBlocked("com.christopheraliprantis.todo", "ToDo");
             if (t)
             {
                 ContentDialog alert = new ContentDialog

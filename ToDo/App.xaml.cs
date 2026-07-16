@@ -7,19 +7,21 @@ namespace ToDo;
 public partial class App : Application
 {
 #if DESKTOP || WINDOWS
-    [DllImport("Assets/DLLs/WinRTapis.dll",
-    CallingConvention = CallingConvention.StdCall,
-    CharSet = CharSet.Unicode)]
-    public static extern void RegisterAppForToasts(
-    string AppId,
-    string AppName);
+    public static partial class Imports
+    {
+        [LibraryImport("Assets/DLLs/WinRTapis.dll", StringMarshalling = StringMarshalling.Utf16)]
+        [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvStdcall)])]
+        public static partial void RegisterAppForToasts(
+        string AppId,
+        string AppName);
 
-    [DllImport("Assets/DLLs/WinRTapis.dll",
-    CallingConvention = CallingConvention.StdCall,
-    CharSet = CharSet.Unicode)]
-    public static extern bool IsNotificationBlocked(
-    string AppId,
-    string AppName);
+        [LibraryImport("Assets/DLLs/WinRTapis.dll", StringMarshalling = StringMarshalling.Utf16)]
+        [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvStdcall)])]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static partial bool IsNotificationBlocked(
+        string AppId,
+        string AppName);
+    }
 #endif
     public App()
     {
@@ -54,7 +56,7 @@ public partial class App : Application
 #if ANDROID
         NotificationService = new global::ToDo.Droid.AndroidNotificationService();
 #elif DESKTOP || WINDOWS
-        RegisterAppForToasts("com.christopheraliprantis.todo", "ToDo");
+        Imports.RegisterAppForToasts("com.christopheraliprantis.todo", "ToDo");
         NotificationService = new global::ToDo.Win32.Win32NotificationService();
         //global::ToDo.Win32.Win32NotificationService.ShowToast("Registered", "Your ToDo installation has registered with\nWindows.");
 #endif

@@ -5,31 +5,34 @@ using Path = System.IO.Path;
 
 namespace ToDo.Win32;
 
-public class Win32NotificationService : global::ToDo.INotificationService
+public partial class Win32NotificationService : global::ToDo.INotificationService
 {
     private string IconPath =>
         Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets", "icons", "todoico.ico");
 
-    [DllImport(
-        "Assets/DLLs/WinRTapis.dll",
-        CallingConvention = CallingConvention.StdCall,
-        CharSet = CharSet.Unicode)]
-    public static extern void ShowToast(
-        string title,
-        string message);
+    public static partial class Imports
+    {
+        [LibraryImport(
+            "Assets/DLLs/WinRTapis.dll", StringMarshalling = StringMarshalling.Utf16)]
+        [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvStdcall)])]
+        public static partial void ShowToast(
+            string title,
+            string message);
+    }
     public void ShowImmediate(string title, string message)
     {
-        ShowToast(title, message);
+        Imports.ShowToast(title, message);
     }
-
-    [DllImport("Assets/DLLs/WinRTapis.dll",
-    CallingConvention = CallingConvention.StdCall,
-    CharSet = CharSet.Unicode)]
-    public static extern void ScheduleToast(
-    string id,
-    string title,
-    string message,
-    long fileTime);
+    public static partial class Imports
+    {
+        [LibraryImport("Assets/DLLs/WinRTapis.dll", StringMarshalling = StringMarshalling.Utf16)]
+        [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvStdcall)])]
+        public static partial void ScheduleToast(
+        string id,
+        string title,
+        string message,
+        long fileTime);
+    }
 
     static string Sanitize(string s)
     {
@@ -55,16 +58,17 @@ public class Win32NotificationService : global::ToDo.INotificationService
         if (string.IsNullOrEmpty(actionData)) actionData = string.Empty;
         if (actionData.Length > 63) actionData = actionData.Substring(0, 63);
 
-        ScheduleToast(actionData, title, message, fileTime);
+        Imports.ScheduleToast(actionData, title, message, fileTime);
     }
-
-    [DllImport("Assets/DLLs/WinRTapis.dll",
-        CallingConvention = CallingConvention.StdCall,
-        CharSet = CharSet.Unicode)]
-    public static extern void CancelToast(string id);
+    public static partial class Imports
+    {
+        [LibraryImport("Assets/DLLs/WinRTapis.dll", StringMarshalling = StringMarshalling.Utf16)]
+        [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvStdcall)])]
+        public static partial void CancelToast(string id);
+    }
     public void CancelNotification(string actionData)
     {
         Console.WriteLine($"Canceling notification with actionData: '{actionData}'");
-        CancelToast(actionData);
+        Imports.CancelToast(actionData);
     }
 }
