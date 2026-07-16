@@ -1,6 +1,6 @@
 namespace ToDo;
 
-public partial class Start : Page
+public sealed partial class Start : Page
 {
     public Start()
     {
@@ -45,7 +45,7 @@ public partial class Start : Page
         };
 
 
-#else
+#elif ANDROID
         App.rootFrame.Navigate(typeof(MainPage));
 #endif
     }
