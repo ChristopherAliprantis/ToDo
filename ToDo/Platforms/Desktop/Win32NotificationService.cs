@@ -1,6 +1,7 @@
 using System;
 using System.IO;
-using System.Diagnostics;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using Path = System.IO.Path;
 
 namespace ToDo.Win32;
@@ -13,59 +14,83 @@ public partial class Win32NotificationService : global::ToDo.INotificationServic
     public static partial class Imports
     {
         [LibraryImport(
-            "Assets/DLLs/WinRTapis.dll", StringMarshalling = StringMarshalling.Utf16)]
-        [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvStdcall)])]
+            "Assets/DLLs/WinRTapis.dll",
+            StringMarshalling = StringMarshalling.Utf16)]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvStdcall)])]
         public static partial void ShowToast(
             string title,
             string message);
+
+        [LibraryImport(
+            "Assets/DLLs/WinRTapis.dll",
+            StringMarshalling = StringMarshalling.Utf16)]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvStdcall)])]
+        public static partial void ScheduleToast(
+            string id,
+            string title,
+            string message,
+            long fileTime);
+
+        [LibraryImport(
+            "Assets/DLLs/WinRTapis.dll",
+            StringMarshalling = StringMarshalling.Utf16)]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvStdcall)])]
+        public static partial void CancelToast(
+            string id);
     }
+
     public void ShowImmediate(string title, string message)
     {
         Imports.ShowToast(title, message);
     }
-    public static partial class Imports
-    {
-        [LibraryImport("Assets/DLLs/WinRTapis.dll", StringMarshalling = StringMarshalling.Utf16)]
-        [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvStdcall)])]
-        public static partial void ScheduleToast(
-        string id,
-        string title,
-        string message,
-        long fileTime);
-    }
 
     static string Sanitize(string s)
     {
-        if (string.IsNullOrEmpty(s)) return string.Empty;
+        if (string.IsNullOrEmpty(s))
+            return string.Empty;
+
         var sb = new System.Text.StringBuilder(s.Length);
-        foreach (char c in s) sb.Append((c >= 0x20 || c == '\t' || c == '\n' || c == '\r') ? c : ' ');
+
+        foreach (char c in s)
+        {
+            sb.Append(
+                (c >= 0x20 || c == '\t' || c == '\n' || c == '\r')
+                ? c
+                : ' ');
+        }
+
         return sb.ToString();
     }
 
-    public void ScheduleNotification(string title, string message, DateTimeOffset scheduleTime, string actionData)
+    public void ScheduleNotification(
+        string title,
+        string message,
+        DateTimeOffset scheduleTime,
+        string actionData)
     {
-        // ensure at least 60s in future to avoid timing validation issues
         var minTime = DateTimeOffset.UtcNow.AddSeconds(60);
-        if (scheduleTime < minTime) scheduleTime = minTime;
+
+        if (scheduleTime < minTime)
+            scheduleTime = minTime;
 
         long fileTime = scheduleTime.UtcDateTime.ToFileTimeUtc();
 
-        // ensure non-empty content (fallback message)
         title = Sanitize(title);
         message = Sanitize(message);
 
-        // ensure small tag, or pass empty so native side won't set Tag
-        if (string.IsNullOrEmpty(actionData)) actionData = string.Empty;
-        if (actionData.Length > 63) actionData = actionData.Substring(0, 63);
+        if (string.IsNullOrEmpty(actionData))
+            actionData = string.Empty;
 
-        Imports.ScheduleToast(actionData, title, message, fileTime);
+        if (actionData.Length > 63)
+            actionData = actionData.Substring(0, 63);
+
+        Imports.ScheduleToast(
+            actionData,
+            title,
+            message,
+            fileTime);
     }
-    public static partial class Imports
-    {
-        [LibraryImport("Assets/DLLs/WinRTapis.dll", StringMarshalling = StringMarshalling.Utf16)]
-        [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvStdcall)])]
-        public static partial void CancelToast(string id);
-    }
+
     public void CancelNotification(string actionData)
     {
         Console.WriteLine($"Canceling notification with actionData: '{actionData}'");
