@@ -218,7 +218,6 @@ public sealed partial class New : Page // #if DESKTOP for all of skia desktop, #
                 else await MainPage.todos.ADD(title.Text, describe.Text, Date, Time, ID, ind.Value);
                 if (edit.Item2 == true && edit.Item1 != null)
                 {
-                    Notifications.CancelNotif(edit.Item1);
                     await edit.Item1.Delete();
                 }
                 edit = (null, false);
