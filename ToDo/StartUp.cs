@@ -1,10 +1,10 @@
+#if DESKTOP || WINDOWS
 namespace ToDo;
 
 public sealed partial class Start : Page
 {
     public Start()
     {
-#if DESKTOP || WINDOWS
         var sp= new Microsoft.UI.Xaml.Media.Imaging.SvgImageSource(new Uri("ms-appx:///Assets/Splash/splash_screen"));
         var splash= new Microsoft.UI.Xaml.Controls.Image
         {
@@ -43,10 +43,6 @@ public sealed partial class Start : Page
             splash.Height = this.ActualHeight / 2;
             splash.Width = this.ActualWidth / 4;
         };
-
-
-#elif ANDROID
-        App.rootFrame.Navigate(typeof(MainPage));
-#endif
     }
 }
+#endif

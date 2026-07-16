@@ -72,7 +72,11 @@ public partial class App : Application
 
         if (rootFrame.Content == null)
         {
+#if DESKTOP || WINDOWS
             rootFrame.Navigate(typeof(Start));
+#else
+            rootFrame.Navigate(typeof(MainPage));
+#endif
         }
 
         MainWindow.Activate();
