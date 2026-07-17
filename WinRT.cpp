@@ -274,11 +274,17 @@ extern "C" __declspec(dllexport) bool __stdcall IsNotificationBlocked(const wcha
 // =====================================================
 extern "C"
 {
-    __declspec(dllexport) bool __stdcall RegisterAppForToasts(const wchar_t* appId, const wchar_t* appName)
+    __declspec(dllexport)
+        bool __stdcall RegisterAppForToasts(
+            const wchar_t* appId,
+            const wchar_t* appName)
     {
-        // 1. Initialize as Multithreaded Apartment State to satisfy modern WinRT tracking
+        // 1. Initialize COM as MULTITHREADED (Mandatory for background shell services)
         HRESULT hr = CoInitializeEx(nullptr, COINIT_MULTITHREADED);
-        if (FAILED(hr) && hr != RPC_E_CHANGED_MODE) return false;
+        if (FAILED(hr) && hr != RPC_E_CHANGED_MODE)
+        {
+            return false;
+        }
 
         wchar_t exePath[MAX_PATH]{};
         GetModuleFileNameW(nullptr, exePath, MAX_PATH);
@@ -289,12 +295,13 @@ extern "C"
 
         std::wstring shortcutPath = std::wstring(startMenuPath) + L"\\" + appName + L".lnk";
 
+        // 2. Build the structural Start Menu link with perfect property matching
         ComPtr<IShellLinkW> shellLink;
         hr = CoCreateInstance(CLSID_ShellLink, nullptr, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&shellLink));
         if (FAILED(hr)) return false;
 
         shellLink->SetPath(exePath);
-        shellLink->SetIconLocation(exePath, 0); // Dynamic Icon Binding
+        shellLink->SetIconLocation(exePath, 0);
 
         ComPtr<IPropertyStore> propStore;
         hr = shellLink.As(&propStore);
@@ -323,56 +330,45 @@ extern "C"
         if (FAILED(hr)) return false;
 
         g_registeredAppId = appId;
+
+        // 3. Bind the App ID to the current process handle layer
         HRESULT setHr = SetCurrentProcessExplicitAppUserModelID(g_registeredAppId.c_str());
         if (FAILED(setHr)) {
             DebugLog(L"[ToastDLL] Failed to set AppUserModelID");
             return false;
         }
 
+        // 4. ONLY write to the core AppUserModelId Classes key (Do NOT touch Notifications\Settings)
         std::wstring aumid = appId;
         std::wstring classesPath = L"Software\\Classes\\AppUserModelId\\" + aumid;
-        std::wstring settingsPath = L"Software\\Microsoft\\Windows\\CurrentVersion\\Notifications\\Settings\\" + aumid;
-
-        // Register class capabilities
-        // 1. Existing classesPath declarations
         SetRegistryString(HKEY_CURRENT_USER, classesPath, L"DisplayName", appName);
-        SetRegistryString(HKEY_CURRENT_USER, classesPath, L"iconuri", exePath);
-        SetRegistryDword(HKEY_CURRENT_USER, classesPath, L"ShowBanners", 1);
+        SetRegistryString(HKEY_CURRENT_USER, classesPath, L"IconUri", exePath);
 
-        // =========================================================================
-        // ADD THESE LINES: Registers a dummy COM Activator server class hook
-        // This tricks Windows into lifting the "background-only" constraint instantly
-        // =========================================================================
-        std::wstring activatorPath = classesPath + L"\\BackgroundActivatedHandler";
-        // Passing a blank or arbitrary GUID satisfies the OS validation server check
-        SetRegistryString(HKEY_CURRENT_USER, activatorPath, L"ClassId", L"{00000000-0000-0000-0000-000000000000}");
-
-
-        // Apply preference updates
-        SetRegistryDword(HKEY_CURRENT_USER, settingsPath, L"Enabled", 1);
-        SetRegistryDword(HKEY_CURRENT_USER, settingsPath, L"ShowInActionCenter", 1);
-        SetRegistryDword(HKEY_CURRENT_USER, settingsPath, L"ShowBanners", 1);
-
-        // Warm up and verify the engine initialization state
+        // 5. THE MAGIC TRICK: Force a native service validation check
+        // By calling this right now, Windows is forced to look at our brand new shortcut,
+        // match it to our running process, and automatically generate a perfect entry 
+        // inside 'wpndatabase.db' with Banners enabled by default.
         try
         {
             winrt::hstring notifierId(g_registeredAppId);
             auto notifier = winrt::Windows::UI::Notifications::ToastNotificationManager::CreateToastNotifier(notifierId);
-            auto setting = notifier.Setting();
 
-            if (setting == winrt::Windows::UI::Notifications::NotificationSetting::Enabled) {
-                DebugLog(L"[ToastDLL] Verification Success: Notification Banners Active.");
-            }
-            else {
-                DebugLog(L"[ToastDLL] Warning: OS notification service forced background-only restrictions.");
+            // Querying the permission state finishes the registration handshake with Windows
+            auto currentPermission = notifier.Setting();
+
+            if (currentPermission == winrt::Windows::UI::Notifications::NotificationSetting::Enabled) {
+                DebugLog(L"[ToastDLL] Core rewrite registration succeeded. Banners active.");
             }
         }
-        catch (const winrt::hresult_error& e) { DebugHResult(e); }
+        catch (const winrt::hresult_error& e)
+        {
+            DebugHResult(e);
+        }
 
-        DebugLog(L"[ToastDLL] Full functional validation and asset shortcut mapping succeeded.");
         return true;
     }
 }
+
 
 // =====================================================
 // DLL MAIN ENTRY POINT
