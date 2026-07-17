@@ -336,7 +336,7 @@ extern "C"
         // Register class capabilities
         // 1. Existing classesPath declarations
         SetRegistryString(HKEY_CURRENT_USER, classesPath, L"DisplayName", appName);
-        SetRegistryString(HKEY_CURRENT_USER, classesPath, L"IconUri", exePath);
+        SetRegistryString(HKEY_CURRENT_USER, classesPath, L"iconuri", exePath);
         SetRegistryDword(HKEY_CURRENT_USER, classesPath, L"ShowBanners", 1);
 
         // =========================================================================
