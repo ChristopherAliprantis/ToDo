@@ -248,7 +248,47 @@ extern "C" __declspec(dllexport) bool __stdcall IsNotificationBlocked(const wcha
     if (status == ERROR_SUCCESS && appEnabled == 0) return true;
     return false;
 }
+extern "C" __declspec(dllexport) bool IsNotificationDisabled(const wchar_t* appId) {
+    if (!appId) {
+        return true; // Treat invalid input as disabled/safe
+    }
 
+    // Define the registry path for Windows 10/11 Push Notifications
+    std::wstring subKey = L"Software\\Microsoft\\Windows\\CurrentVersion\\Notifications\\Settings\\" + std::wstring(appId);
+    HKEY hKey;
+
+    // Open the registry key for the specific Application ID
+    LSTATUS status = RegOpenKeyExW(HKEY_CURRENT_USER, subKey.c_str(), 0, KEY_READ, &hKey);
+    if (status != ERROR_SUCCESS) {
+        // If the key doesn't exist, the user hasn't modified default settings.
+        // By default, notifications are usually enabled.
+        return false;
+    }
+
+    DWORD enabledValue = 1;
+    DWORD showBannersValue = 1;
+    DWORD showInNotificationCenterValue = 1;
+    DWORD dataSize = sizeof(DWORD);
+
+    // 1. Check if global notifications for this app are turned off
+    RegQueryValueExW(hKey, L"Enabled", nullptr, nullptr, reinterpret_cast<LPBYTE>(&enabledValue), &dataSize);
+
+    // 2. Check if "Show banners" is turned off
+    RegQueryValueExW(hKey, L"ShowBanners", nullptr, nullptr, reinterpret_cast<LPBYTE>(&showBannersValue), &dataSize);
+
+    // 3. Check if "Show in notification center" is turned off
+    RegQueryValueExW(hKey, L"ShowInActionCenter", nullptr, nullptr, reinterpret_cast<LPBYTE>(&showInNotificationCenterValue), &dataSize);
+
+    // Close the registry handle
+    RegCloseKey(hKey);
+
+    // Return true if global is off, OR banners are off, OR notification center is off
+    if (enabledValue == 0 || showBannersValue == 0 || showInNotificationCenterValue == 0) {
+        return true;
+    }
+
+    return false;
+}
 // =====================================================
 // REGISTER APP FOR TOASTS
 // =====================================================
