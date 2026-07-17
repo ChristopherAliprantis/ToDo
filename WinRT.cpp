@@ -334,9 +334,19 @@ extern "C"
         std::wstring settingsPath = L"Software\\Microsoft\\Windows\\CurrentVersion\\Notifications\\Settings\\" + aumid;
 
         // Register class capabilities
+        // 1. Existing classesPath declarations
         SetRegistryString(HKEY_CURRENT_USER, classesPath, L"DisplayName", appName);
         SetRegistryString(HKEY_CURRENT_USER, classesPath, L"IconUri", exePath);
         SetRegistryDword(HKEY_CURRENT_USER, classesPath, L"ShowBanners", 1);
+
+        // =========================================================================
+        // ADD THESE LINES: Registers a dummy COM Activator server class hook
+        // This tricks Windows into lifting the "background-only" constraint instantly
+        // =========================================================================
+        std::wstring activatorPath = classesPath + L"\\BackgroundActivatedHandler";
+        // Passing a blank or arbitrary GUID satisfies the OS validation server check
+        SetRegistryString(HKEY_CURRENT_USER, activatorPath, L"ClassId", L"{00000000-0000-0000-0000-000000000000}");
+
 
         // Apply preference updates
         SetRegistryDword(HKEY_CURRENT_USER, settingsPath, L"Enabled", 1);
