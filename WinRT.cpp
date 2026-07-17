@@ -338,32 +338,7 @@ extern "C"
             return false;
         }
 
-        // 4. ONLY write to the core AppUserModelId Classes key (Do NOT touch Notifications\Settings)
-        std::wstring aumid = appId;
-        std::wstring classesPath = L"Software\\Classes\\AppUserModelId\\" + aumid;
-        SetRegistryString(HKEY_CURRENT_USER, classesPath, L"DisplayName", appName);
-        SetRegistryString(HKEY_CURRENT_USER, classesPath, L"IconUri", exePath);
-
-        // 5. THE MAGIC TRICK: Force a native service validation check
-        // By calling this right now, Windows is forced to look at our brand new shortcut,
-        // match it to our running process, and automatically generate a perfect entry 
-        // inside 'wpndatabase.db' with Banners enabled by default.
-        try
-        {
-            winrt::hstring notifierId(g_registeredAppId);
-            auto notifier = winrt::Windows::UI::Notifications::ToastNotificationManager::CreateToastNotifier(notifierId);
-
-            // Querying the permission state finishes the registration handshake with Windows
-            auto currentPermission = notifier.Setting();
-
-            if (currentPermission == winrt::Windows::UI::Notifications::NotificationSetting::Enabled) {
-                DebugLog(L"[ToastDLL] Core rewrite registration succeeded. Banners active.");
-            }
-        }
-        catch (const winrt::hresult_error& e)
-        {
-            DebugHResult(e);
-        }
+        // 4. ONLY write to the core AppUserModelId Classes key (Do NOT touch Notifications\Sett
 
         return true;
     }
