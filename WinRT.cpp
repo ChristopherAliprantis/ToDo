@@ -518,13 +518,16 @@ extern "C"
 
         // 2. Write to Classes (this tells the shell where the app is)
         std::wstring classesPath = L"Software\\Classes\\AppUserModelId\\" + aumid;
-        SetRegistryString(HKEY_CURRENT_USER, classesPath, L"DisplayName", displayName);
-
-        // 3. Write to Settings ONLY if the keys don't exist yet, to prevent overriding the OS engine
         std::wstring settingsPath = L"Software\\Microsoft\\Windows\\CurrentVersion\\Notifications\\Settings\\" + aumid;
+
+        // Path 1: Tell Windows the application capability supports Banners natively
+        SetRegistryDword(HKEY_CURRENT_USER, classesPath, L"ShowBanners", 1); // <-- ADD THIS
+
+        // Path 2: Your existing user state preferences block
         SetRegistryDword(HKEY_CURRENT_USER, settingsPath, L"Enabled", 1);
         SetRegistryDword(HKEY_CURRENT_USER, settingsPath, L"ShowInActionCenter", 1);
         SetRegistryDword(HKEY_CURRENT_USER, settingsPath, L"ShowBanners", 1);
+
 
         // 4. CRITICAL: Trigger a hidden/silent toast or initialize a Toast Notifier object immediately here.
         // This forces Windows to bind your running Process ID + your Start Menu Shortcut + your Registry Keys together.
