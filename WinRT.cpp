@@ -520,15 +520,21 @@ extern "C"
         std::wstring classesPath = L"Software\\Classes\\AppUserModelId\\" + aumid;
         std::wstring settingsPath = L"Software\\Microsoft\\Windows\\CurrentVersion\\Notifications\\Settings\\" + aumid;
 
-        // Only enable notifications for THIS specific app
+        // Fix 1: Properly register the AUMID in Classes so Windows recognizes it as a valid toast source
         SetRegistryString(HKEY_CURRENT_USER, classesPath, L"DisplayName", displayName);
+        // Windows modern notification engine requires this to properly track banner capability:
+        SetRegistryString(HKEY_CURRENT_USER, classesPath, L"IconBackgroundColor", L"FF000000");
+
+        // Fix 2: Force ShowBanners to 1 alongside Enabled and ShowInActionCenter
         SetRegistryDword(HKEY_CURRENT_USER, settingsPath, L"Enabled", 1);
         SetRegistryDword(HKEY_CURRENT_USER, settingsPath, L"ShowInActionCenter", 1);
+        SetRegistryDword(HKEY_CURRENT_USER, settingsPath, L"ShowBanners", 1); // <-- CRITICAL: Stops the banner toggle from turning off
 
         DebugLog(L"[ToastDLL] RegisterAppForToasts succeeded safely for this app only.");
-        std::wcout << L"[ToastDLL] Success! Target app notifications isolated and enabled." << std::endl;
+        std::wcout << L"[ToastDLL] Success! Target app notifications isolated and enabled with banners." << std::endl;
 
         return true;
+
     }
 }
 
