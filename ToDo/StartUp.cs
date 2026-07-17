@@ -28,7 +28,21 @@ public sealed partial class Start : Page
                 ContentDialog alert = new ContentDialog
                 {
                     Title = "Notifications Disabled",
-                    Content = "Please enable notifications in Settings, so the app's ToDos with a set time work.",
+                    Content = "Please enable notifications in Settings on System > Notifications, so the app's ToDos with a set time work.",
+                    CloseButtonText = "OK",
+                    XamlRoot = this.XamlRoot
+                };
+
+                // 2. Open the dialog and capture the user's action asynchronously
+                ContentDialogResult result = await alert.ShowAsync();
+            }
+            t = App.Imports.IsNotificationDisabled("com.christopheraliprantis.todo");
+            if (t)
+            {
+                ContentDialog alert = new ContentDialog
+                {
+                    Title = "App Notifications Disabled",
+                    Content = "Please enable PP notifications in Settings on System > Notifications > ToDo, so the app's ToDos with a set time work and make sure the 2 checkboxes are marked.",
                     CloseButtonText = "OK",
                     XamlRoot = this.XamlRoot
                 };
@@ -38,6 +52,7 @@ public sealed partial class Start : Page
             }
             App.rootFrame.Navigate(typeof(MainPage));
         };
+        
         this.SizeChanged += async(s, e) =>
         {
             splash.Height = this.ActualHeight / 2;
