@@ -388,118 +388,67 @@ bool SetRegistryDword(HKEY hRootKey, const std::wstring& subKey, const std::wstr
 
 
 
-extern "C"
+xtern "C"
 {
     __declspec(dllexport)
-        bool __stdcall RegisterAppForToasts(
-            const wchar_t* appId,
-            const wchar_t* appName)
+        bool __stdcall RegisterAndVerifyToasts(const wchar_t* appId, const wchar_t* appName)
     {
-        HRESULT hr =
-            CoInitializeEx(
-                nullptr,
-                COINIT_APARTMENTTHREADED);
-
+        // 1. Initialize COM properly for Windows Runtime
+        HRESULT hr = CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED);
         if (FAILED(hr) && hr != RPC_E_CHANGED_MODE)
         {
             return false;
         }
 
-        wchar_t exePath[MAX_PATH]{};
-        GetModuleFileNameW(nullptr, exePath, MAX_PATH);
-
-        wchar_t startMenuPath[MAX_PATH]{};
-        hr = SHGetFolderPathW(nullptr, CSIDL_PROGRAMS, nullptr, 0, startMenuPath);
-        if (FAILED(hr))
-        {
-            return false;
-        }
-
-        std::wstring shortcutPath = std::wstring(startMenuPath) + L"\\" + appName + L".lnk";
-
-        ComPtr<IShellLinkW> shellLink;
-        hr = CoCreateInstance(CLSID_ShellLink, nullptr, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&shellLink));
-        if (FAILED(hr))
-        {
-            return false;
-        }
-
-        shellLink->SetPath(exePath);
-
-        // =========================================================================
-        // LINK APP ICON: Explicitly extracts the main embedded icon from your EXE
-        // =========================================================================
-        shellLink->SetIconLocation(exePath, 0);
-
-        ComPtr<IPropertyStore> propStore;
-        hr = shellLink.As(&propStore);
-        if (FAILED(hr))
-        {
-            return false;
-        }
-
-        // Binds your precise application ID metadata into the Shell Link
-        PROPVARIANT pvAppId{};
-        InitPropVariantFromString(appId, &pvAppId);
-        hr = propStore->SetValue(PKEY_AppUserModel_ID, pvAppId);
-        PropVariantClear(&pvAppId);
-        if (FAILED(hr)) return false;
-
-        // Binds your user-visible application string into the Shell Link
-        PROPVARIANT pvName{};
-        InitPropVariantFromString(appName, &pvName);
-        hr = propStore->SetValue(PKEY_ItemNameDisplay, pvName);
-        PropVariantClear(&pvName);
-        if (FAILED(hr)) return false;
-
-        hr = propStore->Commit();
-        if (FAILED(hr)) return false;
-
-        ComPtr<IPersistFile> persistFile;
-        hr = shellLink.As(&persistFile);
-        if (FAILED(hr))
-        {
-            return false;
-        }
-
-        hr = persistFile->Save(shortcutPath.c_str(), TRUE);
-        if (FAILED(hr))
-        {
-            return false;
-        }
-
+        // 2. Explicitly bind the process ID 
         g_registeredAppId = appId;
-
-        // Explicitly declare the running AppUserModelID layout rule for the current process
         HRESULT setHr = SetCurrentProcessExplicitAppUserModelID(g_registeredAppId.c_str());
         if (FAILED(setHr)) {
-            DebugLog(L"[ToastDLL] Failed to set AppUserModelID");
+            DebugLog(L"[ToastDLL] Failed to set process AppUserModelID");
             return false;
         }
 
-        std::wstring aumid = appId;
-        std::wstring classesPath = L"Software\\Classes\\AppUserModelId\\" + aumid;
-        std::wstring settingsPath = L"Software\\Microsoft\\Windows\\CurrentVersion\\Notifications\\Settings\\" + aumid;
+        // Note: Keep your existing Start Menu Shortcut generation code here so the AppId is valid!
+        // [Insert your IShellLinkW shortcut generation code here]
 
-        // Map requirements to the base windows application registry tree
-        SetRegistryString(HKEY_CURRENT_USER, classesPath, L"DisplayName", appName);
-        SetRegistryDword(HKEY_CURRENT_USER, classesPath, L"ShowBanners", 1);
+        try
+        {
+            // 3. Ask Windows directly what our current permission status is
+            winrt::hstring notifierId(g_registeredAppId);
+            auto notifier = winrt::Windows::UI::Notifications::ToastNotificationManager::CreateToastNotifier(notifierId);
 
-        // Write configuration preferences directly into the user choices cluster
-        SetRegistryDword(HKEY_CURRENT_USER, settingsPath, L"Enabled", 1);
-        SetRegistryDword(HKEY_CURRENT_USER, settingsPath, L"ShowInActionCenter", 1);
-        SetRegistryDword(HKEY_CURRENT_USER, settingsPath, L"ShowBanners", 1);
+            // Read the official setting state directly from the Windows core engine
+            auto setting = notifier.Setting();
 
-        // Force a handshake with the system notification engine to validate the newly written properties
-        try {
-            auto notifier = winrt::Windows::UI::Notifications::ToastNotificationManager::CreateToastNotifier(winrt::hstring(appId));
+            switch (setting)
+            {
+            case winrt::Windows::UI::Notifications::NotificationSetting::Enabled:
+                DebugLog(L"[ToastDLL] Success! Notifications and Banners are fully ENABLED by the OS.");
+                return true;
+
+            case winrt::Windows::UI::Notifications::NotificationSetting::DisabledBySettings:
+                DebugLog(L"[ToastDLL] Blocked: User manually turned notifications off in the Settings UI.");
+                break;
+
+            case winrt::Windows::UI::Notifications::NotificationSetting::DisabledByGroupPolicy:
+                DebugLog(L"[ToastDLL] Blocked: Enterprise Group Policy is forcing this off.");
+                break;
+
+            case winrt::Windows::UI::Notifications::NotificationSetting::DisabledForUser:
+                DebugLog(L"[ToastDLL] Blocked: This specific Windows User account has notifications disabled.");
+                break;
+
+            case winrt::Windows::UI::Notifications::NotificationSetting::DisabledForApplication:
+                DebugLog(L"[ToastDLL] Blocked: App-level system restriction.");
+                break;
+            }
         }
-        catch (...) {
-            DebugLog(L"[ToastDLL] Core service notifier handshake bypassed.");
+        catch (const winrt::hresult_error& e)
+        {
+            DebugHResult(e);
         }
 
-        DebugLog(L"[ToastDLL] Full functional validation and asset shortcut mapping succeeded.");
-        return true;
+        return false;
     }
 }
 
