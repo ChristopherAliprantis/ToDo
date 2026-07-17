@@ -221,22 +221,7 @@ extern "C"
 // =====================================================
 // REGISTRY UTILITIES
 // =====================================================
-bool SetRegistryString(HKEY hRootKey, const std::wstring& subKey, const std::wstring& valueName, const std::wstring& data) {
-    HKEY hKey;
-    LONG result = RegCreateKeyExW(hRootKey, subKey.c_str(), 0, NULL, REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &hKey, NULL);
-    if (result != ERROR_SUCCESS) return false;
-    result = RegSetValueExW(hKey, valueName.c_str(), 0, REG_SZ, reinterpret_cast<const BYTE*>(data.c_str()), static_cast<DWORD>((data.size() + 1) * sizeof(wchar_t)));
-    RegCloseKey(hKey);
-    return result == ERROR_SUCCESS;
-}
-
-bool SetRegistryDword(HKEY hRootKey, const std::wstring& subKey, const std::wstring& valueName, DWORD data) {
-    HKEY hKey;
-    LONG result = RegCreateKeyExW(hRootKey, subKey.c_str(), 0, NULL, REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &hKey, NULL);
-    if (result != ERROR_SUCCESS) return false;
-    result = RegSetValueExW(hKey, valueName.c_str(), 0, REG_DWORD, reinterpret_cast<const BYTE*>(&data), sizeof(DWORD));
-    RegCloseKey(hKey);
-    return result == ERROR_SUCCESS;
+return result == ERROR_SUCCESS;
 }
 
 // =====================================================
