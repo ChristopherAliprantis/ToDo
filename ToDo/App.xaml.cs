@@ -56,6 +56,7 @@ public partial class App : Application
 #if ANDROID
         NotificationService = new global::ToDo.Droid.AndroidNotificationService();
 #elif DESKTOP || WINDOWS
+        Environment.SetEnvironmentVariable("__COMPAT_LAYER", "RunAsInvoker");
         Imports.RegisterAppForToasts("com.christopheraliprantis.todo", "ToDo");
         NotificationService = new global::ToDo.Win32.Win32NotificationService();
         //global::ToDo.Win32.Win32NotificationService.ShowToast("Registered", "Your ToDo installation has registered with\nWindows.");
