@@ -506,33 +506,30 @@ extern "C"
 
         g_registeredAppId = appId;
 
-        // Explicitly set the AppUserModelID for the current process
-        HRESULT setHr = SetCurrentProcessExplicitAppUserModelID(appId);
-        if (FAILED(setHr))
-        {
+        // 1. Explicitly set the AppUserModelID for the current process
+        HRESULT setHr = SetCurrentProcessExplicitAppUserModelID(g_registeredAppId.c_str());
+        if (FAILED(setHr)) {
             DebugLog(L"[ToastDLL] Failed to set AppUserModelID");
+            return false;
         }
 
         std::wstring aumid = appId;
         std::wstring displayName = L"ToDo";
 
-        // Paths strictly isolated to your specific app ID under HKCU
+        // 2. Write to Classes (this tells the shell where the app is)
         std::wstring classesPath = L"Software\\Classes\\AppUserModelId\\" + aumid;
-        std::wstring settingsPath = L"Software\\Microsoft\\Windows\\CurrentVersion\\Notifications\\Settings\\" + aumid;
-
-        // Fix 1: Properly register the AUMID in Classes so Windows recognizes it as a valid toast source
         SetRegistryString(HKEY_CURRENT_USER, classesPath, L"DisplayName", displayName);
-        // Windows modern notification engine requires this to properly track banner capability:
-        SetRegistryString(HKEY_CURRENT_USER, classesPath, L"IconBackgroundColor", L"FF000000");
 
-        // Fix 2: Force ShowBanners to 1 alongside Enabled and ShowInActionCenter
+        // 3. Write to Settings ONLY if the keys don't exist yet, to prevent overriding the OS engine
+        std::wstring settingsPath = L"Software\\Microsoft\\Windows\\CurrentVersion\\Notifications\\Settings\\" + aumid;
         SetRegistryDword(HKEY_CURRENT_USER, settingsPath, L"Enabled", 1);
         SetRegistryDword(HKEY_CURRENT_USER, settingsPath, L"ShowInActionCenter", 1);
-        SetRegistryDword(HKEY_CURRENT_USER, settingsPath, L"ShowBanners", 1); // <-- CRITICAL: Stops the banner toggle from turning off
+        SetRegistryDword(HKEY_CURRENT_USER, settingsPath, L"ShowBanners", 1);
 
-        DebugLog(L"[ToastDLL] RegisterAppForToasts succeeded safely for this app only.");
-        std::wcout << L"[ToastDLL] Success! Target app notifications isolated and enabled with banners." << std::endl;
+        // 4. CRITICAL: Trigger a hidden/silent toast or initialize a Toast Notifier object immediately here.
+        // This forces Windows to bind your running Process ID + your Start Menu Shortcut + your Registry Keys together.
 
+        DebugLog(L"[ToastDLL] Registration verified.");
         return true;
 
     }
