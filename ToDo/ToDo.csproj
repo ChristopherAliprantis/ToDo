@@ -28,6 +28,7 @@
 
     <!-- DESKTOP ONLY: Fixes Original Filename and Metadata -->
     <PropertyGroup Condition="'$(TargetFramework)' == 'net10.0-desktop'">
+        <ApplicationManifest>app.manifest</ApplicationManifest>
         <ApplicationIcon>Assets\Icons\todoico.ico</ApplicationIcon>
         <UnoIcon>Assets\Icons\todoico.ico</UnoIcon>
         <AssemblyName>ToDo</AssemblyName>
@@ -84,6 +85,7 @@
     </ItemGroup>
 
     <ItemGroup Condition="'$(TargetFramework)' == 'net10.0-desktop'">
+        
         <None Remove="Platforms\Desktop\WinRTapis.dll" />
     </ItemGroup>
 
