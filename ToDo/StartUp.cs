@@ -42,7 +42,7 @@ public sealed partial class Start : Page
                 ContentDialog alert = new ContentDialog
                 {
                     Title = "App Notifications Disabled",
-                    Content = "Please enable PP notifications in Settings on System > Notifications > ToDo, so the app's ToDos with a set time work and make sure the 2 checkboxes are marked.",
+                    Content = "Please enable App notifications in Settings on System > Notifications > ToDo, so the app's ToDos with a set time work and make sure the 2 checkboxes are marked.",
                     CloseButtonText = "OK",
                     XamlRoot = this.XamlRoot
                 };
