@@ -10,9 +10,9 @@
         <Product>ToDo</Product>
         <ApplicationId>com.christopheraliprantis.todo</ApplicationId>
 
-        <ApplicationDisplayVersion>3.0.0</ApplicationDisplayVersion>
-        <ApplicationVersion>3.0.0</ApplicationVersion>
-        <Version>3.0.0</Version>
+        <ApplicationDisplayVersion>3.0.1</ApplicationDisplayVersion>
+        <ApplicationVersion>3.0.1</ApplicationVersion>
+        <Version>3.0.1</Version>
         <ApplicationPublisher>Christopher Aliprantis</ApplicationPublisher>
         <Description>ToDo, your ultimate time management app</Description>
         <authors>Christopher Aliprantis</authors>
