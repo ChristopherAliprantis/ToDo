@@ -811,3 +811,81 @@ void __stdcall CancelToast(
         );
     }
 }
+
+extern "C"
+{
+    __declspec(dllexport)
+        bool __stdcall IsNotificationBlocked(const wchar_t* appId)
+    {
+        printf("[ToastDLL] IsNotificationBlocked called\n");
+
+        HKEY hKey{};
+        DWORD enabled = 1;
+        DWORD size = sizeof(DWORD);
+
+        const wchar_t* path =
+            L"Software\\Microsoft\\Windows\\CurrentVersion\\PushNotifications";
+
+        if (RegOpenKeyExW(
+            HKEY_CURRENT_USER,
+            path,
+            0,
+            KEY_READ,
+            &hKey) == ERROR_SUCCESS)
+        {
+            RegQueryValueExW(
+                hKey,
+                L"ToastEnabled",
+                nullptr,
+                nullptr,
+                reinterpret_cast<LPBYTE>(&enabled),
+                &size);
+
+            RegCloseKey(hKey);
+        }
+
+        return enabled == 0;
+    }
+
+
+    __declspec(dllexport)
+        bool __stdcall IsNotificationDisabled(const wchar_t* appId)
+    {
+        printf("[ToastDLL] IsNotificationDisabled called\n");
+
+        if (!appId)
+            return true;
+
+        std::wstring path =
+            L"Software\\Microsoft\\Windows\\CurrentVersion\\Notifications\\Settings\\" +
+            std::wstring(appId);
+
+        HKEY hKey{};
+
+        if (RegOpenKeyExW(
+            HKEY_CURRENT_USER,
+            path.c_str(),
+            0,
+            KEY_READ,
+            &hKey) != ERROR_SUCCESS)
+        {
+            // No settings key means default enabled
+            return false;
+        }
+
+        DWORD enabled = 1;
+        DWORD size = sizeof(DWORD);
+
+        RegQueryValueExW(
+            hKey,
+            L"Enabled",
+            nullptr,
+            nullptr,
+            reinterpret_cast<LPBYTE>(&enabled),
+            &size);
+
+        RegCloseKey(hKey);
+
+        return enabled == 0;
+    }
+}
