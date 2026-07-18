@@ -22,9 +22,6 @@ public sealed partial class Start : Page
             splash.Width = this.ActualWidth / 4;
 
             await Task.Delay(1500);
-            Console.WriteLine("[C#] Start Loaded");
-
-            Console.WriteLine("[C#] Before IsNotificationBlocked");
 
             bool blocked = App.Imports.IsNotificationBlocked(
                 "com.christopheraliprantis.todo"
@@ -34,8 +31,6 @@ public sealed partial class Start : Page
             bool disabled = App.Imports.IsNotificationDisabled(
                 "com.christopheraliprantis.todo"
             );
-
-            Console.WriteLine("[C#] After IsNotificationDisabled: " + disabled);
             App.rootFrame.Navigate(typeof(MainPage));
         };
         
