@@ -75,7 +75,6 @@ static bool EnsureWinRT()
     try
     {
         winrt::init_apartment(
-            winrt::apartment_type::multi_threaded
         );
 
         return true;
