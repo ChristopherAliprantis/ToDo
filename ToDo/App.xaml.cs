@@ -19,8 +19,7 @@ public partial class App : Application
         [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvStdcall)])]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static partial bool IsNotificationBlocked(
-        string AppId,
-        string AppName);
+        string AppId);
 
         [LibraryImport("Assets/DLLs/WinRTapis.dll", StringMarshalling = StringMarshalling.Utf16)]
         [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvStdcall)])]
