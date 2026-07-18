@@ -22,34 +22,20 @@ public sealed partial class Start : Page
             splash.Width = this.ActualWidth / 4;
 
             await Task.Delay(1500);
-            bool t = App.Imports.IsNotificationBlocked("com.christopheraliprantis.todo");
-            if (t)
-            {
-                ContentDialog alert = new ContentDialog
-                {
-                    Title = "Notifications Disabled",
-                    Content = "Please enable notifications in Settings on System > Notifications, so the app's ToDos with a set time work.",
-                    CloseButtonText = "OK",
-                    XamlRoot = this.XamlRoot
-                };
+            Console.WriteLine("[C#] Start Loaded");
 
-                // 2. Open the dialog and capture the user's action asynchronously
-                ContentDialogResult result = await alert.ShowAsync();
-            }
-            t = App.Imports.IsNotificationDisabled("com.christopheraliprantis.todo");
-            if (t)
-            {
-                ContentDialog alert = new ContentDialog
-                {
-                    Title = "App Notifications Disabled",
-                    Content = "Please enable App notifications in Settings on System > Notifications > ToDo, so the app's ToDos with a set time work and make sure the 2 checkboxes are marked.",
-                    CloseButtonText = "OK",
-                    XamlRoot = this.XamlRoot
-                };
+            Console.WriteLine("[C#] Before IsNotificationBlocked");
 
-                // 2. Open the dialog and capture the user's action asynchronously
-                ContentDialogResult result = await alert.ShowAsync();
-            }
+            bool blocked = App.Imports.IsNotificationBlocked(
+                "com.christopheraliprantis.todo"
+            );
+
+
+            bool disabled = App.Imports.IsNotificationDisabled(
+                "com.christopheraliprantis.todo"
+            );
+
+            Console.WriteLine("[C#] After IsNotificationDisabled: " + disabled);
             App.rootFrame.Navigate(typeof(MainPage));
         };
         
