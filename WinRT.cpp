@@ -1,381 +1,814 @@
-#include <winrt/base.h>
-#include <winrt/Windows.Data.Xml.Dom.h>
-#include <winrt/Windows.UI.Notifications.h>
-#include <winrt/Windows.Foundation.h>
-#include <winrt/Windows.Foundation.Collections.h>
-
-#include <windows.h>   // 1. Move this ABOVE tlhelp32.h
-#include <tlhelp32.h>  // 2. This can now safely use the Windows types
-
+#include <windows.h>
 #include <shobjidl.h>
 #include <shlobj.h>
-#include <propvarutil.h>
 #include <propkey.h>
+#include <propvarutil.h>
 #include <wrl/client.h>
-#include <combaseapi.h>
-#include <filesystem>
-#include <string>
+
+#include <winrt/base.h>
+#include <winrt/Windows.Data.Xml.Dom.h>
+#include <winrt/Windows.Foundation.h>
+#include <winrt/Windows.Foundation.Collections.h>
+#include <winrt/Windows.UI.Notifications.h>
+
 #include <cstdio>
+#include <cstdint>
+#include <string>
+#include <filesystem>
 #include <iostream>
-#include <optional>
 
 #pragma comment(lib, "runtimeobject.lib")
-#pragma comment(lib, "shlwapi.lib")
 #pragma comment(lib, "windowsapp.lib")
+#pragma comment(lib, "shlwapi.lib")
 
-using namespace Microsoft::WRL;
 
+using Microsoft::WRL::ComPtr;
+
+//
 // =====================================================
-// GLOBAL VARIABLES
+// GLOBALS
 // =====================================================
-extern HINSTANCE g_hModuleInstance = nullptr;
+//
+
 static std::wstring g_registeredAppId;
 
+static HINSTANCE g_hModuleInstance = nullptr;
+
+
+//
 // =====================================================
 // LOGGING
 // =====================================================
-static void DebugLog(const wchar_t* text)
+//
+
+static void PrintError(const char* where, HRESULT hr)
 {
-    OutputDebugStringW(text);
-    OutputDebugStringW(L"\n");
-    try { std::wcerr << text << std::endl; }
-    catch (...) {}
+    std::printf(
+        "[ToastDLL] %s failed HRESULT=0x%08X\n",
+        where,
+        static_cast<unsigned int>(hr)
+    );
 }
 
-static void DebugHResult(const winrt::hresult_error& e)
+static void PrintWinrtError(const char* where, const winrt::hresult_error& e)
 {
-    std::wstring msg = L"[ToastDLL] HRESULT=0x" + std::to_wstring(static_cast<uint32_t>(e.code())) + L" MESSAGE=" + std::wstring(e.message());
-    DebugLog(msg.c_str());
+    std::wcerr
+        << L"[ToastDLL] "
+        << where
+        << L" HRESULT=0x"
+        << std::hex
+        << static_cast<uint32_t>(e.code())
+        << L"\nMessage: "
+        << e.message().c_str()
+        << L"\n";
 }
 
+
+//
 // =====================================================
-// XML ESCAPE
+// WINRT INITIALIZATION
 // =====================================================
-static std::wstring EscapeXml(winrt::hstring const& s)
+//
+
+static bool EnsureWinRT()
 {
-    std::wstring in = s.c_str();
-    std::wstring out;
-    for (wchar_t c : in)
+    try
+    {
+        winrt::init_apartment(
+            winrt::apartment_type::multi_threaded
+        );
+
+        return true;
+    }
+    catch (const winrt::hresult_error& e)
+    {
+        PrintWinrtError("init_apartment", e);
+        return false;
+    }
+}
+
+
+//
+// =====================================================
+// XML ESCAPING
+// =====================================================
+//
+
+static std::wstring EscapeXml(const std::wstring& input)
+{
+    std::wstring output;
+
+    output.reserve(input.size());
+
+    for (wchar_t c : input)
     {
         switch (c)
         {
-        case L'&':  out += L"&amp;";  break;
-        case L'<':  out += L"&lt;";   break;
-        case L'>':  out += L"&gt;";   break;
-        case L'\'': out += L"&apos;"; break;
-        case L'"':  out += L"&quot;"; break;
-        default:    out += c;         break;
+        case L'&':
+            output += L"&amp;";
+            break;
+
+        case L'<':
+            output += L"&lt;";
+            break;
+
+        case L'>':
+            output += L"&gt;";
+            break;
+
+        case L'"':
+            output += L"&quot;";
+            break;
+
+        case L'\'':
+            output += L"&apos;";
+            break;
+
+        default:
+            output += c;
+            break;
         }
     }
-    return out;
+
+    return output;
 }
 
+
+//
 // =====================================================
-// CREATE TOAST XML (Fixed: No conflicting appUserModelId root parameters)
+// SAFE STRING HELPER
 // =====================================================
+//
+
+static std::wstring SafeString(const wchar_t* value)
+{
+    if (!value)
+        return L"";
+
+    return std::wstring(value);
+}
+
+//
+// =====================================================
+// CREATE TOAST XML
+// =====================================================
+//
+
 static winrt::Windows::Data::Xml::Dom::XmlDocument CreateToastXml(
-    winrt::hstring const& title,
-    winrt::hstring const& message,
-    winrt::hstring const& launch = {})
+    const std::wstring& title,
+    const std::wstring& message)
 {
     std::wstring safeTitle = EscapeXml(title);
     std::wstring safeMessage = EscapeXml(message);
 
-    if (safeTitle.empty() && safeMessage.empty())
-    {
-        safeMessage = L" ";
+    if (safeTitle.empty())
         safeTitle = L" ";
-    }
 
-    std::wstring xml;
-    if (launch.empty())
-    {
-        xml = L"<toast><visual><binding template='ToastGeneric'><text>" + safeTitle + L"</text><text>" + safeMessage + L"</text></binding></visual></toast>";
-    }
-    else
-    {
-        xml = L"<toast launch=\"" + EscapeXml(launch) + L"\"><visual><binding template='ToastGeneric'><text>" + safeTitle + L"</text><text>" + safeMessage + L"</text></binding></visual></toast>";
-    }
+    if (safeMessage.empty())
+        safeMessage = L" ";
 
-    winrt::Windows::Data::Xml::Dom::XmlDocument doc;
-    doc.LoadXml(xml);
-    return doc;
+    //
+    // No launch attribute.
+    // Clicking the toast will not activate anything.
+    //
+    std::wstring xml =
+        L"<toast>"
+        L"<visual>"
+        L"<binding template=\"ToastGeneric\">"
+        L"<text>" + safeTitle + L"</text>"
+        L"<text>" + safeMessage + L"</text>"
+        L"</binding>"
+        L"</visual>"
+        L"</toast>";
+
+    winrt::Windows::Data::Xml::Dom::XmlDocument document;
+
+    document.LoadXml(xml);
+
+    return document;
 }
 
+
+//
 // =====================================================
-// SHOW TOAST
+// APP USER MODEL ID
 // =====================================================
-extern "C"
+//
+
+static std::wstring CurrentAppId()
 {
-    __declspec(dllexport) void __stdcall ShowToast(const wchar_t* title, const wchar_t* message)
-    {
-        try
-        {
-            std::wstring titleStr = title ? title : L"";
-            std::wstring messageStr = message ? message : L"";
+    if (!g_registeredAppId.empty())
+        return g_registeredAppId;
 
-            auto doc = CreateToastXml(winrt::hstring(titleStr), winrt::hstring(messageStr));
-            winrt::Windows::UI::Notifications::ToastNotification toast{ doc };
-
-            winrt::hstring notifierId = g_registeredAppId.empty() ? L"com.christopheraliprantis.todo" : winrt::hstring(g_registeredAppId);
-            auto notifier = winrt::Windows::UI::Notifications::ToastNotificationManager::CreateToastNotifier(notifierId);
-            notifier.Show(toast);
-
-            DebugLog(L"[ToastDLL] ShowToast succeeded");
-        }
-        catch (const winrt::hresult_error& e) { DebugHResult(e); }
-        catch (...) { DebugLog(L"[ToastDLL] Unknown exception in ShowToast"); }
-    }
+    //
+    // Fallback.
+    // Must match the shortcut AppUserModelID.
+    //
+    return L"com.christopheraliprantis.todo";
 }
 
+
+//
 // =====================================================
-// SCHEDULE TOAST
+// CREATE TOAST NOTIFIER
 // =====================================================
-extern "C"
+//
+
+static winrt::Windows::UI::Notifications::ToastNotifier CreateNotifier()
 {
-    __declspec(dllexport) void __stdcall ScheduleToast(const wchar_t* id, const wchar_t* title, const wchar_t* message, int64_t fileTime)
-    {
-        try
-        {
-            FILETIME ftNow{};
-            GetSystemTimeAsFileTime(&ftNow);
-            ULARGE_INTEGER uli{};
-            uli.LowPart = ftNow.dwLowDateTime;
-            uli.HighPart = ftNow.dwHighDateTime;
-            uint64_t nowTicks = uli.QuadPart;
+    auto appId = winrt::hstring(CurrentAppId());
 
-            if ((uint64_t)fileTime <= nowTicks)
-            {
-                DebugLog(L"[ToastDLL] Scheduled time is in the past");
-                return;
-            }
-
-            uint64_t delta = (uint64_t)fileTime - nowTicks;
-            DebugLog((L"[ToastDLL] Delta ticks=" + std::to_wstring(delta)).c_str());
-
-            std::wstring titleStr = title ? title : L"";
-            std::wstring messageStr = message ? message : L"";
-            std::wstring tag = id;
-
-            if (tag.length() > 63) { tag = tag.substr(0, 63); }
-
-            auto doc = CreateToastXml(winrt::hstring(titleStr), winrt::hstring(messageStr), winrt::hstring(tag));
-            winrt::file_time ft{ (uint64_t)fileTime };
-            winrt::Windows::Foundation::DateTime when = winrt::clock::from_file_time(ft);
-
-            winrt::Windows::UI::Notifications::ScheduledToastNotification toast{ doc, when };
-            toast.Tag(winrt::hstring(tag));
-
-            winrt::hstring notifierId = g_registeredAppId.empty() ? L"com.christopheraliprantis.todo" : winrt::hstring(g_registeredAppId);
-            auto notifier = winrt::Windows::UI::Notifications::ToastNotificationManager::CreateToastNotifier(notifierId);
-            notifier.AddToSchedule(toast);
-
-            DebugLog(L"[ToastDLL] AddToSchedule succeeded");
-            auto scheduled = notifier.GetScheduledToastNotifications();
-            DebugLog((L"[ToastDLL] Scheduled count=" + std::to_wstring(scheduled.Size())).c_str());
-        }
-        catch (const winrt::hresult_error& e) { DebugHResult(e); }
-        catch (...) { DebugLog(L"[ToastDLL] Unknown exception in ScheduleToast"); }
-    }
+    return winrt::Windows::UI::Notifications::
+        ToastNotificationManager::
+        CreateToastNotifier(appId);
 }
 
+
+//
 // =====================================================
-// CANCEL TOAST
+// GET HOST EXECUTABLE PATH
 // =====================================================
-extern "C"
+//
+
+static std::wstring GetHostExecutablePath()
 {
-    __declspec(dllexport) void __stdcall CancelToast(const wchar_t* id)
+    wchar_t buffer[MAX_PATH]{};
+
+    DWORD length =
+        GetModuleFileNameW(
+            nullptr,
+            buffer,
+            MAX_PATH
+        );
+
+    if (length == 0)
     {
-        try
-        {
-            printf("Rct");
-            winrt::hstring targetTag(id);
-            winrt::hstring notifierId = g_registeredAppId.empty() ? L"com.christopheraliprantis.todo" : winrt::hstring(g_registeredAppId);
-
-            auto notifier = winrt::Windows::UI::Notifications::ToastNotificationManager::CreateToastNotifier(notifierId);
-            auto scheduled = notifier.GetScheduledToastNotifications();
-            std::optional<winrt::Windows::UI::Notifications::ScheduledToastNotification> matchedToast = std::nullopt;
-
-            for (uint32_t i = 0; i < scheduled.Size(); ++i)
-            {
-                auto currentToast = scheduled.GetAt(i);
-                if (currentToast.Tag() == targetTag)
-                {
-                    matchedToast = currentToast;
-                    break;
-                }
-            }
-
-            if (matchedToast.has_value())
-            {
-                notifier.RemoveFromSchedule(matchedToast.value());
-                printf("[ToastDLL] CancelToast succeeded");
-            }
-            else { wprintf(L"[ToastDLL] No matching scheduled toast found\n"); }
-        }
-        catch (const winrt::hresult_error& e) { DebugHResult(e); }
-        catch (...) { DebugLog(L"[ToastDLL] Unknown exception in CancelToast"); }
+        return {};
     }
+
+    return std::wstring(buffer, length);
 }
 
 
+//
 // =====================================================
-// IS NOTIFICATION BLOCKED
+// GET HOST DIRECTORY
 // =====================================================
-extern "C" __declspec(dllexport) bool __stdcall IsNotificationBlocked(const wchar_t* appId) {
-    std::wstring aumid = appId;
-    std::wstring globalPushPath = L"Software\\Microsoft\\Windows\\CurrentVersion\\PushNotifications";
-    HKEY hGlobalKey;
-    DWORD globalEnabled = 1;
-    DWORD dwSize = sizeof(DWORD);
+//
 
-    if (RegOpenKeyExW(HKEY_CURRENT_USER, globalPushPath.c_str(), 0, KEY_READ, &hGlobalKey) == ERROR_SUCCESS) {
-        RegQueryValueExW(hGlobalKey, L"ToastEnabled", NULL, NULL, reinterpret_cast<LPBYTE>(&globalEnabled), &dwSize);
-        RegCloseKey(hGlobalKey);
-    }
-    if (globalEnabled == 0) return true;
+static std::wstring GetHostDirectory()
+{
+    std::wstring path = GetHostExecutablePath();
 
-    std::wstring settingsPath = L"Software\\Microsoft\\Windows\\CurrentVersion\\Notifications\\Settings\\" + aumid;
-    HKEY hAppKey;
-    LONG status = RegOpenKeyExW(HKEY_CURRENT_USER, settingsPath.c_str(), 0, KEY_READ, &hAppKey);
-    if (status != ERROR_SUCCESS) return false;
+    if (path.empty())
+        return {};
 
-    DWORD appEnabled = 1;
-    dwSize = sizeof(DWORD);
-    status = RegQueryValueExW(hAppKey, L"Enabled", NULL, NULL, reinterpret_cast<LPBYTE>(&appEnabled), &dwSize);
-    RegCloseKey(hAppKey);
+    auto pos = path.find_last_of(L"\\/");
 
-    if (status == ERROR_SUCCESS && appEnabled == 0) return true;
-    return false;
+    if (pos == std::wstring::npos)
+        return {};
+
+    return path.substr(0, pos);
 }
-extern "C" __declspec(dllexport) bool IsNotificationDisabled(const wchar_t* appId) {
-    if (!appId) {
-        return true; // Treat invalid input as disabled/safe
-    }
 
-    // Define the registry path for Windows 10/11 Push Notifications
-    std::wstring subKey = L"Software\\Microsoft\\Windows\\CurrentVersion\\Notifications\\Settings\\" + std::wstring(appId);
-    HKEY hKey;
-
-    // Open the registry key for the specific Application ID
-    LSTATUS status = RegOpenKeyExW(HKEY_CURRENT_USER, subKey.c_str(), 0, KEY_READ, &hKey);
-    if (status != ERROR_SUCCESS) {
-        // If the key doesn't exist, the user hasn't modified default settings.
-        // By default, notifications are usually enabled.
-        return false;
-    }
-
-    DWORD enabledValue = 1;
-    DWORD showBannersValue = 1;
-    DWORD showInNotificationCenterValue = 1;
-    DWORD dataSize = sizeof(DWORD);
-
-    // 1. Check if global notifications for this app are turned off
-    RegQueryValueExW(hKey, L"Enabled", nullptr, nullptr, reinterpret_cast<LPBYTE>(&enabledValue), &dataSize);
-
-    // 2. Check if "Show banners" is turned off
-    RegQueryValueExW(hKey, L"ShowBanners", nullptr, nullptr, reinterpret_cast<LPBYTE>(&showBannersValue), &dataSize);
-
-    // 3. Check if "Show in notification center" is turned off
-    RegQueryValueExW(hKey, L"ShowInActionCenter", nullptr, nullptr, reinterpret_cast<LPBYTE>(&showInNotificationCenterValue), &dataSize);
-
-    // Close the registry handle
-    RegCloseKey(hKey);
-
-    // Return true if global is off, OR banners are off, OR notification center is off
-    if (enabledValue == 0 || showBannersValue == 0 || showInNotificationCenterValue == 0) {
-        return true;
-    }
-
-    return false;
-}
+//
 // =====================================================
 // REGISTER APP FOR TOASTS
 // =====================================================
+//
+
 extern "C"
+__declspec(dllexport)
+bool __stdcall RegisterAppForToasts(
+    const wchar_t* appId,
+    const wchar_t* appName)
 {
-    __declspec(dllexport)
-        bool __stdcall RegisterAppForToasts(
-            const wchar_t* appId,
-            const wchar_t* appName)
+    if (!appId || !appName)
     {
-        // 1. Initialize COM as MULTITHREADED (Mandatory for background shell services)
-        HRESULT hr = CoInitializeEx(nullptr, COINIT_MULTITHREADED);
-        if (FAILED(hr) && hr != RPC_E_CHANGED_MODE)
+        std::printf(
+            "[ToastDLL] RegisterAppForToasts invalid arguments\n"
+        );
+        return false;
+    }
+
+    if (!EnsureWinRT())
+    {
+        return false;
+    }
+
+    HRESULT hr = CoInitializeEx(
+        nullptr,
+        COINIT_MULTITHREADED
+    );
+
+    if (FAILED(hr) && hr != RPC_E_CHANGED_MODE)
+    {
+        PrintError(
+            "CoInitializeEx",
+            hr
+        );
+
+        return false;
+    }
+
+
+    //
+    // Store AppUserModelID immediately.
+    //
+    g_registeredAppId = appId;
+
+
+    //
+    // Tell Windows which AppUserModelID this process uses.
+    //
+    hr = SetCurrentProcessExplicitAppUserModelID(
+        g_registeredAppId.c_str()
+    );
+
+    if (FAILED(hr))
+    {
+        PrintError(
+            "SetCurrentProcessExplicitAppUserModelID",
+            hr
+        );
+
+        return false;
+    }
+
+
+    //
+    // Host executable.
+    //
+    std::wstring exePath =
+        GetHostExecutablePath();
+
+    if (exePath.empty())
+    {
+        std::printf(
+            "[ToastDLL] Could not get host executable path\n"
+        );
+
+        return false;
+    }
+
+
+    //
+    // Start Menu Programs folder.
+    //
+    wchar_t programsPath[MAX_PATH]{};
+
+    hr = SHGetFolderPathW(
+        nullptr,
+        CSIDL_PROGRAMS,
+        nullptr,
+        SHGFP_TYPE_CURRENT,
+        programsPath
+    );
+
+    if (FAILED(hr))
+    {
+        PrintError(
+            "SHGetFolderPathW",
+            hr
+        );
+
+        return false;
+    }
+
+
+    std::wstring shortcutPath =
+        std::wstring(programsPath)
+        + L"\\"
+        + appName
+        + L".lnk";
+
+
+    //
+    // Do not recreate existing shortcut.
+    //
+    if (!std::filesystem::exists(shortcutPath))
+    {
+        ComPtr<IShellLinkW> shellLink;
+
+
+        hr = CoCreateInstance(
+            CLSID_ShellLink,
+            nullptr,
+            CLSCTX_INPROC_SERVER,
+            IID_PPV_ARGS(&shellLink)
+        );
+
+        if (FAILED(hr))
         {
+            PrintError(
+                "CoCreateInstance(CLSID_ShellLink)",
+                hr
+            );
+
             return false;
         }
 
-        wchar_t exePath[MAX_PATH]{};
-        GetModuleFileNameW(nullptr, exePath, MAX_PATH);
 
-        wchar_t startMenuPath[MAX_PATH]{};
-        hr = SHGetFolderPathW(nullptr, CSIDL_PROGRAMS, nullptr, 0, startMenuPath);
-        if (FAILED(hr)) return false;
+        shellLink->SetPath(
+            exePath.c_str()
+        );
 
-        std::wstring shortcutPath = std::wstring(startMenuPath) + L"\\" + appName + L".lnk";
+        shellLink->SetWorkingDirectory(
+            GetHostDirectory().c_str()
+        );
 
-        // 2. Build the structural Start Menu link with perfect property matching
-        ComPtr<IShellLinkW> shellLink;
-        hr = CoCreateInstance(CLSID_ShellLink, nullptr, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&shellLink));
-        if (FAILED(hr)) return false;
+        shellLink->SetIconLocation(
+            exePath.c_str(),
+            0
+        );
 
-        shellLink->SetPath(exePath);
-        shellLink->SetIconLocation(exePath, 0);
 
-        ComPtr<IPropertyStore> propStore;
-        hr = shellLink.As(&propStore);
-        if (FAILED(hr)) return false;
+        ComPtr<IPropertyStore> propertyStore;
 
-        PROPVARIANT pvAppId{};
-        InitPropVariantFromString(appId, &pvAppId);
-        hr = propStore->SetValue(PKEY_AppUserModel_ID, pvAppId);
-        PropVariantClear(&pvAppId);
-        if (FAILED(hr)) return false;
+        hr = shellLink.As(
+            &propertyStore
+        );
 
-        PROPVARIANT pvName{};
-        InitPropVariantFromString(appName, &pvName);
-        hr = propStore->SetValue(PKEY_ItemNameDisplay, pvName);
-        PropVariantClear(&pvName);
-        if (FAILED(hr)) return false;
+        if (FAILED(hr))
+        {
+            PrintError(
+                "Query IPropertyStore",
+                hr
+            );
 
-        hr = propStore->Commit();
-        if (FAILED(hr)) return false;
+            return false;
+        }
+
+
+        //
+        // Required for Win32 toast notifications.
+        //
+        PROPVARIANT appIdValue{};
+
+        InitPropVariantFromString(
+            appId,
+            &appIdValue
+        );
+
+
+        hr = propertyStore->SetValue(
+            PKEY_AppUserModel_ID,
+            appIdValue
+        );
+
+
+        PropVariantClear(
+            &appIdValue
+        );
+
+
+        if (FAILED(hr))
+        {
+            PrintError(
+                "Set PKEY_AppUserModel_ID",
+                hr
+            );
+
+            return false;
+        }
+
+
+        PROPVARIANT nameValue{};
+
+        InitPropVariantFromString(
+            appName,
+            &nameValue
+        );
+
+
+        hr = propertyStore->SetValue(
+            PKEY_ItemNameDisplay,
+            nameValue
+        );
+
+
+        PropVariantClear(
+            &nameValue
+        );
+
+
+        if (FAILED(hr))
+        {
+            PrintError(
+                "Set PKEY_ItemNameDisplay",
+                hr
+            );
+
+            return false;
+        }
+
+
+        hr = propertyStore->Commit();
+
+        if (FAILED(hr))
+        {
+            PrintError(
+                "PropertyStore Commit",
+                hr
+            );
+
+            return false;
+        }
+
 
         ComPtr<IPersistFile> persistFile;
-        hr = shellLink.As(&persistFile);
-        if (FAILED(hr)) return false;
 
-        hr = persistFile->Save(shortcutPath.c_str(), TRUE);
-        if (FAILED(hr)) return false;
+        hr = shellLink.As(
+            &persistFile
+        );
 
-        g_registeredAppId = appId;
+        if (FAILED(hr))
+        {
+            PrintError(
+                "Query IPersistFile",
+                hr
+            );
 
-        // 3. Bind the App ID to the current process handle layer
-        HRESULT setHr = SetCurrentProcessExplicitAppUserModelID(g_registeredAppId.c_str());
-        if (FAILED(setHr)) {
-            DebugLog(L"[ToastDLL] Failed to set AppUserModelID");
             return false;
         }
 
-        // 4. ONLY write to the core AppUserModelId Classes key (Do NOT touch Notifications\Sett
 
-        return true;
+        hr = persistFile->Save(
+            shortcutPath.c_str(),
+            TRUE
+        );
+
+
+        if (FAILED(hr))
+        {
+            PrintError(
+                "Save shortcut",
+                hr
+            );
+
+            return false;
+        }
+    }
+
+
+    std::printf(
+        "[ToastDLL] RegisterAppForToasts succeeded\n"
+    );
+
+    return true;
+}
+
+//
+// =====================================================
+// SHOW TOAST
+// =====================================================
+//
+
+extern "C"
+__declspec(dllexport)
+void __stdcall ShowToast(
+    const wchar_t* title,
+    const wchar_t* message)
+{
+    try
+    {
+        if (!EnsureWinRT())
+        {
+            return;
+        }
+
+
+        std::wstring titleText =
+            SafeString(title);
+
+        std::wstring messageText =
+            SafeString(message);
+
+
+        auto xml =
+            CreateToastXml(
+                titleText,
+                messageText
+            );
+
+
+        winrt::Windows::UI::Notifications::
+            ToastNotification toast(xml);
+
+
+        auto notifier =
+            CreateNotifier();
+
+
+        notifier.Show(toast);
+
+
+        std::printf(
+            "[ToastDLL] ShowToast succeeded\n"
+        );
+    }
+    catch (const winrt::hresult_error& e)
+    {
+        PrintWinrtError(
+            "ShowToast",
+            e
+        );
+    }
+    catch (...)
+    {
+        std::printf(
+            "[ToastDLL] ShowToast unknown exception\n"
+        );
+    }
+}
+
+//
+// =====================================================
+// SCHEDULE TOAST
+// =====================================================
+//
+
+extern "C"
+__declspec(dllexport)
+void __stdcall ScheduleToast(
+    const wchar_t* id,
+    const wchar_t* title,
+    const wchar_t* message,
+    int64_t fileTime)
+{
+    try
+    {
+        if (!EnsureWinRT())
+        {
+            return;
+        }
+
+        if (!id)
+        {
+            std::printf(
+                "[ToastDLL] ScheduleToast missing id\n"
+            );
+            return;
+        }
+
+
+        //
+        // Convert FILETIME (100ns since 1601)
+        // into WinRT DateTime correctly.
+        //
+        FILETIME ft{};
+
+        ULARGE_INTEGER u{};
+        u.QuadPart = static_cast<ULONGLONG>(fileTime);
+
+        ft.dwLowDateTime = u.LowPart;
+        ft.dwHighDateTime = u.HighPart;
+
+
+        auto when =
+            winrt::clock::from_FILETIME(ft);
+
+
+        std::wstring tag = id;
+
+
+        //
+        // Toast tag max length.
+        //
+        if (tag.length() > 63)
+        {
+            tag.resize(63);
+        }
+
+
+        auto xml =
+            CreateToastXml(
+                SafeString(title),
+                SafeString(message)
+            );
+
+
+        winrt::Windows::UI::Notifications::
+            ScheduledToastNotification toast(
+                xml,
+                when
+            );
+
+
+        toast.Tag(
+            winrt::hstring(tag)
+        );
+
+
+        auto notifier =
+            CreateNotifier();
+
+
+        notifier.AddToSchedule(
+            toast
+        );
+
+
+        std::printf(
+            "[ToastDLL] ScheduleToast succeeded\n"
+        );
+    }
+    catch (const winrt::hresult_error& e)
+    {
+        PrintWinrtError(
+            "ScheduleToast",
+            e
+        );
+    }
+    catch (...)
+    {
+        std::printf(
+            "[ToastDLL] ScheduleToast unknown exception\n"
+        );
     }
 }
 
 
+
+//
 // =====================================================
-// DLL MAIN ENTRY POINT
+// CANCEL TOAST
 // =====================================================
-BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
+//
+
+extern "C"
+__declspec(dllexport)
+void __stdcall CancelToast(
+    const wchar_t* id)
 {
-    switch (fdwReason)
+    try
     {
-    case DLL_PROCESS_ATTACH:
-        DisableThreadLibraryCalls(hinstDLL);
-        g_hModuleInstance = hinstDLL;
-        break;
+        if (!EnsureWinRT())
+        {
+            return;
+        }
+
+
+        if (!id)
+        {
+            std::printf(
+                "[ToastDLL] CancelToast missing id\n"
+            );
+
+            return;
+        }
+
+
+        auto notifier =
+            CreateNotifier();
+
+
+        auto scheduled =
+            notifier.GetScheduledToastNotifications();
+
+
+        winrt::hstring wantedTag(id);
+
+
+        for (uint32_t i = 0;
+            i < scheduled.Size();
+            i++)
+        {
+            auto toast =
+                scheduled.GetAt(i);
+
+
+            if (toast.Tag() == wantedTag)
+            {
+                notifier.RemoveFromSchedule(
+                    toast
+                );
+
+
+                std::printf(
+                    "[ToastDLL] CancelToast succeeded\n"
+                );
+
+                return;
+            }
+        }
+
+
+        std::printf(
+            "[ToastDLL] CancelToast no matching toast\n"
+        );
     }
-    return TRUE;
+    catch (const winrt::hresult_error& e)
+    {
+        PrintWinrtError(
+            "CancelToast",
+            e
+        );
+    }
+    catch (...)
+    {
+        std::printf(
+            "[ToastDLL] CancelToast unknown exception\n"
+        );
+    }
 }
