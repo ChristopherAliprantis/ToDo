@@ -316,7 +316,12 @@ bool __stdcall RegisterAppForToasts(
         if (status != ERROR_SUCCESS) {
             std::wcerr << L"[ToastDLL] Registry operation failed. Error code: " << status << std::endl;
         }
-
+    }
+    catch (const winrt::hresult_error& e)
+    {
+        PrintWinrtError("RegisterAppForToasts", e);
+        return false;
+    }
 }
 
 // =====================================================
