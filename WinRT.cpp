@@ -261,6 +261,17 @@ static std::wstring GetHostDirectory()
 // =====================================================
 //
 
+std::wstring GetHostExecutablePath() {
+    std::vector<wchar_t> buffer(MAX_PATH);
+    while (true) {
+        // Passing NULL gets the host .exe path
+        DWORD sizeUsed = GetModuleFileNameW(NULL, buffer.data(), static_cast<DWORD>(buffer.size()));
+        if (sizeUsed == 0) return L"";
+        if (sizeUsed < buffer.size()) return std::wstring(buffer.data(), sizeUsed);
+        buffer.resize(buffer.size() * 2);
+    }
+}
+
 extern "C"
 __declspec(dllexport)
 bool __stdcall RegisterAppForToasts(
@@ -489,6 +500,50 @@ bool __stdcall RegisterAppForToasts(
     catch (...)
     {
         printf("[ToastDLL] Unknown RegisterAppForToasts error\n");
+        return false;
+    }
+    std::wstring aumid = appId;
+    auto iconUriValue = GetHostExecutablePath() + L"\\Assets\\Icons\\todoico.ico";
+    std::wstring subKey = L"Software\\Microsoft\\Windows\\CurrentVersion\\Notifications\\Settings\\" + aumid;
+
+    HKEY hKey = nullptr;
+
+    // 2. Open or create the registry key
+    LSTATUS status = RegCreateKeyExW(
+        HKEY_CURRENT_USER,        // Root key handle
+        subKey.c_str(),           // Subkey path
+        0,                        // Reserved
+        nullptr,                  // Class type (can be null)
+        REG_OPTION_NON_VOLATILE,  // Default storage options
+        KEY_SET_VALUE,            // Security access rights (we only need to write)
+        nullptr,                  // Security attributes
+        &hKey,                    // Outputs the open key handle
+        nullptr                   // Outputs disposition (created vs opened, can be null)
+    );
+
+    if (status != ERROR_SUCCESS) {
+        std::wcerr << L"Failed to open/create registry key. Error code: " << status << std::endl;
+        return false;
+    }
+
+    // 3. Calculate string size in bytes, including the null terminator
+    DWORD dataSizeInBytes = static_cast<DWORD>((iconUriValue.length() + 1) * sizeof(wchar_t));
+
+    // 4. Write or overwrite the value
+    status = RegSetValueExW(
+        hKey,
+        L"iconuri",
+        0,
+        REG_SZ,
+        reinterpret_cast<const BYTE*>(iconUriValue.c_str()),
+        dataSizeInBytes
+    );
+
+    // 5. Always close the handle
+    RegCloseKey(hKey);
+
+    if (status != ERROR_SUCCESS) {
+        std::wcerr << L"Failed to set registry value. Error code: " << status << std::endl;
         return false;
     }
 }
