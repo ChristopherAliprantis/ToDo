@@ -276,26 +276,30 @@ bool __stdcall RegisterAppForToasts(
             return false;
         }
 
-        // --- REGISTRY WRITING LOGIC (Fixed & Placed Safely Inside Try Block) ---
+        // --- REGISTRY WRITING LOGIC (Opens if exists, creates if missing) ---
         std::wstring aumid = appId;
         std::wstring iconUriValue = GetHostDirectory() + L"\\Assets\\Icons\\todoico.ico";
         std::wstring subKey = L"Software\\Microsoft\\Windows\\CurrentVersion\\Notifications\\Settings\\" + aumid;
 
         HKEY hKey = nullptr;
+
+        // This function handles both opening and creating automatically
         LSTATUS status = RegCreateKeyExW(
-            HKEY_CURRENT_USER,
-            subKey.c_str(),
-            0,
-            nullptr,
-            REG_OPTION_NON_VOLATILE,
-            KEY_SET_VALUE,
-            nullptr,
-            &hKey,
-            nullptr
+            HKEY_CURRENT_USER,        // Predefined Root Hive
+            subKey.c_str(),           // Subkey path string
+            0,                        // Reserved (must be 0)
+            nullptr,                  // Class string (can be null)
+            REG_OPTION_NON_VOLATILE,  // Persist registry changes across reboots
+            KEY_WRITE,                // CRITICAL: Grants permission to create keys AND write values
+            nullptr,                  // Default security descriptor
+            &hKey,                    // Outputs the open handle to the registry key folder
+            nullptr                   // Pass a pointer to a DWORD here if you want to check if it was opened vs created
         );
 
         if (status == ERROR_SUCCESS) {
             DWORD dataSizeInBytes = static_cast<DWORD>((iconUriValue.length() + 1) * sizeof(wchar_t));
+
+            // Set or overwrite the string value
             status = RegSetValueExW(
                 hKey,
                 L"iconuri",
@@ -304,26 +308,15 @@ bool __stdcall RegisterAppForToasts(
                 reinterpret_cast<const BYTE*>(iconUriValue.c_str()),
                 dataSizeInBytes
             );
+
+            // Always free the handle immediately
             RegCloseKey(hKey);
         }
 
         if (status != ERROR_SUCCESS) {
-            std::wcerr << L"[ToastDLL] Failed to setup notification registry icon settings. Error: " << status << std::endl;
+            std::wcerr << L"[ToastDLL] Registry operation failed. Error code: " << status << std::endl;
         }
 
-        printf("[ToastDLL] RegisterAppForToasts succeeded\n");
-        return true;
-    }
-    catch (const winrt::hresult_error& e)
-    {
-        printf("[ToastDLL] WinRT error: 0x%08X\n", (uint32_t)e.code());
-        return false;
-    }
-    catch (...)
-    {
-        printf("[ToastDLL] Unknown RegisterAppForToasts error\n");
-        return false;
-    }
 }
 
 // =====================================================
