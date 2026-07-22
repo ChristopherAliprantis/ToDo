@@ -23,7 +23,8 @@
 #pragma comment(lib, "shlwapi.lib")
 
 using Microsoft::WRL::ComPtr;
-
+using namespace winrt;
+using namespace winrt::Windows::UI::Notifications;
 // =====================================================
 // GLOBALS
 // =====================================================
@@ -457,62 +458,85 @@ extern "C"
     }
 
     __declspec(dllexport)
-        bool __stdcall IsNotificationBlocked(const wchar_t* appId)
-    {
-        printf("[ToastDLL] IsNotificationBlocked called\n");
-        HKEY hKey{};
-        DWORD enabled = 1;
-        DWORD size = sizeof(DWORD);
-
-        // Fixed: Added missing double backslashes
-        const wchar_t* path = L"Software\\Microsoft\\Windows\\CurrentVersion\\PushNotifications";
-
-        if (RegOpenKeyExW(HKEY_CURRENT_USER, path, 0, KEY_READ, &hKey) == ERROR_SUCCESS)
-        {
-            // Fixed: Added <LPBYTE> template parameter
-            RegQueryValueExW(
-                hKey,
-                L"ToastEnabled",
-                nullptr,
-                nullptr,
-                reinterpret_cast<LPBYTE>(&enabled),
-                &size
-            );
-            RegCloseKey(hKey);
-        }
-        return enabled == 0;
-    }
-
-    __declspec(dllexport)
         bool __stdcall IsNotificationDisabled(const wchar_t* appId)
     {
         printf("[ToastDLL] IsNotificationDisabled called\n");
+
         if (!appId)
             return true;
 
-        // Fixed: Added missing double backslashes
-        std::wstring path = L"Software\\Microsoft\\Windows\\CurrentVersion\\Notifications\\Settings\\" + std::wstring(appId);
-        HKEY hKey{};
-
-        if (RegOpenKeyExW(HKEY_CURRENT_USER, path.c_str(), 0, KEY_READ, &hKey) != ERROR_SUCCESS)
+        try
         {
+            winrt::init_apartment();
+
+            auto notifier =
+                winrt::Windows::UI::Notifications::ToastNotificationManager::
+                CreateToastNotifier(appId);
+
+            auto setting = notifier.Setting();
+
+            // Any state other than Enabled means notifications are disabled
+            return setting !=
+                winrt::Windows::UI::Notifications::NotificationSetting::Enabled;
+        }
+        catch (const winrt::hresult_error& e)
+        {
+            printf("[ToastDLL] IsNotificationDisabled error: %ls\n",
+                e.message().c_str());
+
+            // If Windows cannot tell us, treat as disabled
+            return true;
+        }
+    }
+
+
+    __declspec(dllexport)
+        bool __stdcall IsNotificationBlocked(const wchar_t* appId)
+    {
+        printf("[ToastDLL] IsNotificationBlocked called\n");
+
+        HKEY hKey = nullptr;
+
+        const wchar_t* path =
+            L"Software\\Microsoft\\Windows\\CurrentVersion\\PushNotifications";
+
+        DWORD toastEnabled = 1;
+        DWORD size = sizeof(DWORD);
+
+        LONG result = RegOpenKeyExW(
+            HKEY_CURRENT_USER,
+            path,
+            0,
+            KEY_READ,
+            &hKey);
+
+        if (result != ERROR_SUCCESS)
+        {
+            // Could not read system setting, assume not blocked
             return false;
         }
 
-        DWORD enabled = 1;
-        DWORD size = sizeof(DWORD);
 
-        // Fixed: Added <LPBYTE> template parameter
-        RegQueryValueExW(
+        result = RegQueryValueExW(
             hKey,
-            L"Enabled",
+            L"ToastEnabled",
             nullptr,
             nullptr,
-            reinterpret_cast<LPBYTE>(&enabled),
-            &size
-        );
+            reinterpret_cast<LPBYTE>(&toastEnabled),
+            &size);
+
         RegCloseKey(hKey);
 
-        return enabled == 0;
+
+        if (result != ERROR_SUCCESS)
+        {
+            // Value missing = system notifications are not known to be blocked
+            return false;
+        }
+
+
+        printf("[ToastDLL] System ToastEnabled=%lu\n", toastEnabled);
+
+        // 0 = Windows global notifications disabled
+        return toastEnabled == 0;
     }
-}
