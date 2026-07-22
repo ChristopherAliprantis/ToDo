@@ -280,7 +280,6 @@ bool __stdcall RegisterAppForToasts(
         // --- REGISTRY WRITING LOGIC (Opens if exists, creates if missing) ---
         // --- Create/Open notification settings key and overwrite iconuri ---
         std::wstring aumid = appId;
-        std::wstring iconUriValue = GetHostDirectory() + L"\\Assets\\Icons\\todoico.ico";
         std::wstring subKey =
             L"Software\\Microsoft\\Windows\\CurrentVersion\\Notifications\\Settings\\" + aumid;
 
@@ -314,13 +313,6 @@ bool __stdcall RegisterAppForToasts(
         }
         std::wcout << L"AUMID: [" << aumid << L"]\n";
         std::wcout << L"SubKey: [" << subKey << L"]\n";
-        status = RegSetValueExW(
-            hKey,
-            L"iconuri",
-            0,
-            REG_SZ,
-            reinterpret_cast<const BYTE*>(iconUriValue.c_str()),
-            static_cast<DWORD>((iconUriValue.length() + 1) * sizeof(wchar_t)));
 
         if (status != ERROR_SUCCESS)
         {
@@ -330,8 +322,6 @@ bool __stdcall RegisterAppForToasts(
         }
 
         RegCloseKey(hKey);
-
-        std::wcout << L"[ToastDLL] iconuri set to: " << iconUriValue << std::endl;
 
         return true;
 	}
