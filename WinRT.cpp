@@ -381,6 +381,7 @@ extern "C"
         }
     }
 
+}
     __declspec(dllexport)
         void __stdcall ScheduleToast(
             const wchar_t* id,
