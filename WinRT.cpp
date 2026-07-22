@@ -311,7 +311,8 @@ bool __stdcall RegisterAppForToasts(
         {
             std::wcout << L"[ToastDLL] Opened existing registry key: " << subKey << std::endl;
         }
-
+        std::wcout << L"AUMID: [" << aumid << L"]\n";
+        std::wcout << L"SubKey: [" << subKey << L"]\n";
         status = RegSetValueExW(
             hKey,
             L"iconuri",
