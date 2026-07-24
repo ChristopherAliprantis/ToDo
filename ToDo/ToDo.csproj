@@ -16,6 +16,7 @@
         <ApplicationPublisher>Christopher Aliprantis</ApplicationPublisher>
         <Description>ToDo, your ultimate time management app</Description>
         <authors>Christopher Aliprantis</authors>
+        <PublishTrimmed>true</PublishTrimmed>
 
         <UnoDisableHotDesign>true</UnoDisableHotDesign>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
