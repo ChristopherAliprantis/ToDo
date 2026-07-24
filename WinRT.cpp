@@ -371,7 +371,7 @@ extern "C"
         }
     }
 
-}
+
     __declspec(dllexport)
         void __stdcall ScheduleToast(
             const wchar_t* id,
@@ -531,3 +531,4 @@ extern "C"
         // 0 = Windows global notifications disabled
         return toastEnabled == 0;
     }
+}
