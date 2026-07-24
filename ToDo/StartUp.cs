@@ -32,7 +32,8 @@ public sealed partial class Start : Page
                 {
                     Title = "Notifications Disabled",
                     Content = "Notifications are blocked for this computer. Please enable them in settings.",
-                    CloseButtonText = "OK"
+                    CloseButtonText = "OK",
+                    XamlRoot = this.XamlRoot
                 };
                 await dialog.ShowAsync();
             }
@@ -45,7 +46,8 @@ public sealed partial class Start : Page
                 {
                     Title = "Notifications Disabled for App",
                     Content = "Notifications are disabled for this app. Please enable them in settings.",
-                    CloseButtonText = "OK"
+                    CloseButtonText = "OK",
+                    XamlRoot = this.XamlRoot
                 };
                 await dialog.ShowAsync();
             }
