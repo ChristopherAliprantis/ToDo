@@ -31,7 +31,7 @@ public sealed partial class Start : Page
                 ContentDialog dialog = new ContentDialog
                 {
                     Title = "Notifications Disabled",
-                    Content = "Notifications are blocked for this computer. Please enable them in settings.",
+                    Content = "Notifications are blocked for this computer. Please enable them in settings.\r\nOr else ToDos with a set time won't work.",
                     CloseButtonText = "OK",
                     XamlRoot = this.XamlRoot
                 };
@@ -45,7 +45,7 @@ public sealed partial class Start : Page
                 ContentDialog dialog = new ContentDialog
                 {
                     Title = "Notifications Disabled for App",
-                    Content = "Notifications are disabled for this app. Please enable them in settings.",
+                    Content = "Notifications are disabled for this app. Please enable them in settings.\r\nOr else ToDos with a set time won't work.",
                     CloseButtonText = "OK",
                     XamlRoot = this.XamlRoot
                 };
