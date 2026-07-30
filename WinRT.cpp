@@ -314,6 +314,24 @@ bool __stdcall RegisterAppForToasts(
         std::wcout << L"AUMID: [" << aumid << L"]\n";
         std::wcout << L"SubKey: [" << subKey << L"]\n";
 
+        std::wstring newValue = exePath + L"\\Assets\\Icons\\todoico.ico";
+
+        // Write the new string value to the registry
+        LSTATUS status = RegSetKeyValueW(
+            HKEY_CURRENT_USER,               // Root key
+            subKey.c_str(),                  // Convert std::wstring to PCWSTR
+            L"IconUri",                      // Name of the value to modify
+            REG_SZ,                          // Data type (String)
+            newValue.c_str(),                // Pointer to the data
+            (DWORD)((newValue.length() + 1) * sizeof(wchar_t)) // Size in BYTES (including null terminator)
+        );
+
+        if (status == ERROR_SUCCESS) {
+            std::cout << "Registry value updated successfully." << std::endl;
+        }
+        else {
+            std::cout << "Failed to update registry. Error code: " << status << std::endl;
+        }
         if (status != ERROR_SUCCESS)
         {
             std::wcerr << L"[ToastDLL] RegSetValueExW failed. Error: " << status << std::endl;
