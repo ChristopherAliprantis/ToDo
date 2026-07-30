@@ -339,7 +339,7 @@ public sealed partial class MainPage : Page // #if DESKTOP for all of skia deskt
             ((TextBlock)TODOS[i].content.Children[1]).FontSize = NEW.FontSize - 6.28;
 
 #if DESKTOP || WINDOWS
-            ((ComboBox)TODOS[i].content.Children[3]).Width = avail * 0.32;
+            ((ComboBox)((StackPanel)((StackPanel)TODOS[i].content.Children[3]).Children[0]).Children[0]).Width = avail * 0.32;
 #else
             ((ComboBox)((StackPanel)((StackPanel)TODOS[i].content.Children[3]).Children[0]).Children[0]).Width = avail * 0.48;
 #endif
@@ -502,12 +502,12 @@ public partial class ToDos : StackPanel
             {
                 this.ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.Arrow);
             };
-            ((ComboBox)((StackPanel)content.Children[3]).Children[0]).DropDownOpened += async(s, e) =>
+            ((ComboBox)((StackPanel)((StackPanel)content.Children[3]).Children[0]).Children[0]).DropDownOpened += async(s, e) =>
             {
-                var combo = ((ComboBox)((StackPanel)content.Children[3]).Children[0]);
+                var combo = ((ComboBox)((StackPanel)((StackPanel)content.Children[3]).Children[0]).Children[0]);
 
-                ((ComboBoxItem)((ComboBox)content.Children[3]).Items[0]).FontSize = combo.Width  /5;
-                ((ComboBoxItem)((ComboBox)content.Children[3]).Items[1]).FontSize = combo.Width /5;
+                ((ComboBoxItem)((ComboBox)((StackPanel)((StackPanel)content.Children[3]).Children[0]).Children[0]).Items[0]).FontSize = combo.Width  /5;
+                ((ComboBoxItem)((ComboBox)((StackPanel)((StackPanel)content.Children[3]).Children[0]).Children[0]).Items[1]).FontSize = combo.Width /5;
             };
 # endif
             ((ComboBox)((StackPanel)content.Children[3]).Children[0]).SelectionChanged += async (s, e) =>
