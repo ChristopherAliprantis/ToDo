@@ -37,12 +37,10 @@
         <TargetName>ToDo</TargetName>
         <AssemblyTitle>ToDo</AssemblyTitle>
         <!-- This is what was causing Android errors; now it's isolated -->
-        <UseAppHost>true</UseAppHost>
     </PropertyGroup>
     <PropertyGroup Condition="'$(TargetFramework)' == 'net10.0-android'">
         <AndroidApplication>true</AndroidApplication>
         <AndroidIcon>appicon</AndroidIcon>
-        <UseAppHost>false</UseAppHost>
     </PropertyGroup>
     <Import Project="keystore.targets" />
     <!-- for people that downloaded this from github, this is a file where I had keystore properties, I .gitignored it, because it has private info.-->
