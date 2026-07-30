@@ -509,7 +509,7 @@ public partial class ToDos : StackPanel
                 ((ComboBoxItem)((ComboBox)((StackPanel)((StackPanel)content.Children[3]).Children[0]).Children[0]).Items[0]).FontSize = combo.Width  /5;
                 ((ComboBoxItem)((ComboBox)((StackPanel)((StackPanel)content.Children[3]).Children[0]).Children[0]).Items[1]).FontSize = combo.Width /5;
             };
-# endif
+#endif
             ((ComboBox)((StackPanel)content.Children[3]).Children[0]).SelectionChanged += async (s, e) =>
             {
                 var combo = (s as ComboBox);
