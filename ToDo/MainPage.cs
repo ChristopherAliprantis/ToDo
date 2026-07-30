@@ -502,15 +502,20 @@ public partial class ToDos : StackPanel
             {
                 this.ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.Arrow);
             };
-            ((ComboBox)((StackPanel)((StackPanel)content.Children[3]).Children[0]).Children[0]).DropDownOpened += async(s, e) =>
-            {
-                var combo = ((ComboBox)((StackPanel)((StackPanel)content.Children[3]).Children[0]).Children[0]);
+            var combo = ((ComboBox)((StackPanel)((StackPanel)content.Children[3]).Children[0]).Children[0]);
 
-                ((ComboBoxItem)((ComboBox)((StackPanel)((StackPanel)content.Children[3]).Children[0]).Children[0]).Items[0]).FontSize = combo.Width  /5;
-                ((ComboBoxItem)((ComboBox)((StackPanel)((StackPanel)content.Children[3]).Children[0]).Children[0]).Items[1]).FontSize = combo.Width /5;
+            combo.DropDownOpened += (s, e) =>
+            {
+                double fontSize = combo.Width / 5;
+
+                if (combo.Items.Count > 0 && combo.Items[0] is ComboBoxItem item0)
+                    item0.FontSize = fontSize;
+
+                if (combo.Items.Count > 1 && combo.Items[1] is ComboBoxItem item1)
+                    item1.FontSize = fontSize;
             };
 #endif
-            ((ComboBox)((StackPanel)content.Children[3]).Children[0]).SelectionChanged += async (s, e) =>
+            ((ComboBox)((StackPanel)((StackPanel)content.Children[3]).Children[0]).Children[0]).SelectionChanged += async (s, e) =>
             {
                 var combo = (s as ComboBox);
                 if (combo == null || combo.SelectedIndex == -1) return;
