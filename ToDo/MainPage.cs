@@ -346,10 +346,10 @@ public sealed partial class MainPage : Page // #if DESKTOP for all of skia deskt
 
             ((TextBlock)TODOS[i].content.Children[2]).FontSize = ((TextBlock)TODOS[i].content.Children[1]).FontSize;
 
-            ((ComboBox)((StackPanel)((StackPanel)TODOS[i].content.Children[3]).Children[0]).Children[0]).Height = ((ComboBox)((StackPanel)((StackPanel)TODOS[i].content.Children[3]).Children[0]).Children[0]).Width * 0.387;
-            ((ComboBox)((StackPanel)((StackPanel)TODOS[i].content.Children[3]).Children[0]).Children[0]).FontSize = ((ComboBox)((StackPanel)((StackPanel)TODOS[i].content.Children[3]).Children[0]).Children[0]).Height / 2.1;
+            ((ComboBox)((StackPanel)((StackPanel)TODOS[i].content.Children[3]).Children[0]).Children[0]).Height =                ((ComboBox)((StackPanel)((StackPanel)TODOS[i].content.Children[3]).Children[0]).Children[0]).Width * 0.387;
+            ((ComboBox)((StackPanel)((StackPanel)TODOS[i].content.Children[3]).Children[0]).Children[0]).FontSize =              ((ComboBox)((StackPanel)((StackPanel)TODOS[i].content.Children[3]).Children[0]).Children[0]).Height / 2.1;
             ((ComboBox)((StackPanel)((StackPanel)TODOS[i].content.Children[3]).Children[0]).Children[0]).Padding = new Thickness(((ComboBox)((StackPanel)((StackPanel)TODOS[i].content.Children[3]).Children[0]).Children[0]).Width / 5, 0, 0, 0);
-            TODOS[i].move.Width = ((ComboBox)((StackPanel)TODOS[i].content.Children[3]).Children[0]).Width;
+            TODOS[i].move.Width = ((ComboBox)((StackPanel)((StackPanel)TODOS[i].content.Children[3]).Children[0]).Children[0]).Width;
             TODOS[i].move.Height = TODOS[i].move.Width;
             todos.AddBack(TODOS[i]);
         }
