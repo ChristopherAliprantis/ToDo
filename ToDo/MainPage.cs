@@ -1,5 +1,7 @@
 namespace ToDo;
 using System.Text.Json;
+using Android.Graphics;
+using Microsoft.UI.Input;
 using Microsoft.UI.Xaml.Media.Imaging;
 using Path = System.IO.Path;
 
@@ -340,14 +342,16 @@ public sealed partial class MainPage : Page // #if DESKTOP for all of skia deskt
 #if DESKTOP || WINDOWS
             ((ComboBox)TODOS[i].content.Children[3]).Width = avail * 0.32;
 #else
-            ((ComboBox)TODOS[i].content.Children[3]).Width = avail * 0.48;
+            ((ComboBox)((StackPanel)TODOS[i].content.Children[3]).Children[0]).Width = avail * 0.48;
 #endif
 
             ((TextBlock)TODOS[i].content.Children[2]).FontSize = ((TextBlock)TODOS[i].content.Children[1]).FontSize;
 
-            ((ComboBox)TODOS[i].content.Children[3]).Height = ((ComboBox)TODOS[i].content.Children[3]).Width * 0.387;
-            ((ComboBox)TODOS[i].content.Children[3]).FontSize = ((ComboBox)TODOS[i].content.Children[3]).Height / 2.1;
-            ((ComboBox)TODOS[i].content.Children[3]).Padding = new Thickness(((ComboBox)TODOS[i].content.Children[3]).Width / 5, 0, 0, 0);
+            ((ComboBox)((StackPanel)TODOS[i].content.Children[3]).Children[0]).Height = ((ComboBox)((StackPanel)TODOS[i].content.Children[3]).Children[0]).Width * 0.387;
+            ((ComboBox)((StackPanel)((StackPanel)TODOS[i].content.Children[3]).Children[0]).Children[0]).FontSize = ((ComboBox)((StackPanel)TODOS[i].content.Children[3]).Children[0]).Height / 2.1;
+            ((ComboBox)((StackPanel)((StackPanel)TODOS[i].content.Children[3]).Children[0]).Children[0]).Padding = new Thickness(((ComboBox)((StackPanel)TODOS[i].content.Children[3]).Children[0]).Width / 5, 0, 0, 0);
+            TODOS[i].move.Width = ((ComboBox)((StackPanel)TODOS[i].content.Children[3]).Children[0]).Width;
+            TODOS[i].move.Height = ((ComboBox)((StackPanel)TODOS[i].content.Children[3]).Children[0]).Height;
             todos.AddBack(TODOS[i]);
         }
     }
@@ -402,6 +406,7 @@ public partial class ToDos : StackPanel
         public string? DTime;
         public string? DDate;
         public string? ID;
+        public TextBox? move = new();
         public ToDo(string title, string descrip, DateOnly? date, TimeOnly? time, string? id)
         {
             Title = title;
@@ -447,21 +452,34 @@ public partial class ToDos : StackPanel
                         TextWrapping = TextWrapping.Wrap,
                         Text = $"{DDate}\n{DTime}"
                     },
-                    new ComboBox
+                    new StackPanel
                     {
-                        PlaceholderText = ". . .",
-                        PlaceholderForeground = new SolidColorBrush(Colors.Black),
-                        
-                        Items =
+                        Spacing = 0,
+                        Orientation = Orientation.Horizontal,
+                        Children =
                         {
-                            new ComboBoxItem
+                            new ComboBox
                             {
-                                Content = "Delete",
+                                PlaceholderText = ". . .",
+                                PlaceholderForeground = new SolidColorBrush(Colors.Black),
+
+                                Items =
+                                {
+                                    new ComboBoxItem
+                                    {
+                                        Content = "Delete",
+                                    },
+                                    new ComboBoxItem
+                                    {
+                                        Content = "Edit",
+                                    }
+                                }
                             },
-                            new ComboBoxItem
+                            (move = new TextBox
                             {
-                                Content = "Edit",
-                            }
+                                Text = "|||",
+                                Foreground = new SolidColorBrush(Colors.LightGray),
+                            })
                         }
                     },
                 }
@@ -476,14 +494,24 @@ public partial class ToDos : StackPanel
                 Background = new SolidColorBrush(Color.White),
                 Child = content,
             };
-            ((ComboBox)content.Children[3]).DropDownOpened += async(s, e) =>
+#if DESKTOP || WINDOWS
+            move.PointerEntered += (s, e) =>
             {
-                var combo = (ComboBox)content.Children[3];
-                
+                this.ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.Hand);
+            };
+            move.PointerExited += (s, e) =>
+            {
+                this.ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.Arrow);
+            };
+            ((ComboBox)((StackPanel)content.Children[3]).Children[0]).DropDownOpened += async(s, e) =>
+            {
+                var combo = ((ComboBox)((StackPanel)content.Children[3]).Children[0]);
+
                 ((ComboBoxItem)((ComboBox)content.Children[3]).Items[0]).FontSize = combo.Width  /5;
                 ((ComboBoxItem)((ComboBox)content.Children[3]).Items[1]).FontSize = combo.Width /5;
             };
-            ((ComboBox)content.Children[3]).SelectionChanged += async (s, e) =>
+# endif
+            ((ComboBox)((StackPanel)content.Children[3]).Children[0]).SelectionChanged += async (s, e) =>
             {
                 var combo = (s as ComboBox);
                 if (combo == null || combo.SelectedIndex == -1) return;
