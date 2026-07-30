@@ -1,6 +1,5 @@
 namespace ToDo;
 using System.Text.Json;
-using Android.Graphics;
 using Microsoft.UI.Input;
 using Microsoft.UI.Xaml.Media.Imaging;
 using Path = System.IO.Path;
