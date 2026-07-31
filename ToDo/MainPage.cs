@@ -1,6 +1,6 @@
 namespace ToDo;
+
 using System.Text.Json;
-using Microsoft.UI.Input;
 using Microsoft.UI.Xaml.Media.Imaging;
 using Path = System.IO.Path;
 
@@ -16,7 +16,7 @@ public sealed partial class MainPage : Page // #if DESKTOP for all of skia deskt
     public RotateTransform rotationTransform = new Microsoft.UI.Xaml.Media.RotateTransform();
     public static Grid? H;
     public MainPage()
-    { 
+    {
         var Bar = new StackPanel
         {
             Height = 0,
@@ -63,9 +63,9 @@ public sealed partial class MainPage : Page // #if DESKTOP for all of skia deskt
             }
 
         };
-        var hoverBrush = new SolidColorBrush(ColorHelper.FromArgb(132,235, 235, 235));
+        var hoverBrush = new SolidColorBrush(ColorHelper.FromArgb(132, 235, 235, 235));
         ((Button)content.Children[0]).Resources["ButtonBackgroundPointerOver"] = hoverBrush;
-        ((Button)content.Children[0]).Click += async(s, e) =>
+        ((Button)content.Children[0]).Click += async (s, e) =>
         {
             await Reload();
         };
@@ -91,7 +91,7 @@ public sealed partial class MainPage : Page // #if DESKTOP for all of skia deskt
 #endif
             Content = content
         };
-        this.SizeChanged += async(s, e) =>
+        this.SizeChanged += async (s, e) =>
         {
             w = this.ActualWidth;
             h = this.ActualHeight;
@@ -162,7 +162,7 @@ public sealed partial class MainPage : Page // #if DESKTOP for all of skia deskt
             NEW.FontSize = Bar.Width / 3.2;
             RebuildTodos();
         };
-        this.Loaded += async(s, e) =>
+        this.Loaded += async (s, e) =>
         {
             await MainPage.todos.Load();
             await MainPage.todos.Save();
@@ -297,8 +297,8 @@ public sealed partial class MainPage : Page // #if DESKTOP for all of skia deskt
             return;
         }
         if (bounds.Width > bounds.Height)
-        { 
-            todos.currentcol = 0; 
+        {
+            todos.currentcol = 0;
         }
         else
         {
@@ -339,18 +339,16 @@ public sealed partial class MainPage : Page // #if DESKTOP for all of skia deskt
             ((TextBlock)TODOS[i].content.Children[1]).FontSize = NEW.FontSize - 6.28;
 
 #if DESKTOP || WINDOWS
-            ((ComboBox)((StackPanel)((StackPanel)TODOS[i].content.Children[3]).Children[0]).Children[0]).Width = avail * 0.32;
+            ((ComboBox)TODOS[i].content.Children[3]).Width = avail * 0.32;
 #else
-            ((ComboBox)((StackPanel)((StackPanel)TODOS[i].content.Children[3]).Children[0]).Children[0]).Width = avail * 0.48;
+            ((ComboBox)TODOS[i].content.Children[3]).Width = avail * 0.48;
 #endif
 
             ((TextBlock)TODOS[i].content.Children[2]).FontSize = ((TextBlock)TODOS[i].content.Children[1]).FontSize;
 
-            ((ComboBox)((StackPanel)((StackPanel)TODOS[i].content.Children[3]).Children[0]).Children[0]).Height =                ((ComboBox)((StackPanel)((StackPanel)TODOS[i].content.Children[3]).Children[0]).Children[0]).Width * 0.387;
-            ((ComboBox)((StackPanel)((StackPanel)TODOS[i].content.Children[3]).Children[0]).Children[0]).FontSize =              ((ComboBox)((StackPanel)((StackPanel)TODOS[i].content.Children[3]).Children[0]).Children[0]).Height / 2.1;
-            ((ComboBox)((StackPanel)((StackPanel)TODOS[i].content.Children[3]).Children[0]).Children[0]).Padding = new Thickness(((ComboBox)((StackPanel)((StackPanel)TODOS[i].content.Children[3]).Children[0]).Children[0]).Width / 5, 0, 0, 0);
-            TODOS[i].move.Width = ((ComboBox)((StackPanel)((StackPanel)TODOS[i].content.Children[3]).Children[0]).Children[0]).Width;
-            TODOS[i].move.Height = TODOS[i].move.Width;
+            ((ComboBox)TODOS[i].content.Children[3]).Height = ((ComboBox)TODOS[i].content.Children[3]).Width * 0.387;
+            ((ComboBox)TODOS[i].content.Children[3]).FontSize = ((ComboBox)TODOS[i].content.Children[3]).Height / 2.1;
+            ((ComboBox)TODOS[i].content.Children[3]).Padding = new Thickness(((ComboBox)TODOS[i].content.Children[3]).Width / 5, 0, 0, 0);
             todos.AddBack(TODOS[i]);
         }
     }
@@ -405,7 +403,6 @@ public partial class ToDos : StackPanel
         public string? DTime;
         public string? DDate;
         public string? ID;
-        public TextBox? move = new();
         public ToDo(string title, string descrip, DateOnly? date, TimeOnly? time, string? id)
         {
             Title = title;
@@ -451,34 +448,21 @@ public partial class ToDos : StackPanel
                         TextWrapping = TextWrapping.Wrap,
                         Text = $"{DDate}\n{DTime}"
                     },
-                    new StackPanel
+                    new ComboBox
                     {
-                        Spacing = 0,
-                        Orientation = Orientation.Horizontal,
-                        Children =
-                        {
-                            new ComboBox
-                            {
-                                PlaceholderText = ". . .",
-                                PlaceholderForeground = new SolidColorBrush(Colors.Black),
+                        PlaceholderText = ". . .",
+                        PlaceholderForeground = new SolidColorBrush(Colors.Black),
 
-                                Items =
-                                {
-                                    new ComboBoxItem
-                                    {
-                                        Content = "Delete",
-                                    },
-                                    new ComboBoxItem
-                                    {
-                                        Content = "Edit",
-                                    }
-                                }
-                            },
-                            (move = new TextBox
+                        Items =
+                        {
+                            new ComboBoxItem
                             {
-                                Text = "|||",
-                                Foreground = new SolidColorBrush(Colors.LightGray),
-                            })
+                                Content = "Delete",
+                            },
+                            new ComboBoxItem
+                            {
+                                Content = "Edit",
+                            }
                         }
                     },
                 }
@@ -493,31 +477,16 @@ public partial class ToDos : StackPanel
                 Background = new SolidColorBrush(Color.White),
                 Child = content,
             };
-            var combo = ((ComboBox)((StackPanel)((StackPanel)content.Children[3]).Children[0]).Children[0]);
-#if DESKTOP || WINDOWS
-            move.PointerEntered += (s, e) =>
+            ((ComboBox)content.Children[3]).DropDownOpened += async (s, e) =>
             {
-                this.ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.Hand);
-            };
-            move.PointerExited += (s, e) =>
-            {
-                this.ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.Arrow);
-            };
-            
+                var combo = (ComboBox)content.Children[3];
 
-            combo.DropDownOpened += (s, e) =>
-            {
-                double fontSize = combo.Width / 5;
-
-                if (combo.Items.Count > 0 && combo.Items[0] is ComboBoxItem item0)
-                    item0.FontSize = fontSize;
-
-                if (combo.Items.Count > 1 && combo.Items[1] is ComboBoxItem item1)
-                    item1.FontSize = fontSize;
+                ((ComboBoxItem)((ComboBox)content.Children[3]).Items[0]).FontSize = combo.Width / 5;
+                ((ComboBoxItem)((ComboBox)content.Children[3]).Items[1]).FontSize = combo.Width / 5;
             };
-#endif
-            combo.SelectionChanged += async (s, e) =>
+            ((ComboBox)content.Children[3]).SelectionChanged += async (s, e) =>
             {
+                var combo = (s as ComboBox);
                 if (combo == null || combo.SelectedIndex == -1) return;
 
                 var item = combo.SelectedItem as ComboBoxItem;
