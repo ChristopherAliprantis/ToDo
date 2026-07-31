@@ -493,6 +493,7 @@ public partial class ToDos : StackPanel
                 Background = new SolidColorBrush(Color.White),
                 Child = content,
             };
+            var combo = ((ComboBox)((StackPanel)((StackPanel)content.Children[3]).Children[0]).Children[0]);
 #if DESKTOP || WINDOWS
             move.PointerEntered += (s, e) =>
             {
@@ -502,7 +503,7 @@ public partial class ToDos : StackPanel
             {
                 this.ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.Arrow);
             };
-            var combo = ((ComboBox)((StackPanel)((StackPanel)content.Children[3]).Children[0]).Children[0]);
+            
 
             combo.DropDownOpened += (s, e) =>
             {
@@ -515,9 +516,8 @@ public partial class ToDos : StackPanel
                     item1.FontSize = fontSize;
             };
 #endif
-            ((ComboBox)((StackPanel)((StackPanel)content.Children[3]).Children[0]).Children[0]).SelectionChanged += async (s, e) =>
+            combo.SelectionChanged += async (s, e) =>
             {
-                var combo = (s as ComboBox);
                 if (combo == null || combo.SelectedIndex == -1) return;
 
                 var item = combo.SelectedItem as ComboBoxItem;
