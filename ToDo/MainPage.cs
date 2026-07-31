@@ -13,6 +13,7 @@ public sealed partial class MainPage : Page // #if DESKTOP for all of skia deskt
     public static double w;
     public static double avail;
     public static Button? NEW;
+    public static Button? SETTINGS;
     public RotateTransform rotationTransform = new Microsoft.UI.Xaml.Media.RotateTransform();
     public static Grid? H;
     public MainPage()
@@ -76,11 +77,23 @@ public sealed partial class MainPage : Page // #if DESKTOP for all of skia deskt
             Background = new SolidColorBrush(Color.Transparent),
         };
 
+        SETTINGS = new Button
+        {
+            BorderThickness = new Thickness(0),
+            Content = "Settings",
+            Background = new SolidColorBrush(Color.Transparent),
+        };
+
         NEW.Click += (s, e) =>
         {
             App.rootFrame.Navigate(typeof(New));
         };
         Bar.Children.Add(NEW);
+        SETTINGS.Click += (s, e) =>
+        {
+            App.rootFrame.Navigate(typeof(Settings));
+        };
+        Bar.Children.Add(SETTINGS);
         var Scroll = new ScrollViewer
         {
             HorizontalScrollBarVisibility = ScrollBarVisibility.Hidden,
@@ -160,12 +173,14 @@ public sealed partial class MainPage : Page // #if DESKTOP for all of skia deskt
             NEW.Margin = new Thickness(Bar.Width / 55, Bar.Height / 18, 0, 0);
             NEW.Height = NEW.Width * 0.463757;
             NEW.FontSize = Bar.Width / 3.2;
+            SETTINGS.Width = Bar.Width - (Bar.Width / 55 * 2);
+            SETTINGS.Margin = new Thickness(Bar.Width / 55, Bar.Height / 18, 0, 0);
+            SETTINGS.Height = SETTINGS.Width * 0.463757;
+            SETTINGS.FontSize = Bar.Width / 3.2;
             RebuildTodos();
         };
         this.Loaded += async (s, e) =>
         {
-            await MainPage.todos.Load();
-            await MainPage.todos.Save();
             w = this.ActualWidth;
             h = this.ActualHeight;
 
@@ -233,8 +248,11 @@ public sealed partial class MainPage : Page // #if DESKTOP for all of skia deskt
             NEW.Margin = new Thickness(Bar.Width / 55, Bar.Height / 18, 0, 0);
             NEW.Height = NEW.Width * 0.463757;
             NEW.FontSize = Bar.Width / 3.2;
-            await Task.Delay(100);
-            await Reload();
+            SETTINGS.Width = Bar.Width - (Bar.Width / 55 * 2);
+            SETTINGS.Margin = new Thickness(Bar.Width / 55, Bar.Height / 18, 0, 0);
+            SETTINGS.Height = SETTINGS.Width * 0.463757;
+            SETTINGS.FontSize = Bar.Width / 3.2;
+            RebuildTodos();
         };
         Helpers.Add(H, Scroll, 0, 1);
         Helpers.Add(H, Bar, 0, 0);
