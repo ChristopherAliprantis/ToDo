@@ -154,7 +154,7 @@ public sealed partial class MainPage : Page // #if DESKTOP for all of skia deskt
             todos.col2.Children.Clear();
             todos.col3.Children.Clear();
             todos.col4.Children.Clear();
-            todos.Spacing = h / 96 * 2.7;
+            todos.Spacing = h / 96 * 2.7; 
             todos.col1.Spacing = h / 96 * 2.7;
 
             if (bounds.Width > bounds.Height)
@@ -164,7 +164,7 @@ public sealed partial class MainPage : Page // #if DESKTOP for all of skia deskt
                 todos.col4.Spacing = h / 96 * 2.7;
             }
             Bar.Height = h;
-
+            Bar.Spacing = h / 23.0;
 
             todos.Margin = new Thickness(h / 96 * 2.7, h / 13.0 / 6, 0, 0);
 
@@ -176,7 +176,7 @@ public sealed partial class MainPage : Page // #if DESKTOP for all of skia deskt
             SETTINGS.Width = Bar.Width - (Bar.Width / 55 * 2);
             SETTINGS.Margin = new Thickness(Bar.Width / 55, Bar.Height / 18, 0, 0);
             SETTINGS.Height = SETTINGS.Width * 0.463757;
-            SETTINGS.FontSize = Bar.Width / 3.2;
+            SETTINGS.FontSize = Bar.Width / 5.5;
             RebuildTodos();
         };
         this.Loaded += async (s, e) =>
@@ -239,7 +239,7 @@ public sealed partial class MainPage : Page // #if DESKTOP for all of skia deskt
                 todos.col4.Spacing = h / 96 * 2.7;
             }
             Bar.Height = h;
-
+            Bar.Spacing = h / 23.0;
 
             todos.Margin = new Thickness(h / 96 * 2.7, h / 13.0 / 6, 0, 0);
 
@@ -251,7 +251,7 @@ public sealed partial class MainPage : Page // #if DESKTOP for all of skia deskt
             SETTINGS.Width = Bar.Width - (Bar.Width / 55 * 2);
             SETTINGS.Margin = new Thickness(Bar.Width / 55, Bar.Height / 18, 0, 0);
             SETTINGS.Height = SETTINGS.Width * 0.463757;
-            SETTINGS.FontSize = Bar.Width / 3.2;
+            SETTINGS.FontSize = Bar.Width / 5.5;
             RebuildTodos();
         };
         Helpers.Add(H, Scroll, 0, 1);
