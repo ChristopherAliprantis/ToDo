@@ -10,7 +10,9 @@ public sealed partial class Settings : Page
             Width = this.Width, Height = this.Height,
             RowDefinitions =
             {
-                new RowDefinition{ Height = new GridLength(1, GridUnitType.Star) },
+                new RowDefinition{ Height = new GridLength(0, GridUnitType.Auto) },
+                new RowDefinition{ Height = new GridLength(1, GridUnitType.Star) }
+
             },
             ColumnDefinitions =
             {
@@ -42,8 +44,6 @@ public sealed partial class Settings : Page
         {
             S.Width = this.Width;
             S.Height = this.Height;
-            arrowpic.Height = S.Height / 30;
-            arrowpic.Width = back.Width;
             back.Height = (S.Height / 30.0);
             back.Width = back.Height;
         };
@@ -51,8 +51,6 @@ public sealed partial class Settings : Page
         {
             S.Width = this.Width;
             S.Height = this.Height;
-            arrowpic.Height = S.Height / 30.0;
-            arrowpic.Width = back.Width;
             back.Height = (S.Height / 30.0);
             back.Width = back.Height;
         };
