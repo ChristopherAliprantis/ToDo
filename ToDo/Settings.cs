@@ -31,6 +31,10 @@ public sealed partial class Settings : Page
             BorderThickness = new Thickness(0),
             Padding = new Thickness(0.1),
             BorderBrush = new SolidColorBrush(Color.Transparent),
+            Width = 40,
+            Height = 40,
+            HorizontalAlignment = HorizontalAlignment.Left,
+            VerticalAlignment = VerticalAlignment.Top,
         };
         var hoverBrush = new SolidColorBrush(ColorHelper.FromArgb(132, 235, 235, 235));
         back.Resources["ButtonBackgroundPointerOver"] = hoverBrush;
@@ -38,19 +42,19 @@ public sealed partial class Settings : Page
         {
             S.Width = this.Width;
             S.Height = this.Height;
-            back.Height = this.Height / 30.0;
-            back.Width = back.Height;
-            arrowpic.Height = back.Height;
+            arrowpic.Height = S.Height / 30;
             arrowpic.Width = back.Width;
+            back.Height = (S.Height / 30.0);
+            back.Width = back.Height;
         };
         this.SizeChanged += async(s, e) =>
         {
             S.Width = this.Width;
             S.Height = this.Height;
-            back.Height = this.Height / 30.0;
-            back.Width = back.Height;
-            arrowpic.Height = back.Height;
+            arrowpic.Height = S.Height / 30.0;
             arrowpic.Width = back.Width;
+            back.Height = (S.Height / 30.0);
+            back.Width = back.Height;
         };
         back.Click += async(s, e) =>
         {
