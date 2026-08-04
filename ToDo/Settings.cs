@@ -105,11 +105,23 @@ public sealed partial class Settings : Page
         SizeChanged += (s, e) =>
         {
             ResizeButton();
+            ((TextBlock)theme.Children[0]).Height = ActualHeight / 23.0;
+            theme.Width = ActualWidth;
+            theme.Height = ActualHeight / 23.0;
+            THEME.Height = theme.Height;
+            THEME.Width = THEME.Height * 3.3;
+            THEME.FontSize = THEME.Height / 1.5;
         };
 
         Loaded += (s, e) =>
         {
             ResizeButton();
+            ((TextBlock)theme.Children[0]).Height = ActualHeight / 23.0;
+            theme.Width = ActualWidth;
+            theme.Height = ActualHeight / 23.0;
+            THEME.Height = theme.Height;
+            THEME.Width = THEME.Height * 3.3;
+            THEME.FontSize = THEME.Height / 1.5;
         };
 
         back.Click += async(s, e) =>
