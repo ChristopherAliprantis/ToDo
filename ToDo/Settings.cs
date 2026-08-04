@@ -38,6 +38,7 @@ public sealed partial class Settings : Page
         StackPanel theme = new StackPanel
         { 
             Orientation = Orientation.Horizontal,
+            VerticalAlignment = VerticalAlignment.Top,
             Children =
             {
                 new TextBlock
@@ -105,23 +106,43 @@ public sealed partial class Settings : Page
         SizeChanged += (s, e) =>
         {
             ResizeButton();
-            ((TextBlock)theme.Children[0]).Height = ActualHeight / 23.0;
+            theme.Spacing = ActualWidth / 15.0;
+            ((TextBlock)theme.Children[0]).Height = ActualHeight / 15.0;
+            ((TextBlock)theme.Children[0]).FontSize = ((TextBlock)theme.Children[0]).Height / 2.0;
             theme.Width = ActualWidth;
-            theme.Height = ActualHeight / 23.0;
+            theme.Height = ActualHeight / 15.0;
             THEME.Height = theme.Height;
-            THEME.Width = THEME.Height * 3.3;
-            THEME.FontSize = THEME.Height / 1.5;
+            THEME.Width = THEME.Height * 4;
+            THEME.FontSize = THEME.Height / 2.0;
+            foreach (var item in THEME.Items)
+            {
+                if (item is ComboBoxItem comboBoxItem)
+                {
+                    comboBoxItem.FontSize = THEME.FontSize;
+                }
+            }
+            theme.Margin = new Thickness(ActualWidth / 20.0, ActualHeight / 20.0, 0, 0);
         };
 
         Loaded += (s, e) =>
         {
             ResizeButton();
-            ((TextBlock)theme.Children[0]).Height = ActualHeight / 23.0;
+            theme.Spacing = ActualWidth / 15.0;
+            ((TextBlock)theme.Children[0]).Height = ActualHeight / 15.0;
+            ((TextBlock)theme.Children[0]).FontSize = ((TextBlock)theme.Children[0]).Height / 2.0;
             theme.Width = ActualWidth;
-            theme.Height = ActualHeight / 23.0;
+            theme.Height = ActualHeight / 15.0;
             THEME.Height = theme.Height;
-            THEME.Width = THEME.Height * 3.3;
-            THEME.FontSize = THEME.Height / 1.5;
+            THEME.Width = THEME.Height * 4;
+            THEME.FontSize = THEME.Height / 2.0;
+            foreach (var item in THEME.Items)
+            {
+                if (item is ComboBoxItem comboBoxItem)
+                {
+                    comboBoxItem.FontSize = THEME.FontSize;
+                }
+            }
+            theme.Margin = new Thickness(ActualWidth / 20.0, ActualHeight / 20.0, 0, 0);
         };
 
         back.Click += async(s, e) =>
@@ -131,7 +152,7 @@ public sealed partial class Settings : Page
         };
 
         Helpers.Add(S, back, 0, 0);
-
+        Helpers.Add(S, theme, 1, 1);
         Content = S;
     }
 
