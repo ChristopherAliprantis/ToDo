@@ -33,8 +33,6 @@ public sealed partial class Settings : Page
             BorderThickness = new Thickness(0),
             Padding = new Thickness(0.1),
             BorderBrush = new SolidColorBrush(Color.Transparent),
-            Width = 40,
-            Height = 40,
             HorizontalAlignment = HorizontalAlignment.Left,
             VerticalAlignment = VerticalAlignment.Top,
         };
@@ -44,15 +42,23 @@ public sealed partial class Settings : Page
         {
             S.Width = this.Width;
             S.Height = this.Height;
+            arrowpic.Height = (S.Height / 30.0);
+            arrowpic.Width = arrowpic.Height;
             back.Height = (S.Height / 30.0);
             back.Width = back.Height;
+            arrowpic.Height = (S.Height / 30.0);
+            arrowpic.Width = arrowpic.Height;
         };
         this.SizeChanged += async(s, e) =>
         {
             S.Width = this.Width;
             S.Height = this.Height;
+            arrowpic.Height = (S.Height / 30.0);
+            arrowpic.Width = arrowpic.Height;
             back.Height = (S.Height / 30.0);
             back.Width = back.Height;
+            arrowpic.Height = (S.Height / 30.0);
+            arrowpic.Width = arrowpic.Height;
         };
         back.Click += async(s, e) =>
         {
