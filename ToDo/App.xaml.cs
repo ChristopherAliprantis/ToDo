@@ -40,12 +40,15 @@ public partial class App : Application
                 "ToDo");
 
         Directory.CreateDirectory(folderPath);
-
+        var contents = "";
         string filePath = Path.Combine(folderPath, "theme.txt");
-        var contents = File.ReadAllText(filePath);
-        if (contents == "Dark" || contents == "Light" || contents == "System")
+        if (File.Exists(filePath))
         {
-
+            contents = File.ReadAllText(filePath);
+            if (contents == "Dark" || contents == "Light" || contents == "System")
+            {
+                return contents;
+            }
         }
         else
         {
