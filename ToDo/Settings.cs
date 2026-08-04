@@ -22,7 +22,7 @@ public sealed partial class Settings : Page
         }
         };
 
-        var As = new SvgImageSource(new Uri("ms-appx:///Assets/arrow.svg"));
+        var As = new SvgImageSource(new Uri("ms-appx:///Assets/arrow"));
 
         var arrowpic = new Image
         {
@@ -45,7 +45,7 @@ public sealed partial class Settings : Page
 
         void ResizeButton()
         {
-            double size = ActualHeight / 30.0;
+            double size = ActualHeight / 27.0;
 
             back.Width = size;
             back.Height = size;
