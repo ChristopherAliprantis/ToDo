@@ -1,3 +1,4 @@
+using Microsoft.UI.Xaml.Media.Imaging;
 using ToDo;
 
 public sealed partial class Settings : Page
@@ -7,64 +8,69 @@ public sealed partial class Settings : Page
     {
         S = new Grid
         {
-            Width = this.Width, Height = this.Height,
+            HorizontalAlignment = HorizontalAlignment.Stretch,
+            VerticalAlignment = VerticalAlignment.Stretch,
             RowDefinitions =
-            {
-                new RowDefinition{ Height = new GridLength(0, GridUnitType.Auto) },
-                new RowDefinition{ Height = new GridLength(1, GridUnitType.Star) }
-
-            },
+        {
+            new RowDefinition { Height = GridLength.Auto },
+            new RowDefinition { Height = new GridLength(1, GridUnitType.Star) }
+        },
             ColumnDefinitions =
-            {
-                new ColumnDefinition { Width = GridLength.Auto },
-                new ColumnDefinition { Width = new GridLength(1,GridUnitType.Star) }
-            }
+        {
+            new ColumnDefinition { Width = GridLength.Auto },
+            new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) }
+        }
         };
-        var As = new Microsoft.UI.Xaml.Media.Imaging.SvgImageSource(new Uri("ms-appx:///Assets/arrow"));
-        var arrowpic = new Microsoft.UI.Xaml.Controls.Image
+
+        var As = new SvgImageSource(new Uri("ms-appx:///Assets/arrow.svg"));
+
+        var arrowpic = new Image
         {
             Source = As,
-            Stretch = Microsoft.UI.Xaml.Media.Stretch.Uniform,
+            Stretch = Stretch.Uniform
         };
+
         var back = new Button
         {
             Content = arrowpic,
-            Background = new SolidColorBrush(Color.Transparent),
+            Background = new SolidColorBrush(Colors.Transparent),
             BorderThickness = new Thickness(0),
-            Padding = new Thickness(0.1),
-            BorderBrush = new SolidColorBrush(Color.Transparent),
+            Padding = new Thickness(0),
             HorizontalAlignment = HorizontalAlignment.Left,
-            VerticalAlignment = VerticalAlignment.Top,
+            VerticalAlignment = VerticalAlignment.Top
         };
+
         var hoverBrush = new SolidColorBrush(ColorHelper.FromArgb(132, 235, 235, 235));
         back.Resources["ButtonBackgroundPointerOver"] = hoverBrush;
-        this.Loaded += async(s, e) =>
+
+        void ResizeButton()
         {
-            S.Width = this.Width;
-            S.Height = this.Height;
-            arrowpic.Height = (S.Height / 30.0);
-            arrowpic.Width = arrowpic.Height;
-            back.Height = (S.Height / 30.0);
-            back.Width = back.Height;
-            arrowpic.Height = (S.Height / 30.0);
-            arrowpic.Width = arrowpic.Height;
-        };
-        this.SizeChanged += async(s, e) =>
+            double size = ActualHeight / 30.0;
+
+            back.Width = size;
+            back.Height = size;
+
+            arrowpic.Width = size;
+            arrowpic.Height = size;
+        }
+
+        SizeChanged += (s, e) =>
         {
-            S.Width = this.Width;
-            S.Height = this.Height;
-            arrowpic.Height = (S.Height / 30.0);
-            arrowpic.Width = arrowpic.Height;
-            back.Height = (S.Height / 30.0);
-            back.Width = back.Height;
-            arrowpic.Height = (S.Height / 30.0);
-            arrowpic.Width = arrowpic.Height;
+            ResizeButton();
         };
-        back.Click += async(s, e) =>
+
+        Loaded += (s, e) =>
+        {
+            ResizeButton();
+        };
+
+        back.Click += (s, e) =>
         {
             App.rootFrame.Navigate(typeof(MainPage));
         };
-        Helpers.Add(S, back, 0,0);
-        this.Content = S;
+
+        Helpers.Add(S, back, 0, 0);
+
+        Content = S;
     }
 }
