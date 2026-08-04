@@ -33,6 +33,18 @@ public partial class App : Application
         this.InitializeComponent();
     }
 
+    public static string LoadTheme()
+    {
+        string folderPath = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                "ToDo");
+
+        Directory.CreateDirectory(folderPath);
+
+        string filePath = Path.Combine(folderPath, "theme.txt");
+        return File.ReadAllText(filePath);
+    }
+    public static string Theme { get; set; } = LoadTheme();
     public static Window? MainWindow { get; private set; }
     public IHost? Host { get; private set; }
 

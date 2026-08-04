@@ -1,6 +1,6 @@
 using Microsoft.UI.Xaml.Media.Imaging;
 using ToDo;
-
+using Path = System.IO.Path;
 public sealed partial class Settings : Page
 {
     public static Grid S = new Grid();
@@ -21,8 +21,52 @@ public sealed partial class Settings : Page
             new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) }
         }
         };
-
+        int index = 0;
         var As = new SvgImageSource(new Uri("ms-appx:///Assets/arrow"));
+        if (App.Theme == "Dark")
+        {
+            index = 0;
+        }
+        else if (App.Theme == "Light")
+        {
+            index = 1;
+        }
+        else if (App.Theme == "System")
+        {
+            index = 2;
+        }
+        StackPanel theme = new StackPanel
+        { 
+            Orientation = Orientation.Horizontal,
+            Children =
+            {
+                new TextBlock
+                {
+                    Text = "Theme: ",
+                    FontSize = 20,
+                },
+                new ComboBox
+                {
+                    Width = 150,
+                    Items =
+                    {
+                        new ComboBoxItem
+                        {
+                            Content = "Dark",
+                        },
+                        new ComboBoxItem
+                        {
+                            Content = "Light",
+                        },
+                        new ComboBoxItem
+                        {
+                            Content = "System",
+                        }
+                    },
+                    SelectedIndex = index
+                }
+            }
+        };
 
         var arrowpic = new Image
         {
@@ -42,7 +86,11 @@ public sealed partial class Settings : Page
 
         var hoverBrush = new SolidColorBrush(ColorHelper.FromArgb(132, 235, 235, 235));
         back.Resources["ButtonBackgroundPointerOver"] = hoverBrush;
-
+        var THEME = (ComboBox)theme.Children[1];
+        THEME.SelectionChanged += async (s, e) =>
+        {
+            await UpdateTheme(((ComboBoxItem)THEME.Items[THEME.SelectedIndex]).Content.ToString());
+        };
         void ResizeButton()
         {
             double size = ActualHeight / 27.0;
@@ -64,13 +112,27 @@ public sealed partial class Settings : Page
             ResizeButton();
         };
 
-        back.Click += (s, e) =>
+        back.Click += async(s, e) =>
         {
             App.rootFrame.Navigate(typeof(MainPage));
+            await UpdateTheme(((ComboBoxItem)THEME.Items[THEME.SelectedIndex]).Content.ToString());
         };
 
         Helpers.Add(S, back, 0, 0);
 
         Content = S;
+    }
+
+    public async Task UpdateTheme(string theme)
+    {
+        App.Theme = theme;
+        string folderPath = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                "ToDo");
+
+        Directory.CreateDirectory(folderPath);
+
+        string filePath = Path.Combine(folderPath, "theme.txt");
+        await File.WriteAllTextAsync(filePath, theme);
     }
 }
