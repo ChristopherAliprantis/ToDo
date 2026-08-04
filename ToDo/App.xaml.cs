@@ -42,7 +42,17 @@ public partial class App : Application
         Directory.CreateDirectory(folderPath);
 
         string filePath = Path.Combine(folderPath, "theme.txt");
-        return File.ReadAllText(filePath);
+        var contents = File.ReadAllText(filePath);
+        if (contents == "Dark" || contents == "Light" || contents == "System")
+        {
+
+        }
+        else
+        {
+            contents = "System";
+            Settings.UpdateTheme(contents);
+        }
+        return contents;
     }
     public static string Theme { get; set; } = LoadTheme();
     public static Window? MainWindow { get; private set; }

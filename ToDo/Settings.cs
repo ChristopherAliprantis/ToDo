@@ -123,7 +123,7 @@ public sealed partial class Settings : Page
         Content = S;
     }
 
-    public async Task UpdateTheme(string theme)
+    public static async Task UpdateTheme(string theme)
     {
         App.Theme = theme;
         string folderPath = Path.Combine(
