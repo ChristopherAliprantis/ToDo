@@ -84,7 +84,7 @@ public sealed partial class Settings : Page
             HorizontalAlignment = HorizontalAlignment.Left,
             VerticalAlignment = VerticalAlignment.Top
         };
-
+        
         var hoverBrush = new SolidColorBrush(ColorHelper.FromArgb(132, 235, 235, 235));
         back.Resources["ButtonBackgroundPointerOver"] = hoverBrush;
         var THEME = (ComboBox)theme.Children[1];
@@ -150,9 +150,18 @@ public sealed partial class Settings : Page
             App.rootFrame.Navigate(typeof(MainPage));
             await UpdateTheme(((ComboBoxItem)THEME.Items[THEME.SelectedIndex]).Content.ToString());
         };
-
+        if (App.ThemeMode == "Light")
+        {
+            S.Background = new SolidColorBrush(Colors.White);
+        }
+        else if (App.ThemeMode == "Dark")
+        {
+            S.Background = new SolidColorBrush(Colors.Black);
+            theme.BorderBrush = new SolidColorBrush(Colors.FromARGB(255, 58, 58, 58));
+        }
         Helpers.Add(S, back, 0, 0);
         Helpers.Add(S, theme, 1, 1);
+
         Content = S;
     }
 

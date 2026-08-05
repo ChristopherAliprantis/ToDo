@@ -22,7 +22,6 @@ public sealed partial class MainPage : Page // #if DESKTOP for all of skia deskt
         {
             Height = 0,
             Width = 0,
-            Background = new SolidColorBrush(Color.LightGray),
         };
         H = new Grid
         {
@@ -36,6 +35,7 @@ public sealed partial class MainPage : Page // #if DESKTOP for all of skia deskt
                 new ColumnDefinition { Width = new GridLength(1,GridUnitType.Star) }
             }
         };
+        
         var rs = new Microsoft.UI.Xaml.Media.Imaging.SvgImageSource(new Uri("ms-appx:///Assets/reload"));
         var reloadpic = new Microsoft.UI.Xaml.Controls.Image
         {
@@ -254,6 +254,16 @@ public sealed partial class MainPage : Page // #if DESKTOP for all of skia deskt
             SETTINGS.FontSize = Bar.Width / 5.5;
             RebuildTodos();
         };
+        if (App.ThemeMode == "Light")
+        {
+            H.Background = new SolidColorBrush(Colors.White);
+            Bar.Background = new SolidColorBrush(Colors.LightGray);
+        }
+        else if (App.ThemeMode == "Dark")
+        {
+            H.Background = new SolidColorBrush(Colors.Black);
+            Bar.Background = new SolidColorBrush(Colors.FromARGB(255, 58, 58, 58));
+        }
         Helpers.Add(H, Scroll, 0, 1);
         Helpers.Add(H, Bar, 0, 0);
         this.Content = H;

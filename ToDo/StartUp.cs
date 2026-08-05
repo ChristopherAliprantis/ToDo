@@ -5,7 +5,15 @@ public sealed partial class Start : Page
 {
     public Start()
     {
-        var sp= new Microsoft.UI.Xaml.Media.Imaging.SvgImageSource(new Uri("ms-appx:///Assets/Splash/splash_screen"));
+        if (App.ThemeMode == "Light")
+        {
+            this.Background = new SolidColorBrush(Colors.White);
+        }
+        else if (App.ThemeMode == "Dark")
+        {
+            this.Background = new SolidColorBrush(Colors.Black);
+        }
+        var sp = new Microsoft.UI.Xaml.Media.Imaging.SvgImageSource(new Uri("ms-appx:///Assets/Splash/splash_screen"));
         var splash= new Microsoft.UI.Xaml.Controls.Image
         {
             Source = sp,

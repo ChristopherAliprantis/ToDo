@@ -121,7 +121,6 @@ public partial class App : Application
         MainWindow.Content = rootFrame;
 
         // 3. Handle click if the app was launched FROM a closed state
-
         if (rootFrame.Content == null)
         {
 #if DESKTOP || WINDOWS
@@ -130,7 +129,14 @@ public partial class App : Application
             rootFrame.Navigate(typeof(MainPage));
 #endif
         }
-
+        if (ThemeMode == "Light")
+        {
+            rootFrame.RequestedTheme = ElementTheme.Light;
+        }
+        else if (ThemeMode == "Dark")
+        {
+            rootFrame.RequestedTheme = ElementTheme.Dark;
+        }
         MainWindow.Activate();
     }
 }
