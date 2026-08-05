@@ -91,6 +91,15 @@ public sealed partial class Settings : Page
         THEME.SelectionChanged += async (s, e) =>
         {
             await UpdateTheme(((ComboBoxItem)THEME.Items[THEME.SelectedIndex]).Content.ToString());
+            if (App.ThemeMode == "Light")
+            {
+                S.Background = new SolidColorBrush(Colors.White);
+            }
+            else if (App.ThemeMode == "Dark")
+            {
+                S.Background = new SolidColorBrush(Colors.Black);
+                theme.BorderBrush = new SolidColorBrush(Colors.FromARGB(255, 58, 58, 58));
+            }
         };
         void ResizeButton()
         {
@@ -147,6 +156,16 @@ public sealed partial class Settings : Page
 
         back.Click += async(s, e) =>
         {
+            await UpdateTheme(((ComboBoxItem)THEME.Items[THEME.SelectedIndex]).Content.ToString());
+            if (App.ThemeMode == "Light")
+            {
+                S.Background = new SolidColorBrush(Colors.White);
+            }
+            else if (App.ThemeMode == "Dark")
+            {
+                S.Background = new SolidColorBrush(Colors.Black);
+                theme.BorderBrush = new SolidColorBrush(Colors.FromARGB(255, 58, 58, 58));
+            }
             App.rootFrame.Navigate(typeof(MainPage));
         };
         if (App.ThemeMode == "Light")
