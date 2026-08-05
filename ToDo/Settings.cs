@@ -148,7 +148,6 @@ public sealed partial class Settings : Page
         back.Click += async(s, e) =>
         {
             App.rootFrame.Navigate(typeof(MainPage));
-            await UpdateTheme(((ComboBoxItem)THEME.Items[THEME.SelectedIndex]).Content.ToString());
         };
         if (App.ThemeMode == "Light")
         {
@@ -176,5 +175,14 @@ public sealed partial class Settings : Page
 
         string filePath = Path.Combine(folderPath, "theme.txt");
         await File.WriteAllTextAsync(filePath, theme);
+        App.ThemeMode = App.LoadThemeMode(theme);
+        if (App.ThemeMode == "Light")
+        {
+            App.rootFrame.RequestedTheme = ElementTheme.Light;
+        }
+        else if (App.ThemeMode == "Dark")
+        {
+            App.rootFrame.RequestedTheme = ElementTheme.Dark;
+        }
     }
 }
