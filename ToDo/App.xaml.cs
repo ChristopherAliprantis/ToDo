@@ -57,7 +57,29 @@ public partial class App : Application
         }
         return contents;
     }
+
+    public static string LoadThemeMode(string tri)
+    {
+        if (tri == "Dark" || tri == "Light")
+        {
+            return tri;
+        }
+        if (tri == "System")
+        {
+            var themebin = Application.Current.RequestedTheme;
+            if (themebin == ApplicationTheme.Dark)
+            {
+                return "Dark";
+            }
+            else if (themebin == ApplicationTheme.Light)
+            {
+                return "Light";
+            }
+        }
+        return "";
+    }
     public static string Theme { get; set; } = LoadTheme();
+    public static string ThemeMode { get; set; } = LoadThemeMode(LoadTheme());
     public static Window? MainWindow { get; private set; }
     public IHost? Host { get; private set; }
 
