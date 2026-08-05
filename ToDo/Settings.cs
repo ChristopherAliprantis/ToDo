@@ -93,14 +93,11 @@ public sealed partial class Settings : Page
             await UpdateTheme(((ComboBoxItem)THEME.Items[THEME.SelectedIndex]).Content.ToString());
             if (App.ThemeMode == "Light")
             {
-                theme.BorderThickness = new Thickness(0);
                 S.Background = new SolidColorBrush(Colors.White);
             }
             else if (App.ThemeMode == "Dark")
             {
                 S.Background = new SolidColorBrush(Colors.Black);
-                theme.BorderBrush = new SolidColorBrush(Colors.FromARGB(255, 58, 58, 58));
-                theme.BorderThickness = new Thickness(1);
             }
         };
         void ResizeButton()
@@ -161,27 +158,21 @@ public sealed partial class Settings : Page
             await UpdateTheme(((ComboBoxItem)THEME.Items[THEME.SelectedIndex]).Content.ToString());
             if (App.ThemeMode == "Light")
             {
-                theme.BorderThickness = new Thickness(0);
                 S.Background = new SolidColorBrush(Colors.White);
             }
             else if (App.ThemeMode == "Dark")
             {
                 S.Background = new SolidColorBrush(Colors.Black);
-                theme.BorderBrush = new SolidColorBrush(Colors.FromARGB(255, 58, 58, 58));
-                theme.BorderThickness = new Thickness(1);
             }
             App.rootFrame.Navigate(typeof(MainPage));
         };
         if (App.ThemeMode == "Light")
         {
-            theme.BorderThickness = new Thickness(0);
             S.Background = new SolidColorBrush(Colors.White);
         }
         else if (App.ThemeMode == "Dark")
         {
             S.Background = new SolidColorBrush(Colors.Black);
-            theme.BorderBrush = new SolidColorBrush(Colors.FromARGB(255, 58, 58, 58));
-            theme.BorderThickness = new Thickness(1);
         }
         Helpers.Add(S, back, 0, 0);
         Helpers.Add(S, theme, 1, 1);
