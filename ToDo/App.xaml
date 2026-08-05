@@ -11,27 +11,31 @@
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <!-- Initializes internal WinUI / Uno Platform control styles -->
                 <XamlControlsResources xmlns="using:Microsoft.UI.Xaml.Controls" />
             </ResourceDictionary.MergedDictionaries>
 
             <ResourceDictionary.ThemeDictionaries>
-                <!-- "Default" is the theme key mapped strictly to Dark Mode in WinUI -->
+                <!-- 1. DARK THEME OVERRIDES ONLY -->
                 <ResourceDictionary x:Key="Default">
-                    <!-- Define your custom SolidColorBrush using your exact RGB (58, 58, 58) -->
                     <SolidColorBrush x:Key="GlobalCustomBorderBrush" Color="#FF3A3A3A" />
 
-                    <!-- 1. ButtonBase (Button, ToggleButton, RepeatButton) -->
                     <StaticResource x:Key="ButtonBorderBrush" ResourceKey="GlobalCustomBorderBrush" />
                     <StaticResource x:Key="ToggleButtonBorderBrush" ResourceKey="GlobalCustomBorderBrush" />
-
-                    <!-- 2. TextBox -->
                     <StaticResource x:Key="TextBoxBorderBrush" ResourceKey="GlobalCustomBorderBrush" />
-
-                    <!-- 3. ItemsControl derivatives (ComboBox, ListView, ListBox) -->
                     <StaticResource x:Key="ComboBoxBorderBrush" ResourceKey="GlobalCustomBorderBrush" />
+                    <StaticResource x:Key="ComboBoxBackgroundBorderBrush" ResourceKey="GlobalCustomBorderBrush" />
+                    <StaticResource x:Key="ComboBoxHeaderBorderBrush" ResourceKey="GlobalCustomBorderBrush" />
                     <StaticResource x:Key="ListBoxBorderBrush" ResourceKey="GlobalCustomBorderBrush" />
                     <StaticResource x:Key="ListViewBorderBrush" ResourceKey="GlobalCustomBorderBrush" />
+
+                    <!-- Overrides the shared pointer strictly during Dark Mode -->
+                    <StaticResource x:Key="ControlElevationBorderBrush" ResourceKey="GlobalCustomBorderBrush" />
+                </ResourceDictionary>
+
+                <!-- 2. LIGHT THEME RE-ANCHORING -->
+                <ResourceDictionary x:Key="Light">
+                    <!-- Resets the shared pointer back to standard semi-transparent black for Light Mode -->
+                    <SolidColorBrush x:Key="ControlElevationBorderBrush" Color="#0F000000" />
                 </ResourceDictionary>
             </ResourceDictionary.ThemeDictionaries>
         </ResourceDictionary>
