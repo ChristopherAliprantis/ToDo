@@ -350,6 +350,16 @@ public sealed partial class MainPage : Page // #if DESKTOP for all of skia deskt
             {
                 continue;
             }
+            if (App.ThemeMode == "Light")
+            {
+                TODOS[i].border.Background = new SolidColorBrush(Colors.White);
+                TODOS[i].border.BorderBrush = new SolidColorBrush(Colors.Black);
+            }
+            else if (App.ThemeMode == "Dark")
+            {
+                TODOS[i].border.Background = new SolidColorBrush(Colors.Black);
+                TODOS[i].border.BorderBrush = new SolidColorBrush(Colors.White);
+            }
             TODOS[i].Width = avail;
             TODOS[i].content.Padding = new Thickness(avail / 17, avail / 17, avail / 17, avail / 17);
 #if ANDROID
@@ -479,7 +489,6 @@ public partial class ToDos : StackPanel
                     new ComboBox
                     {
                         PlaceholderText = ". . .",
-                        PlaceholderForeground = new SolidColorBrush(Colors.Black),
 
                         Items =
                         {
@@ -502,7 +511,6 @@ public partial class ToDos : StackPanel
                 Width = this.Width,
                 Height = this.Height,
                 CornerRadius = new CornerRadius(5.2),
-                Background = new SolidColorBrush(Color.White),
                 Child = content,
             };
             ((ComboBox)content.Children[3]).DropDownOpened += async (s, e) =>
@@ -532,6 +540,16 @@ public partial class ToDos : StackPanel
                     await Delete();
                 }
             };
+            if (App.ThemeMode == "Light")
+            {
+                border.Background = new SolidColorBrush(Colors.White);
+                border.BorderBrush = new SolidColorBrush(Colors.Black);
+            }
+            else if (App.ThemeMode == "Dark")
+            {
+                border.Background = new SolidColorBrush(Colors.Black);
+                border.BorderBrush = new SolidColorBrush(Colors.White);
+            }
 
         }
 
