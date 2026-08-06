@@ -103,8 +103,11 @@ public sealed partial class Settings : Page
         };
         void ResizeButton()
         {
+#if DESKTOP || WINDOWS
             double size = ActualHeight / 27.0;
-
+#else
+            double size = ActualHeight / 23.0;
+#endif
             back.Width = size;
             back.Height = size;
 

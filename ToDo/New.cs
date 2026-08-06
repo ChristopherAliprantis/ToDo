@@ -282,8 +282,8 @@ public sealed partial class New : Page // #if DESKTOP for all of skia desktop, #
             done.Height = back.Height;
             done.FontSize = back.FontSize;
             describe.Margin = done.Margin;
-            Ti.Width = done.Width * 0.8;
-            Ti.Height = done.Height * 0.79;
+            Ti.Width = done.Width * 0.6;
+            Ti.Height = done.Height * 0.59;
             Ti.Margin = done.Margin;
             date.Height = done.Height;
             date.Width = done.Width * 2.76;
@@ -339,8 +339,8 @@ public sealed partial class New : Page // #if DESKTOP for all of skia desktop, #
             done.Height = back.Height;
             done.FontSize = back.FontSize;
             describe.Margin = done.Margin;
-            Ti.Width = done.Width * 0.8;
-            Ti.Height = done.Height * 0.79;
+            Ti.Width = done.Width * 0.6;
+            Ti.Height = done.Height * 0.59;
             Ti.Margin = done.Margin;
             date.Height = done.Height;
             date.Width = done.Width * 2.76;
