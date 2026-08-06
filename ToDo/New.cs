@@ -236,16 +236,6 @@ public sealed partial class New : Page // #if DESKTOP for all of skia desktop, #
 
             Content = all,
         };
-        if (Application.Current.Resources.TryGetValue("DefaultButtonStyle", out object styleObj))
-        {
-            if (styleObj is Style defaultStyle)
-            {
-                time.up.Style = defaultStyle;
-                time.down.Style = defaultStyle;
-                date.up.Style = defaultStyle;
-                date.down.Style = defaultStyle;
-            }
-        }
         this.Loaded += (s, e) =>
         {
             var bounds = App.MainWindow.Bounds;
@@ -360,6 +350,14 @@ public sealed partial class New : Page // #if DESKTOP for all of skia desktop, #
             time.Margin = done.Margin;
             date.Margin = done.Margin;
         };
+        if (App.ThemeMode == "Light")
+        {
+            N.Background = new SolidColorBrush(Colors.White);
+        }
+        else if (App.ThemeMode == "Dark")
+        {
+            N.Background = new SolidColorBrush(Colors.Black);
+        }
         Helpers.Add(N, scroll, 1, 0);
         this.Content = N;
     }
