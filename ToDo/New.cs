@@ -293,7 +293,6 @@ public sealed partial class New : Page // #if DESKTOP for all of skia desktop, #
             Ti.Width = done.Width * 1.2;
             Ti.Height = done.Height * 0.79;
             Ti.Margin = done.Margin;
-            times.Padding = new Thickness(0, 0, 0, (this.ActualWidth / 6.597677));
             date.Height = done.Height;
             date.Width = done.Width * 2.76;
             time.Height = done.Height;
@@ -303,8 +302,6 @@ public sealed partial class New : Page // #if DESKTOP for all of skia desktop, #
         };
         this.SizeChanged += (s,e) =>
         {
-            time.disabled = !(bool)Ti.IsOn;
-            date.disabled = !(bool)Ti.IsOn;
             var bounds = App.MainWindow.Bounds;
             all.Width = this.ActualWidth;
             space.Height = new GridLength(this.ActualHeight / 9.2, GridUnitType.Pixel);
@@ -353,7 +350,6 @@ public sealed partial class New : Page // #if DESKTOP for all of skia desktop, #
             Ti.Width = done.Width * 1.2;
             Ti.Height = done.Height * 0.79;
             Ti.Margin = done.Margin;
-            times.Padding = new Thickness(0, 0, 0, (this.ActualWidth / 6.597677));
             date.Height = done.Height;
             date.Width = done.Width * 2.76;
             time.Height = done.Height;
