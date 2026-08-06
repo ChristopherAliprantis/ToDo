@@ -207,7 +207,7 @@ public sealed partial class Settings : Page
     }
 }
 
-public sealed class Switch : UserControl
+sealed class Switch : UserControl
 {
     private const double DesignWidth = 44;
     private const double DesignHeight = 20;
@@ -216,13 +216,22 @@ public sealed class Switch : UserControl
     private readonly Canvas canvas;
     private readonly Border track;
     private readonly Ellipse thumb;
-    private readonly TranslateTransform thumbTransform;
+    private readonly CompositeTransform thumbTransform;
 
-    private bool isPressed;
+    private Storyboard? currentStoryboard;
+
     private bool isPointerOver;
+    private bool isPressed;
+    private bool isDragging;
+    private bool hasMoved;
+    private bool ignoreVisualUpdate;
+
+    private double pressStartX;
+    private double currentThumbX;
 
 
     public event RoutedEventHandler? Toggled;
+
 
 
     public static readonly DependencyProperty IsOnProperty =
@@ -233,6 +242,7 @@ public sealed class Switch : UserControl
             new PropertyMetadata(false, OnIsOnChanged));
 
 
+
     public static readonly DependencyProperty OnColorProperty =
         DependencyProperty.Register(
             nameof(OnColor),
@@ -240,7 +250,12 @@ public sealed class Switch : UserControl
             typeof(Switch),
             new PropertyMetadata(
                 new SolidColorBrush(
-                    Color.FromARGB(255, 0, 120, 212))));
+                    Color.FromARGB(
+                        255,
+                        0,
+                        120,
+                        212))));
+
 
 
     public static readonly DependencyProperty OffColorProperty =
@@ -250,7 +265,12 @@ public sealed class Switch : UserControl
             typeof(Switch),
             new PropertyMetadata(
                 new SolidColorBrush(
-                    Color.FromARGB(255, 128, 128, 128))));
+                    Color.FromARGB(
+                        255,
+                        128,
+                        128,
+                        128))));
+
 
 
     public static readonly DependencyProperty ThumbColorProperty =
@@ -260,7 +280,12 @@ public sealed class Switch : UserControl
             typeof(Switch),
             new PropertyMetadata(
                 new SolidColorBrush(
-                    Color.FromARGB(255, 255, 255, 255))));
+                    Color.FromARGB(
+                        255,
+                        255,
+                        255,
+                        255))));
+
 
 
     public bool IsOn
@@ -291,6 +316,8 @@ public sealed class Switch : UserControl
     }
 
 
+
+
     public Switch()
     {
         root = new Grid();
@@ -299,7 +326,9 @@ public sealed class Switch : UserControl
 
         track = new Border();
 
-        thumbTransform = new TranslateTransform();
+
+        thumbTransform = new CompositeTransform();
+
 
         thumb = new Ellipse
         {
@@ -316,6 +345,7 @@ public sealed class Switch : UserControl
         Content = root;
 
 
+
         PointerEntered += (_, _) =>
         {
             isPointerOver = true;
@@ -330,25 +360,105 @@ public sealed class Switch : UserControl
         };
 
 
+
         PointerPressed += (_, e) =>
         {
+            if (!IsEnabled)
+                return;
+
+
+            currentStoryboard?.Stop();
+
+
             isPressed = true;
+            isDragging = false;
+            hasMoved = false;
+
+
+            pressStartX =
+                e.GetCurrentPoint(this)
+                 .Position.X;
+
+
             CapturePointer(e.Pointer);
-            UpdateVisual(false);
+
+
+            SetSquish(true);
         };
+
+
+
+        PointerMoved += (_, e) =>
+        {
+            if (!isPressed)
+                return;
+
+
+            double x =
+                e.GetCurrentPoint(this)
+                 .Position.X;
+
+
+            if (Math.Abs(x - pressStartX) > 4)
+            {
+                hasMoved = true;
+                isDragging = true;
+            }
+
+
+            if (isDragging)
+            {
+                MoveThumb(x);
+            }
+        };
+
 
 
         PointerReleased += (_, e) =>
         {
+            if (!isPressed)
+                return;
+
+
             isPressed = false;
+
 
             ReleasePointerCapture(e.Pointer);
 
-            if (IsEnabled)
-                IsOn = !IsOn;
 
-            UpdateVisual(false);
+            SetSquish(false);
+
+
+            ignoreVisualUpdate = false;
+
+
+
+            if (!hasMoved)
+            {
+                IsOn = !IsOn;
+            }
+            else
+            {
+                double middle =
+                    (GetOffPosition() +
+                     GetOnPosition()) / 2;
+
+
+                IsOn =
+                    currentThumbX > middle;
+            }
+
+
+
+            isDragging = false;
+
+
+            currentThumbX =
+                IsOn
+                ? GetOnPosition()
+                : GetOffPosition();
         };
+
 
 
         SizeChanged += (_, _) =>
@@ -364,18 +474,27 @@ public sealed class Switch : UserControl
     }
 
 
+
+
     private static void OnIsOnChanged(
         DependencyObject sender,
         DependencyPropertyChangedEventArgs e)
     {
         var control = (Switch)sender;
 
-        control.UpdateVisual(true);
+
+        if (!control.ignoreVisualUpdate)
+        {
+            control.UpdateVisual(true);
+        }
+
 
         control.Toggled?.Invoke(
             control,
             new RoutedEventArgs());
     }
+
+
 
 
     private void UpdateVisual(bool animate)
@@ -385,14 +504,20 @@ public sealed class Switch : UserControl
             return;
 
 
+
         double scale =
             Math.Min(
                 ActualWidth / DesignWidth,
                 ActualHeight / DesignHeight);
 
 
-        double width = DesignWidth * scale;
-        double height = DesignHeight * scale;
+
+        double width =
+            DesignWidth * scale;
+
+
+        double height =
+            DesignHeight * scale;
 
 
         double left =
@@ -403,9 +528,13 @@ public sealed class Switch : UserControl
             (ActualHeight - height) / 2;
 
 
-        double padding = 3 * scale;
 
-        double thumbSize = 14 * scale;
+        double thumbSize =
+            15 * scale;
+
+
+        double padding =
+            2 * scale;
 
 
 
@@ -414,6 +543,7 @@ public sealed class Switch : UserControl
 
         track.CornerRadius =
             new CornerRadius(height / 2);
+
 
         track.Background =
             IsOn
@@ -425,10 +555,13 @@ public sealed class Switch : UserControl
         Canvas.SetTop(track, top);
 
 
+
         thumb.Width = thumbSize;
         thumb.Height = thumbSize;
 
-        thumb.Fill = ThumbColor;
+        thumb.Fill =
+            ThumbColor;
+
 
         thumb.Stroke =
             new SolidColorBrush(
@@ -438,88 +571,184 @@ public sealed class Switch : UserControl
                     0,
                     0));
 
-        thumb.StrokeThickness = scale;
 
-
-        double thumbY =
-            top + ((height - thumbSize) / 2);
+        thumb.StrokeThickness =
+            scale;
 
 
         Canvas.SetTop(
             thumb,
-            thumbY);
+            top +
+            ((height - thumbSize) / 2));
 
-
-        double offX =
-            left + padding;
-
-
-        double onX =
-            left +
-            width -
-            thumbSize -
-            padding;
 
 
         double target =
             IsOn
-            ? onX
-            : offX;
+            ? GetOnPosition()
+            : GetOffPosition();
+
+
+
+        if (!isDragging)
+        {
+            currentThumbX = target;
+        }
+
 
 
         if (animate)
         {
-            var animation =
-                new DoubleAnimation
-                {
-                    To = target,
-                    Duration =
-                        new Duration(
-                            TimeSpan.FromMilliseconds(160)),
-                    EasingFunction =
-                        new CubicEase()
-                };
-
-
-            Storyboard.SetTarget(
-                animation,
-                thumbTransform);
-
-
-            Storyboard.SetTargetProperty(
-                animation,
-                nameof(TranslateTransform.X));
-
-
-            var storyboard =
-                new Storyboard();
-
-            storyboard.Children.Add(animation);
-
-            storyboard.Begin();
+            AnimateThumb(target);
         }
-        else
+        else if (!isDragging)
         {
-            thumbTransform.X = target;
+            thumbTransform.TranslateX =
+                target;
         }
 
 
 
         if (!IsEnabled)
-        {
             Opacity = 0.4;
-        }
         else if (isPressed)
-        {
             Opacity = 0.75;
-        }
         else if (isPointerOver)
-        {
-            Opacity = 0.92;
-        }
+            Opacity = 0.9;
         else
-        {
             Opacity = 1;
-        }
+    }
+
+
+
+
+    private void MoveThumb(double pointerX)
+    {
+        ignoreVisualUpdate = true;
+
+
+        currentThumbX =
+            Math.Clamp(
+                pointerX - thumb.Width / 2,
+                GetOffPosition(),
+                GetOnPosition());
+
+
+        thumbTransform.TranslateX =
+            currentThumbX;
+
+
+        SetSquish(true);
+    }
+
+
+
+
+    private double GetOffPosition()
+    {
+        double scale =
+            Math.Min(
+                ActualWidth / DesignWidth,
+                ActualHeight / DesignHeight);
+
+
+        double width =
+            DesignWidth * scale;
+
+
+        double left =
+            (ActualWidth - width) / 2;
+
+
+        return left + (2 * scale);
+    }
+
+
+
+
+    private double GetOnPosition()
+    {
+        double scale =
+            Math.Min(
+                ActualWidth / DesignWidth,
+                ActualHeight / DesignHeight);
+
+
+        double width =
+            DesignWidth * scale;
+
+
+        double thumbSize =
+            15 * scale;
+
+
+        double left =
+            (ActualWidth - width) / 2;
+
+
+        return left +
+               width -
+               thumbSize -
+               (2 * scale);
+    }
+
+
+
+
+    private void AnimateThumb(double target)
+    {
+        currentStoryboard?.Stop();
+
+
+        currentStoryboard =
+            new Storyboard();
+
+
+        var animation =
+            new DoubleAnimation
+            {
+                From =
+                    thumbTransform.TranslateX,
+
+                To = target,
+
+                Duration =
+                    new Duration(
+                        TimeSpan.FromMilliseconds(
+                            160)),
+
+                EasingFunction =
+                    new CubicEase()
+            };
+
+
+        Storyboard.SetTarget(
+            animation,
+            thumbTransform);
+
+
+        Storyboard.SetTargetProperty(
+            animation,
+            nameof(
+                CompositeTransform.TranslateX));
+
+
+        currentStoryboard.Children.Add(animation);
+
+
+        currentStoryboard.Begin();
+    }
+
+
+
+
+    private void SetSquish(bool value)
+    {
+        thumbTransform.ScaleX =
+            value ? 1.08 : 1;
+
+
+        thumbTransform.ScaleY =
+            value ? 0.92 : 1;
     }
 }
