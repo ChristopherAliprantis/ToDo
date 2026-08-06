@@ -72,6 +72,7 @@ public sealed partial class New : Page // #if DESKTOP for all of skia desktop, #
                     IsOn = false,
                     MinWidth = 0,
                     MinHeight = 0,
+                    HorizontalAlignment = HorizontalAlignment.Left
                 }),
 
                  (date = new UpDownBox
@@ -281,7 +282,7 @@ public sealed partial class New : Page // #if DESKTOP for all of skia desktop, #
             done.Height = back.Height;
             done.FontSize = back.FontSize;
             describe.Margin = done.Margin;
-            Ti.Width = done.Width * 1.2;
+            Ti.Width = done.Width * 0.8;
             Ti.Height = done.Height * 0.79;
             Ti.Margin = done.Margin;
             date.Height = done.Height;
@@ -338,7 +339,7 @@ public sealed partial class New : Page // #if DESKTOP for all of skia desktop, #
             done.Height = back.Height;
             done.FontSize = back.FontSize;
             describe.Margin = done.Margin;
-            Ti.Width = done.Width * 1.2;
+            Ti.Width = done.Width * 0.8;
             Ti.Height = done.Height * 0.79;
             Ti.Margin = done.Margin;
             date.Height = done.Height;

@@ -206,12 +206,14 @@ public sealed partial class Settings : Page
 
 public sealed class Switch : UserControl
 {
-    private const double BaseWidth = 44;
-    private const double BaseHeight = 20;
+    private const double DesignWidth = 44;
+    private const double DesignHeight = 20;
 
+    private readonly Grid root;
+    private readonly Canvas canvas;
     private readonly Border track;
     private readonly Ellipse thumb;
-    private readonly Grid root;
+    private readonly TranslateTransform thumbTransform;
 
     private bool isPressed;
     private bool isPointerOver;
@@ -235,11 +237,7 @@ public sealed class Switch : UserControl
             typeof(Switch),
             new PropertyMetadata(
                 new SolidColorBrush(
-                    Color.FromARGB(
-                        255,
-                        0,
-                        120,
-                        212))));
+                    Color.FromARGB(255, 0, 120, 212))));
 
 
     public static readonly DependencyProperty OffColorProperty =
@@ -249,11 +247,7 @@ public sealed class Switch : UserControl
             typeof(Switch),
             new PropertyMetadata(
                 new SolidColorBrush(
-                    Color.FromARGB(
-                        255,
-                        128,
-                        128,
-                        128))));
+                    Color.FromARGB(255, 128, 128, 128))));
 
 
     public static readonly DependencyProperty ThumbColorProperty =
@@ -263,11 +257,7 @@ public sealed class Switch : UserControl
             typeof(Switch),
             new PropertyMetadata(
                 new SolidColorBrush(
-                    Color.FromARGB(
-                        255,
-                        255,
-                        255,
-                        255))));
+                    Color.FromARGB(255, 255, 255, 255))));
 
 
     public bool IsOn
@@ -302,25 +292,23 @@ public sealed class Switch : UserControl
     {
         root = new Grid();
 
+        canvas = new Canvas();
 
-        track = new Border
-        {
-            Background = OffColor,
-            HorizontalAlignment = HorizontalAlignment.Stretch,
-            VerticalAlignment = VerticalAlignment.Stretch
-        };
+        track = new Border();
 
+        thumbTransform = new TranslateTransform();
 
         thumb = new Ellipse
         {
-            Fill = ThumbColor,
+            RenderTransform = thumbTransform,
             Shadow = new ThemeShadow()
         };
 
 
-        root.Children.Add(track);
-        root.Children.Add(thumb);
+        canvas.Children.Add(track);
+        canvas.Children.Add(thumb);
 
+        root.Children.Add(canvas);
 
         Content = root;
 
@@ -350,6 +338,7 @@ public sealed class Switch : UserControl
         PointerReleased += (_, e) =>
         {
             isPressed = false;
+
             ReleasePointerCapture(e.Pointer);
 
             if (IsEnabled)
@@ -359,13 +348,13 @@ public sealed class Switch : UserControl
         };
 
 
-        Loaded += (_, _) =>
+        SizeChanged += (_, _) =>
         {
             UpdateVisual(false);
         };
 
 
-        SizeChanged += (_, _) =>
+        Loaded += (_, _) =>
         {
             UpdateVisual(false);
         };
@@ -395,31 +384,84 @@ public sealed class Switch : UserControl
 
         double scale =
             Math.Min(
-                ActualWidth / BaseWidth,
-                ActualHeight / BaseHeight);
+                ActualWidth / DesignWidth,
+                ActualHeight / DesignHeight);
 
 
-        double thumbSize =
-            ActualHeight - (4 * scale);
+        double width = DesignWidth * scale;
+        double height = DesignHeight * scale;
 
 
-        track.Background =
-            IsOn ? OnColor : OffColor;
+        double left =
+            (ActualWidth - width) / 2;
 
+
+        double top =
+            (ActualHeight - height) / 2;
+
+
+        double padding = 3 * scale;
+
+        double thumbSize = 14 * scale;
+
+
+
+        track.Width = width;
+        track.Height = height;
 
         track.CornerRadius =
-            new CornerRadius(
-                ActualHeight / 2);
+            new CornerRadius(height / 2);
+
+        track.Background =
+            IsOn
+            ? OnColor
+            : OffColor;
+
+
+        Canvas.SetLeft(track, left);
+        Canvas.SetTop(track, top);
 
 
         thumb.Width = thumbSize;
         thumb.Height = thumbSize;
 
+        thumb.Fill = ThumbColor;
 
-        double x =
+        thumb.Stroke =
+            new SolidColorBrush(
+                Color.FromARGB(
+                    40,
+                    0,
+                    0,
+                    0));
+
+        thumb.StrokeThickness = scale;
+
+
+        double thumbY =
+            top + ((height - thumbSize) / 2);
+
+
+        Canvas.SetTop(
+            thumb,
+            thumbY);
+
+
+        double offX =
+            left + padding;
+
+
+        double onX =
+            left +
+            width -
+            thumbSize -
+            padding;
+
+
+        double target =
             IsOn
-            ? ActualWidth - thumbSize - (2 * scale)
-            : 2 * scale;
+            ? onX
+            : offX;
 
 
         if (animate)
@@ -427,10 +469,10 @@ public sealed class Switch : UserControl
             var animation =
                 new DoubleAnimation
                 {
-                    To = x,
+                    To = target,
                     Duration =
                         new Duration(
-                            TimeSpan.FromMilliseconds(150)),
+                            TimeSpan.FromMilliseconds(160)),
                     EasingFunction =
                         new CubicEase()
                 };
@@ -438,15 +480,16 @@ public sealed class Switch : UserControl
 
             Storyboard.SetTarget(
                 animation,
-                thumb);
+                thumbTransform);
 
 
             Storyboard.SetTargetProperty(
                 animation,
-                "Translation.X");
+                nameof(TranslateTransform.X));
 
 
-            var storyboard = new Storyboard();
+            var storyboard =
+                new Storyboard();
 
             storyboard.Children.Add(animation);
 
@@ -454,12 +497,9 @@ public sealed class Switch : UserControl
         }
         else
         {
-            thumb.Translation =
-                new System.Numerics.Vector3(
-                    (float)x,
-                    0,
-                    0);
+            thumbTransform.X = target;
         }
+
 
 
         if (!IsEnabled)
@@ -472,7 +512,7 @@ public sealed class Switch : UserControl
         }
         else if (isPointerOver)
         {
-            Opacity = 0.9;
+            Opacity = 0.92;
         }
         else
         {
