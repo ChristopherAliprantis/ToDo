@@ -227,7 +227,7 @@ public sealed partial class New : Page // #if DESKTOP for all of skia desktop, #
 
             Content = all,
         };
-        Ti.internalSwitch.Toggled += (s, e) =>
+        Ti.Toggled += (s, e) =>
         {
             time.disabled = !(bool)Ti.IsOn;
             date.disabled = !(bool)Ti.IsOn;

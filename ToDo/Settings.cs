@@ -1,3 +1,4 @@
+using Microsoft.UI.Xaml.Media.Animation;
 using Microsoft.UI.Xaml.Media.Imaging;
 using ToDo;
 using Path = System.IO.Path;
@@ -203,18 +204,71 @@ public sealed partial class Settings : Page
     }
 }
 
-public partial class Switch : UserControl
+public sealed class Switch : UserControl
 {
+    private const double BaseWidth = 44;
+    private const double BaseHeight = 20;
 
-    public ToggleSwitch internalSwitch = new();
-    public static readonly DependencyProperty IsOnProperty = DependencyProperty.Register(
-        nameof(IsOn), typeof(bool), typeof(Switch), new PropertyMetadata(false));
+    private readonly Border track;
+    private readonly Ellipse thumb;
+    private readonly Grid root;
 
-    public static readonly DependencyProperty TargetHeightProperty = DependencyProperty.Register(
-        nameof(TargetHeight), typeof(double), typeof(Switch), new PropertyMetadata(32.0));
+    private bool isPressed;
+    private bool isPointerOver;
 
-    public static readonly DependencyProperty LabelProperty = DependencyProperty.Register(
-        nameof(Label), typeof(string), typeof(Switch), new PropertyMetadata(string.Empty));
+
+    public event RoutedEventHandler? Toggled;
+
+
+    public static readonly DependencyProperty IsOnProperty =
+        DependencyProperty.Register(
+            nameof(IsOn),
+            typeof(bool),
+            typeof(Switch),
+            new PropertyMetadata(false, OnIsOnChanged));
+
+
+    public static readonly DependencyProperty OnColorProperty =
+        DependencyProperty.Register(
+            nameof(OnColor),
+            typeof(Brush),
+            typeof(Switch),
+            new PropertyMetadata(
+                new SolidColorBrush(
+                    Color.FromARGB(
+                        255,
+                        0,
+                        120,
+                        212))));
+
+
+    public static readonly DependencyProperty OffColorProperty =
+        DependencyProperty.Register(
+            nameof(OffColor),
+            typeof(Brush),
+            typeof(Switch),
+            new PropertyMetadata(
+                new SolidColorBrush(
+                    Color.FromARGB(
+                        255,
+                        128,
+                        128,
+                        128))));
+
+
+    public static readonly DependencyProperty ThumbColorProperty =
+        DependencyProperty.Register(
+            nameof(ThumbColor),
+            typeof(Brush),
+            typeof(Switch),
+            new PropertyMetadata(
+                new SolidColorBrush(
+                    Color.FromARGB(
+                        255,
+                        255,
+                        255,
+                        255))));
+
 
     public bool IsOn
     {
@@ -222,48 +276,207 @@ public partial class Switch : UserControl
         set => SetValue(IsOnProperty, value);
     }
 
-    public double TargetHeight
+
+    public Brush OnColor
     {
-        get => (double)GetValue(TargetHeightProperty);
-        set => SetValue(TargetHeightProperty, value);
+        get => (Brush)GetValue(OnColorProperty);
+        set => SetValue(OnColorProperty, value);
     }
 
-    public string Label
+
+    public Brush OffColor
     {
-        get => (string)GetValue(LabelProperty);
-        set => SetValue(LabelProperty, value);
+        get => (Brush)GetValue(OffColorProperty);
+        set => SetValue(OffColorProperty, value);
     }
+
+
+    public Brush ThumbColor
+    {
+        get => (Brush)GetValue(ThumbColorProperty);
+        set => SetValue(ThumbColorProperty, value);
+    }
+
 
     public Switch()
     {
-        internalSwitch = new ToggleSwitch()
-            .Header(x => x.Binding(() => Label))
-            .HorizontalAlignment(HorizontalAlignment.Left);
+        root = new Grid();
 
-        internalSwitch.SetBinding(
-            ToggleSwitch.IsOnProperty,
-            new Microsoft.UI.Xaml.Data.Binding
-            {
-                Source = this,
-                Path = new PropertyPath(nameof(IsOn)),
-                Mode = Microsoft.UI.Xaml.Data.BindingMode.TwoWay
-            });
 
-        var scalingWrapper = new Viewbox
+        track = new Border
         {
-            HorizontalAlignment = HorizontalAlignment.Left,
-            Child = internalSwitch
+            Background = OffColor,
+            HorizontalAlignment = HorizontalAlignment.Stretch,
+            VerticalAlignment = VerticalAlignment.Stretch
         };
 
-        scalingWrapper.SetBinding(
-            Viewbox.HeightProperty,
-            new Microsoft.UI.Xaml.Data.Binding
-            {
-                Source = this,
-                Path = new PropertyPath(nameof(TargetHeight)),
-                Mode = Microsoft.UI.Xaml.Data.BindingMode.OneWay
-            });
 
-        this.Content = scalingWrapper;
+        thumb = new Ellipse
+        {
+            Fill = ThumbColor,
+            Shadow = new ThemeShadow()
+        };
+
+
+        root.Children.Add(track);
+        root.Children.Add(thumb);
+
+
+        Content = root;
+
+
+        PointerEntered += (_, _) =>
+        {
+            isPointerOver = true;
+            UpdateVisual(false);
+        };
+
+
+        PointerExited += (_, _) =>
+        {
+            isPointerOver = false;
+            UpdateVisual(false);
+        };
+
+
+        PointerPressed += (_, e) =>
+        {
+            isPressed = true;
+            CapturePointer(e.Pointer);
+            UpdateVisual(false);
+        };
+
+
+        PointerReleased += (_, e) =>
+        {
+            isPressed = false;
+            ReleasePointerCapture(e.Pointer);
+
+            if (IsEnabled)
+                IsOn = !IsOn;
+
+            UpdateVisual(false);
+        };
+
+
+        Loaded += (_, _) =>
+        {
+            UpdateVisual(false);
+        };
+
+
+        SizeChanged += (_, _) =>
+        {
+            UpdateVisual(false);
+        };
+    }
+
+
+    private static void OnIsOnChanged(
+        DependencyObject sender,
+        DependencyPropertyChangedEventArgs e)
+    {
+        var control = (Switch)sender;
+
+        control.UpdateVisual(true);
+
+        control.Toggled?.Invoke(
+            control,
+            new RoutedEventArgs());
+    }
+
+
+    private void UpdateVisual(bool animate)
+    {
+        if (ActualWidth <= 0 ||
+            ActualHeight <= 0)
+            return;
+
+
+        double scale =
+            Math.Min(
+                ActualWidth / BaseWidth,
+                ActualHeight / BaseHeight);
+
+
+        double thumbSize =
+            ActualHeight - (4 * scale);
+
+
+        track.Background =
+            IsOn ? OnColor : OffColor;
+
+
+        track.CornerRadius =
+            new CornerRadius(
+                ActualHeight / 2);
+
+
+        thumb.Width = thumbSize;
+        thumb.Height = thumbSize;
+
+
+        double x =
+            IsOn
+            ? ActualWidth - thumbSize - (2 * scale)
+            : 2 * scale;
+
+
+        if (animate)
+        {
+            var animation =
+                new DoubleAnimation
+                {
+                    To = x,
+                    Duration =
+                        new Duration(
+                            TimeSpan.FromMilliseconds(150)),
+                    EasingFunction =
+                        new CubicEase()
+                };
+
+
+            Storyboard.SetTarget(
+                animation,
+                thumb);
+
+
+            Storyboard.SetTargetProperty(
+                animation,
+                "Translation.X");
+
+
+            var storyboard = new Storyboard();
+
+            storyboard.Children.Add(animation);
+
+            storyboard.Begin();
+        }
+        else
+        {
+            thumb.Translation =
+                new System.Numerics.Vector3(
+                    (float)x,
+                    0,
+                    0);
+        }
+
+
+        if (!IsEnabled)
+        {
+            Opacity = 0.4;
+        }
+        else if (isPressed)
+        {
+            Opacity = 0.75;
+        }
+        else if (isPointerOver)
+        {
+            Opacity = 0.9;
+        }
+        else
+        {
+            Opacity = 1;
+        }
     }
 }
