@@ -202,3 +202,68 @@ public sealed partial class Settings : Page
         }
     }
 }
+
+public partial class Switch : UserControl
+{
+
+    public ToggleSwitch internalSwitch = new();
+    public static readonly DependencyProperty IsOnProperty = DependencyProperty.Register(
+        nameof(IsOn), typeof(bool), typeof(Switch), new PropertyMetadata(false));
+
+    public static readonly DependencyProperty TargetHeightProperty = DependencyProperty.Register(
+        nameof(TargetHeight), typeof(double), typeof(Switch), new PropertyMetadata(32.0));
+
+    public static readonly DependencyProperty LabelProperty = DependencyProperty.Register(
+        nameof(Label), typeof(string), typeof(Switch), new PropertyMetadata(string.Empty));
+
+    public bool IsOn
+    {
+        get => (bool)GetValue(IsOnProperty);
+        set => SetValue(IsOnProperty, value);
+    }
+
+    public double TargetHeight
+    {
+        get => (double)GetValue(TargetHeightProperty);
+        set => SetValue(TargetHeightProperty, value);
+    }
+
+    public string Label
+    {
+        get => (string)GetValue(LabelProperty);
+        set => SetValue(LabelProperty, value);
+    }
+
+    public Switch()
+    {
+        internalSwitch = new ToggleSwitch()
+            .Header(x => x.Binding(() => Label))
+            .HorizontalAlignment(HorizontalAlignment.Left);
+
+        internalSwitch.SetBinding(
+            ToggleSwitch.IsOnProperty,
+            new Microsoft.UI.Xaml.Data.Binding
+            {
+                Source = this,
+                Path = new PropertyPath(nameof(IsOn)),
+                Mode = Microsoft.UI.Xaml.Data.BindingMode.TwoWay
+            });
+
+        var scalingWrapper = new Viewbox
+        {
+            HorizontalAlignment = HorizontalAlignment.Left,
+            Child = internalSwitch
+        };
+
+        scalingWrapper.SetBinding(
+            Viewbox.HeightProperty,
+            new Microsoft.UI.Xaml.Data.Binding
+            {
+                Source = this,
+                Path = new PropertyPath(nameof(TargetHeight)),
+                Mode = Microsoft.UI.Xaml.Data.BindingMode.OneWay
+            });
+
+        this.Content = scalingWrapper;
+    }
+}

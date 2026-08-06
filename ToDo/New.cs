@@ -1,6 +1,5 @@
 using Uno.Diagnostics.Eventing;
 using static ToDo.ToDos;
-
 namespace ToDo;
 
 
@@ -34,7 +33,7 @@ public sealed partial class New : Page // #if DESKTOP for all of skia desktop, #
         UpDownBox? date;
         UpDownBox? time;
         StackPanel? times = new() ;
-        ToggleSwitch? Ti;
+        Switch? Ti;
         all = new StackPanel
         {
             Orientation = Orientation.Vertical,
@@ -68,7 +67,7 @@ public sealed partial class New : Page // #if DESKTOP for all of skia desktop, #
                 {
                     Fill = new SolidColorBrush(Color.Black)
                 }),
-                (Ti = new ToggleSwitch
+                (Ti = new Switch
                 {
                     IsOn = false,
                     MinWidth = 0,
@@ -228,7 +227,7 @@ public sealed partial class New : Page // #if DESKTOP for all of skia desktop, #
 
             Content = all,
         };
-        Ti.Toggled += (s, e) =>
+        Ti.internalSwitch.Toggled += (s, e) =>
         {
             time.disabled = !(bool)Ti.IsOn;
             date.disabled = !(bool)Ti.IsOn;
