@@ -33,7 +33,7 @@ public sealed partial class New : Page // #if DESKTOP for all of skia desktop, #
         UpDownBox? date;
         UpDownBox? time;
         StackPanel? times;
-        ToggleButton? Ti;
+        ToggleSwitch? Ti;
         all = new StackPanel
         {
             Orientation = Orientation.Vertical,
@@ -68,27 +68,26 @@ public sealed partial class New : Page // #if DESKTOP for all of skia desktop, #
                     Fill = new SolidColorBrush(Color.Black)
                 }),
                 (times = new StackPanel
-                { 
+                {
+                    BorderThickness = new Thickness(2),
                     Children =
                     {
-                        (Ti = new ToggleButton
+                        (Ti = new ToggleSwitch
                         {
-                            IsChecked = false,
+                            IsOn = false,
                         }),
 
                         (date = new UpDownBox
                         {
-                            Visibility = Visibility.Collapsed,
                             HorizontalAlignment = HorizontalAlignment.Left,
                             Text = Date.ToString("d"),
-                            disabled = !(bool)Ti.IsChecked
+                            disabled = !(bool)Ti.IsOn
                         }),
                         (time = new UpDownBox
                         {
-                            Visibility = Visibility.Collapsed,
                             HorizontalAlignment = HorizontalAlignment.Left,
                             Text = Time.ToString("hh:mm tt"),
-                            disabled = !(bool)Ti.IsChecked
+                            disabled = !(bool)Ti.IsOn
                         }),
                     }
                 })
@@ -104,7 +103,7 @@ public sealed partial class New : Page // #if DESKTOP for all of skia desktop, #
             describe.Text = edit.Item1.Descrip;
             if (edit.Item1.Date != null)
             {
-                Ti.IsChecked = true;
+                Ti.IsOn = true;
                 date.Text = Date.ToString("yyyy-MM-dd");
                 time.Text = Time.ToString("hh:mm tt");
             }
@@ -177,7 +176,7 @@ public sealed partial class New : Page // #if DESKTOP for all of skia desktop, #
         done.Click += async(s, e) =>
         {
             int? ind = null;
-            if (Ti.IsChecked == false)
+            if (Ti.IsOn == false)
             {
                 if (edit.Item2 == true && edit.Item1 != null)
                 {
@@ -281,6 +280,7 @@ public sealed partial class New : Page // #if DESKTOP for all of skia desktop, #
             describe.Margin = done.Margin;
             Ti.Width = done.Width * 0.82;
             Ti.Height = done.Height * 0.79;
+            Ti.Margin = done.Margin;
             date.Height = done.Height;
             date.Width = done.Width * 2.76;
             time.Height = done.Height;
@@ -336,6 +336,7 @@ public sealed partial class New : Page // #if DESKTOP for all of skia desktop, #
             describe.Margin = done.Margin;
             Ti.Width = done.Width * 0.82;
             Ti.Height = done.Height * 0.79;
+            Ti.Margin = done.Margin;
             date.Height = done.Height;
             date.Width = done.Width * 2.76;
             time.Height = done.Height;
