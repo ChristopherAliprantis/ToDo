@@ -32,6 +32,8 @@ public sealed partial class New : Page // #if DESKTOP for all of skia desktop, #
         Button? op;
         UpDownBox? date;
         UpDownBox? time;
+        StackPanel? times;
+        ToggleButton? Ti;
         all = new StackPanel
         {
             Orientation = Orientation.Vertical,
@@ -65,23 +67,31 @@ public sealed partial class New : Page // #if DESKTOP for all of skia desktop, #
                 {
                     Fill = new SolidColorBrush(Color.Black)
                 }),
-                (op = new Button
-                {
-                    Content = "optional",
-                    HorizontalAlignment = HorizontalAlignment.Left,
-                }),
-                (date = new UpDownBox
-                {
-                    Visibility = Visibility.Collapsed,
-                    HorizontalAlignment = HorizontalAlignment.Left,
-                    Text = Date.ToString("d"),
-                }),
-                (time = new UpDownBox
-                {
-                    Visibility = Visibility.Collapsed,
-                    HorizontalAlignment = HorizontalAlignment.Left,
-                    Text = Time.ToString("hh:mm tt"),
-                }),
+                (times = new StackPanel
+                { 
+                    Children =
+                    {
+                        (Ti = new ToggleButton
+                        {
+                            IsChecked = false,
+                        }),
+
+                        (date = new UpDownBox
+                        {
+                            Visibility = Visibility.Collapsed,
+                            HorizontalAlignment = HorizontalAlignment.Left,
+                            Text = Date.ToString("d"),
+                            disabled = !(bool)Ti.IsChecked
+                        }),
+                        (time = new UpDownBox
+                        {
+                            Visibility = Visibility.Collapsed,
+                            HorizontalAlignment = HorizontalAlignment.Left,
+                            Text = Time.ToString("hh:mm tt"),
+                            disabled = !(bool)Ti.IsChecked
+                        }),
+                    }
+                })
 
             }
 
@@ -94,8 +104,7 @@ public sealed partial class New : Page // #if DESKTOP for all of skia desktop, #
             describe.Text = edit.Item1.Descrip;
             if (edit.Item1.Date != null)
             {
-                time.Visibility = Visibility.Visible;
-                date.Visibility = Visibility.Visible;
+                Ti.IsChecked = true;
                 date.Text = Date.ToString("yyyy-MM-dd");
                 time.Text = Time.ToString("hh:mm tt");
             }
@@ -161,18 +170,6 @@ public sealed partial class New : Page // #if DESKTOP for all of skia desktop, #
                 date.text.Text = date.Text;
             }
         };
-        op.Click += (s, e) =>
-        {
-            if (time.Visibility == Visibility.Collapsed)
-                time.Visibility = Visibility.Visible;
-            else
-                time.Visibility = Visibility.Collapsed;
-
-            if (date.Visibility == Visibility.Collapsed)
-                date.Visibility = Visibility.Visible;
-            else
-                date.Visibility = Visibility.Collapsed;
-        };
         back.Click += (s, e) =>
         {
             App.rootFrame.Navigate(typeof(MainPage));
@@ -180,7 +177,7 @@ public sealed partial class New : Page // #if DESKTOP for all of skia desktop, #
         done.Click += async(s, e) =>
         {
             int? ind = null;
-            if (date.Visibility == Visibility.Collapsed && time.Visibility == Visibility.Collapsed)
+            if (Ti.IsChecked == false)
             {
                 if (edit.Item2 == true && edit.Item1 != null)
                 {
@@ -282,10 +279,8 @@ public sealed partial class New : Page // #if DESKTOP for all of skia desktop, #
             done.Height = back.Height;
             done.FontSize = back.FontSize;
             describe.Margin = done.Margin;
-            op.Width = done.Width * 0.82;
-            op.Height = done.Height * 0.79;
-            op.FontSize = op.Width / 5.96;
-            op.Margin = new Thickness(done.Margin.Left * 0.87, 0, 0, 0);
+            Ti.Width = done.Width * 0.82;
+            Ti.Height = done.Height * 0.79;
             date.Height = done.Height;
             date.Width = done.Width * 2.76;
             time.Height = done.Height;
@@ -308,15 +303,15 @@ public sealed partial class New : Page // #if DESKTOP for all of skia desktop, #
             }
             else back.Height = this.ActualHeight / 17.1;
 #endif
-            
+
             divide.Width = this.ActualWidth;
             divide.Height = this.ActualHeight / 676.6;
             title.Height = back.Height * 1.1;
             title.Width = title.Height * 2.3;
             title.Margin = new Thickness((this.ActualWidth / 6.597677), all.Spacing * 4.8, 0, 0);
             title.FontSize = title.Width / 4.6;
-            
-            
+
+
 #if ANDROID
             if (bounds.Width > bounds.Height)
             {
@@ -339,10 +334,8 @@ public sealed partial class New : Page // #if DESKTOP for all of skia desktop, #
             done.Height = back.Height;
             done.FontSize = back.FontSize;
             describe.Margin = done.Margin;
-            op.Width = done.Width * 0.82;
-            op.Height = done.Height * 0.79;
-            op.FontSize = op.Width / 5.96;
-            op.Margin = new Thickness(done.Margin.Left * 0.87, 0,0,0);
+            Ti.Width = done.Width * 0.82;
+            Ti.Height = done.Height * 0.79;
             date.Height = done.Height;
             date.Width = done.Width * 2.76;
             time.Height = done.Height;
@@ -353,10 +346,12 @@ public sealed partial class New : Page // #if DESKTOP for all of skia desktop, #
         if (App.ThemeMode == "Light")
         {
             N.Background = new SolidColorBrush(Colors.White);
+            times.BorderBrush = new SolidColorBrush(Colors.Black);
         }
         else if (App.ThemeMode == "Dark")
         {
             N.Background = new SolidColorBrush(Colors.Black);
+            times.BorderBrush = new SolidColorBrush(Colors.FromARGB(255, 58, 58, 58));
         }
         Helpers.Add(N, scroll, 1, 0);
         this.Content = N;
@@ -370,6 +365,7 @@ partial class UpDownBox : UserControl
     public RepeatButton? up;
     public RepeatButton? down;
     public TextBox? text;
+    public bool disabled = false;
 
     public UpDownBox()
     {
@@ -382,6 +378,7 @@ partial class UpDownBox : UserControl
                 (text = new TextBox
                 {
                     IsReadOnly = true,
+                    IsEnabled = !disabled,
                 }),
                 new StackPanel
                 {
@@ -392,13 +389,15 @@ partial class UpDownBox : UserControl
                         {
                             Content = "+",
                             Delay = 105,
-                            Interval = 35
+                            Interval = 35,
+                            IsEnabled = !disabled
                         }),
                         (down = new RepeatButton
                         {
                             Content = "\u2212",
                             Delay = 105,
-                            Interval = 35
+                            Interval = 35,
+                            IsEnabled = !disabled
                         })
                     }
                 }
