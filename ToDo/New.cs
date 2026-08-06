@@ -71,7 +71,7 @@ public sealed partial class New : Page // #if DESKTOP for all of skia desktop, #
                 (times = new StackPanel
                 {
                     Spacing = all.Spacing,
-                    BorderThickness = new Thickness(1),
+                    BorderThickness = new Thickness(2),
                     Children =
                     {
                         (Ti = new ToggleSwitch
