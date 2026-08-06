@@ -1,3 +1,4 @@
+using Uno.Diagnostics.Eventing;
 using static ToDo.ToDos;
 
 namespace ToDo;
@@ -21,7 +22,7 @@ public sealed partial class New : Page // #if DESKTOP for all of skia desktop, #
                 new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star)}
             }
         };
-        StackPanel? all;
+        StackPanel? all = new();
         Button? back;
         Rectangle? divide;
         TextBox? title;
@@ -32,7 +33,7 @@ public sealed partial class New : Page // #if DESKTOP for all of skia desktop, #
         Button? op;
         UpDownBox? date;
         UpDownBox? time;
-        StackPanel? times;
+        StackPanel? times = new() ;
         ToggleSwitch? Ti;
         all = new StackPanel
         {
@@ -69,7 +70,8 @@ public sealed partial class New : Page // #if DESKTOP for all of skia desktop, #
                 }),
                 (times = new StackPanel
                 {
-                    BorderThickness = new Thickness(2),
+                    Spacing = all.Spacing,
+                    BorderThickness = new Thickness(1),
                     Children =
                     {
                         (Ti = new ToggleSwitch
@@ -232,12 +234,20 @@ public sealed partial class New : Page // #if DESKTOP for all of skia desktop, #
 
             Content = all,
         };
+        Ti.Toggled += (s, e) =>
+        {
+            time.disabled = !(bool)Ti.IsOn;
+            date.disabled = !(bool)Ti.IsOn;
+        };
         this.Loaded += (s, e) =>
         {
+            time.disabled = !(bool)Ti.IsOn;
+            date.disabled = !(bool)Ti.IsOn;
             var bounds = App.MainWindow.Bounds;
             all.Width = this.ActualWidth;
             space.Height = new GridLength(this.ActualHeight / 9.2, GridUnitType.Pixel);
             all.Spacing = this.ActualHeight / 96;
+            times.Spacing = all.Spacing;
 #if DESKTOP || WINDOWS
             back.Height = this.ActualHeight / 17.3;
 #else
@@ -294,6 +304,7 @@ public sealed partial class New : Page // #if DESKTOP for all of skia desktop, #
             all.Width = this.ActualWidth;
             space.Height = new GridLength(this.ActualHeight / 9.2, GridUnitType.Pixel);
             all.Spacing = this.ActualHeight / 96;
+            times.Spacing = all.Spacing;
 #if DESKTOP || WINDOWS
             back.Height = this.ActualHeight / 17.3;
 #else
@@ -347,7 +358,7 @@ public sealed partial class New : Page // #if DESKTOP for all of skia desktop, #
         if (App.ThemeMode == "Light")
         {
             N.Background = new SolidColorBrush(Colors.White);
-            times.BorderBrush = new SolidColorBrush(Colors.Black);
+            times.BorderBrush = new SolidColorBrush(Colors.LightGray);
         }
         else if (App.ThemeMode == "Dark")
         {
@@ -366,11 +377,23 @@ partial class UpDownBox : UserControl
     public RepeatButton? up;
     public RepeatButton? down;
     public TextBox? text;
-    public bool disabled = false;
+    private bool _value = false;
+    public event Action<bool> OnChanged;
+    public bool disabled
+    {
+        get => _value;
+        set
+        {
+            if (_value != value)
+            {
+                _value = value;
+                OnChanged?.Invoke(_value);
+            }
+        }
+    }
 
     public UpDownBox()
-    {
-
+    { 
         var c = new StackPanel
         {
             Orientation = Orientation.Horizontal,
@@ -404,6 +427,12 @@ partial class UpDownBox : UserControl
                 }
             }
 
+        };
+        this.OnChanged += (s) =>
+        {
+            text.IsEnabled = !disabled;
+            up.IsEnabled = !disabled;
+            down.IsEnabled = !disabled;
         };
         this.Content = c;
         this.SizeChanged += (s, e) =>
