@@ -229,7 +229,7 @@ sealed class Switch : UserControl
     private double pressStartX;
     private double currentThumbX;
 
-
+    private double thumbOffset;
     public event RoutedEventHandler? Toggled;
 
 
@@ -440,7 +440,8 @@ sealed class Switch : UserControl
             else
             {
                 IsOn =
-                    currentThumbX > GetThumbTravel() / 2;
+                    thumbOffset >
+                    (GetOnPosition() - GetOffPosition()) / 2;
             }
 
 
@@ -458,30 +459,12 @@ sealed class Switch : UserControl
 
         SizeChanged += (_, _) =>
         {
-            if (!isDragging)
-            {
-                currentThumbX = IsOn
-                    ? GetOnPosition()
-                    : GetOffPosition();
-
-                thumbTransform.TranslateX = currentThumbX;
-            }
-
             UpdateVisual(false);
         };
 
 
         Loaded += (_, _) =>
         {
-            if (!isDragging)
-            {
-                currentThumbX = IsOn
-                    ? GetOnPosition()
-                    : GetOffPosition();
-
-                thumbTransform.TranslateX = currentThumbX;
-            }
-
             UpdateVisual(false);
         };
     }
@@ -601,8 +584,12 @@ sealed class Switch : UserControl
 
         double target =
             IsOn
-            ? GetThumbTravel()
-            : 0;
+            ? GetOnPosition()
+            : GetOffPosition();
+
+
+        thumbOffset =
+            target - GetOffPosition();
 
 
 
@@ -616,7 +603,7 @@ sealed class Switch : UserControl
             }
             else
             {
-                thumbTransform.TranslateX = target;
+                thumbTransform.TranslateX = thumbOffset;
             }
         }
 
@@ -639,18 +626,20 @@ sealed class Switch : UserControl
     {
         ignoreVisualUpdate = true;
 
-        double localX =
-            pointerX - GetOffPosition();
 
-        currentThumbX =
+        double x =
             Math.Clamp(
-                localX,
-                0,
-                GetThumbTravel());
+                pointerX - thumb.Width / 2,
+                GetOffPosition(),
+                GetOnPosition());
+
+
+        thumbOffset =
+            x - GetOffPosition();
 
 
         thumbTransform.TranslateX =
-            currentThumbX;
+            thumbOffset;
 
 
         SetSquish(true);
@@ -717,13 +706,17 @@ sealed class Switch : UserControl
             new Storyboard();
 
 
+        double offset =
+            target - GetOffPosition();
+
+
         var animation =
             new DoubleAnimation
             {
                 From =
                     thumbTransform.TranslateX,
 
-                To = target,
+                To = offset,
 
                 Duration =
                     new Duration(
@@ -733,30 +726,6 @@ sealed class Switch : UserControl
                 EasingFunction =
                     new CubicEase()
             };
-
-
-        animation.Completed += (_, _) =>
-        {
-            currentThumbX = target;
-            thumbTransform.TranslateX = target;
-        };
-
-
-        Storyboard.SetTarget(
-            animation,
-            thumbTransform);
-
-
-        Storyboard.SetTargetProperty(
-            animation,
-            nameof(
-                CompositeTransform.TranslateX));
-
-
-        currentStoryboard.Children.Add(animation);
-
-
-        currentStoryboard.Begin();
     }
 
     private double GetThumbTravel()
