@@ -180,7 +180,7 @@ public sealed partial class Settings : Page
         }
         Helpers.Add(S, back, 0, 0);
         Helpers.Add(S, theme, 1, 1);
-        App.rootFrame.ActualThemeChanged += async(s, e) =>
+        App.Themes.ThemeChanged += async(s, e) =>
         {
             App.ThemeMode = App.LoadThemeMode(App.Theme);
             if (App.ThemeMode == "Light")

@@ -64,7 +64,7 @@ public sealed partial class MainPage : Page // #if DESKTOP for all of skia deskt
             }
 
         };
-        App.rootFrame.ActualThemeChanged += async (s, e) =>
+        App.Themes.ThemeChanged += async (s, e) =>
         {
             App.ThemeMode = App.LoadThemeMode(App.Theme);
             if (App.ThemeMode == "Light")

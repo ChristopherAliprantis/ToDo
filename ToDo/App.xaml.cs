@@ -1,5 +1,6 @@
-using Uno.Resizetizer;
 using Microsoft.UI.Windowing;
+using Uno.Resizetizer;
+using Windows.UI.ViewManagement;
 using Path = System.IO.Path;
 
 namespace ToDo;
@@ -28,11 +29,39 @@ public partial class App : Application
         string AppId);
     }
 #endif
-    public App()
-    {
-        this.InitializeComponent();
-    }
 
+    public sealed class Themes
+    {
+        private readonly UISettings _uiSettings;
+        private readonly DispatcherQueue _dispatcherQueue;
+
+        public static event EventHandler<string> ThemeChanged;
+
+        public Themes()
+        {
+            _uiSettings = new UISettings();
+            _dispatcherQueue = DispatcherQueue.GetForCurrentThread();
+            _uiSettings.ColorValuesChanged += OnColorValuesChanged;
+        }
+
+        public string GetCurrentTheme()
+        {
+            var background = _uiSettings.GetColorValue(UIColorType.Background);
+            return (background.R == 0 && background.G == 0 && background.B == 0) ? "Dark" : "Light";
+        }
+
+        private void OnColorValuesChanged(UISettings sender, object args)
+        {
+            _dispatcherQueue?.TryEnqueue(() =>
+            {
+                ThemeChanged?.Invoke(this, GetCurrentTheme());
+            });
+        }
+    }
+        public App()
+        {
+            this.InitializeComponent();
+        }
     public static string LoadTheme()
     {
         string folderPath = Path.Combine(

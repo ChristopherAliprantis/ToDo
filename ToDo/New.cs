@@ -349,7 +349,7 @@ public sealed partial class New : Page // #if DESKTOP for all of skia desktop, #
             time.Margin = done.Margin;
             date.Margin = done.Margin;
         };
-        App.rootFrame.ActualThemeChanged += async (s, e) =>
+        App.Themes.ThemeChanged += async (s, e) =>
         {
             App.ThemeMode = App.LoadThemeMode(App.Theme);
             if (App.ThemeMode == "Light")
