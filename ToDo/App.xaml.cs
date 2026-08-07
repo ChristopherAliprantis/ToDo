@@ -30,16 +30,16 @@ public partial class App : Application
     }
 #endif
 
-    public sealed class Themes
+    public sealed class Themess
     {
-        private readonly UISettings _uiSettings;
+        private static UISettings _uiSettings;
         private readonly DispatcherQueue _dispatcherQueue;
 
-        public static event EventHandler<string> ThemeChanged;
+        public event EventHandler<string> ThemeChanged;
 
-        public Themes()
+        public Themess()
         {
-            _uiSettings = new UISettings();
+            _uiSettings ??= new UISettings();
             _dispatcherQueue = DispatcherQueue.GetForCurrentThread();
             _uiSettings.ColorValuesChanged += OnColorValuesChanged;
         }
@@ -58,10 +58,11 @@ public partial class App : Application
             });
         }
     }
-        public App()
-        {
+    public App()
+    {
             this.InitializeComponent();
-        }
+    }
+    public static Themess Themes = new Themess();
     public static string LoadTheme()
     {
         string folderPath = Path.Combine(
