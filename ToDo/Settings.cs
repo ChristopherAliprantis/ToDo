@@ -180,7 +180,26 @@ public sealed partial class Settings : Page
         }
         Helpers.Add(S, back, 0, 0);
         Helpers.Add(S, theme, 1, 1);
-
+        App.rootFrame.ActualThemeChanged += async(s, e) =>
+        {
+            App.ThemeMode = App.LoadThemeMode(App.Theme);
+            if (App.ThemeMode == "Light")
+            {
+                App.rootFrame.RequestedTheme = ElementTheme.Light;
+            }
+            else if (App.ThemeMode == "Dark")
+            {
+                App.rootFrame.RequestedTheme = ElementTheme.Dark;
+            }
+            if (App.ThemeMode == "Light")
+            {
+                S.Background = new SolidColorBrush(Colors.White);
+            }
+            else if (App.ThemeMode == "Dark")
+            {
+                S.Background = new SolidColorBrush(Colors.Black);
+            }
+        };
         Content = S;
     }
 

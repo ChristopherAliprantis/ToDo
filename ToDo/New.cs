@@ -349,6 +349,28 @@ public sealed partial class New : Page // #if DESKTOP for all of skia desktop, #
             time.Margin = done.Margin;
             date.Margin = done.Margin;
         };
+        App.rootFrame.ActualThemeChanged += async (s, e) =>
+        {
+            App.ThemeMode = App.LoadThemeMode(App.Theme);
+            if (App.ThemeMode == "Light")
+            {
+                App.rootFrame.RequestedTheme = ElementTheme.Light;
+            }
+            else if (App.ThemeMode == "Dark")
+            {
+                App.rootFrame.RequestedTheme = ElementTheme.Dark;
+            }
+            if (App.ThemeMode == "Light")
+            {
+                N.Background = new SolidColorBrush(Colors.White);
+                times.BorderBrush = new SolidColorBrush(Colors.Black);
+            }
+            else if (App.ThemeMode == "Dark")
+            {
+                N.Background = new SolidColorBrush(Colors.Black);
+                times.BorderBrush = new SolidColorBrush(Colors.White);
+            }
+        };
         if (App.ThemeMode == "Light")
         {
             N.Background = new SolidColorBrush(Colors.White);

@@ -64,6 +64,29 @@ public sealed partial class MainPage : Page // #if DESKTOP for all of skia deskt
             }
 
         };
+        App.rootFrame.ActualThemeChanged += async (s, e) =>
+        {
+            App.ThemeMode = App.LoadThemeMode(App.Theme);
+            if (App.ThemeMode == "Light")
+            {
+                App.rootFrame.RequestedTheme = ElementTheme.Light;
+            }
+            else if (App.ThemeMode == "Dark")
+            {
+                App.rootFrame.RequestedTheme = ElementTheme.Dark;
+            }
+            if (App.ThemeMode == "Light")
+            {
+                H.Background = new SolidColorBrush(Colors.White);
+                Bar.Background = new SolidColorBrush(Colors.LightGray);
+            }
+            else if (App.ThemeMode == "Dark")
+            {
+                H.Background = new SolidColorBrush(Colors.Black);
+                Bar.Background = new SolidColorBrush(Colors.FromARGB(255, 58, 58, 58));
+            }
+            RebuildTodos();
+        };
         var hoverBrush = new SolidColorBrush(ColorHelper.FromArgb(132, 235, 235, 235));
         ((Button)content.Children[0]).Resources["ButtonBackgroundPointerOver"] = hoverBrush;
         ((Button)content.Children[0]).Click += async (s, e) =>
