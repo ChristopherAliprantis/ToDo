@@ -83,7 +83,7 @@ public partial class App : Application
         else
         {
             contents = "System";
-            Settings.UpdateTheme(contents);
+            await Settings.UpdateTheme(contents);
         }
         return contents;
     }
@@ -108,8 +108,8 @@ public partial class App : Application
         }
         return "";
     }
-    public static string Theme { get; set; } = LoadTheme().Result;
-    public static string ThemeMode { get; set; } = LoadThemeMode(LoadTheme().Result);
+    public static string Theme { get; set; } = Task.Run(() => LoadTheme()).Result;
+    public static string ThemeMode { get; set; } = LoadThemeMode(Task.Run(() => LoadTheme()).Result);
     public static Window? MainWindow { get; private set; }
     public IHost? Host { get; private set; }
 
