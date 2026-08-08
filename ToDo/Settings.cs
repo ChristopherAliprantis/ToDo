@@ -1,6 +1,7 @@
 using Microsoft.UI.Xaml.Media.Animation;
 using Microsoft.UI.Xaml.Media.Imaging;
 using ToDo;
+using static Android.Views.WindowInsetsAnimation;
 using Path = System.IO.Path;
 public sealed partial class Settings : Page
 {
@@ -110,7 +111,7 @@ public sealed partial class Settings : Page
 #else
             if (bounds.Width > bounds.Height == false) size = ActualHeight / 23.0;
             else size = ActualHeight / 8.0;
-            arrowpic.Margin = new Thickness(0, 0, 0, ActualHeight / 22.0);
+            arrowpic.Margin = new Thickness(size * 2, 0, 0, 0);
 #endif
             back.Width = size;
             back.Height = size;
@@ -142,7 +143,7 @@ public sealed partial class Settings : Page
 
         Loaded += (s, e) =>
         {
-            
+            var bounds = App.MainWindow.Bounds;
             ResizeButton();
             theme.Spacing = ActualWidth / 15.0;
             ((TextBlock)theme.Children[0]).Height = ActualHeight / 15.0;
@@ -150,7 +151,8 @@ public sealed partial class Settings : Page
             theme.Width = ActualWidth;
             theme.Height = ActualHeight / 15.0;
             THEME.Height = theme.Height;
-            THEME.Width = THEME.Height * 2.7;
+            if (bounds.Width > bounds.Height == false) THEME.Width = THEME.Height * 2.7;
+            else THEME.Width = THEME.Height * 4;
             THEME.FontSize = THEME.Height / 2.0;
             foreach (var item in THEME.Items)
             {
