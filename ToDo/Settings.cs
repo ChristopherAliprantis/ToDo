@@ -1,7 +1,6 @@
 using Microsoft.UI.Xaml.Media.Animation;
 using Microsoft.UI.Xaml.Media.Imaging;
 using ToDo;
-using static Android.Views.WindowInsetsAnimation;
 using Path = System.IO.Path;
 public sealed partial class Settings : Page
 {
@@ -129,7 +128,7 @@ public sealed partial class Settings : Page
             theme.Width = ActualWidth;
             theme.Height = ActualHeight / 15.0;
             THEME.Height = theme.Height;
-            THEME.Width = THEME.Height * 2.7;
+            THEME.Width = THEME.Height * 2.8;
             THEME.FontSize = THEME.Height / 2.0;
             foreach (var item in THEME.Items)
             {
@@ -151,7 +150,7 @@ public sealed partial class Settings : Page
             theme.Width = ActualWidth;
             theme.Height = ActualHeight / 15.0;
             THEME.Height = theme.Height;
-            if (bounds.Width > bounds.Height == false) THEME.Width = THEME.Height * 2.7;
+            if (bounds.Width > bounds.Height == false) THEME.Width = THEME.Height * 2.8;
             else THEME.Width = THEME.Height * 4;
             THEME.FontSize = THEME.Height / 2.0;
             foreach (var item in THEME.Items)
