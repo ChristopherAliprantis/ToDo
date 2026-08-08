@@ -103,10 +103,14 @@ public sealed partial class Settings : Page
         };
         void ResizeButton()
         {
+            var bounds = App.MainWindow.Bounds;
+            double size = 0;
 #if DESKTOP || WINDOWS
-            double size = ActualHeight / 27.0;
+            size = ActualHeight / 27.0;
 #else
-            double size = ActualHeight / 23.0;
+            if (bounds.Width > bounds.Height == false) size = ActualHeight / 23.0;
+            else size = ActualHeight / 8.0;
+            arrowpic.Margin = new Thickness(0, 0, 0, ActualHeight / 22.0);
 #endif
             back.Width = size;
             back.Height = size;
@@ -124,7 +128,7 @@ public sealed partial class Settings : Page
             theme.Width = ActualWidth;
             theme.Height = ActualHeight / 15.0;
             THEME.Height = theme.Height;
-            THEME.Width = THEME.Height * 4;
+            THEME.Width = THEME.Height * 2.7;
             THEME.FontSize = THEME.Height / 2.0;
             foreach (var item in THEME.Items)
             {
@@ -138,6 +142,7 @@ public sealed partial class Settings : Page
 
         Loaded += (s, e) =>
         {
+            
             ResizeButton();
             theme.Spacing = ActualWidth / 15.0;
             ((TextBlock)theme.Children[0]).Height = ActualHeight / 15.0;
@@ -145,7 +150,7 @@ public sealed partial class Settings : Page
             theme.Width = ActualWidth;
             theme.Height = ActualHeight / 15.0;
             THEME.Height = theme.Height;
-            THEME.Width = THEME.Height * 4;
+            THEME.Width = THEME.Height * 2.7;
             THEME.FontSize = THEME.Height / 2.0;
             foreach (var item in THEME.Items)
             {
