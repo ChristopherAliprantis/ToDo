@@ -63,7 +63,7 @@ public partial class App : Application
             this.InitializeComponent();
     }
     public static Themess Themes = new Themess();
-    public static string LoadTheme()
+    public static async Task<string> LoadTheme()
     {
         string folderPath = Path.Combine(
                 Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
@@ -74,7 +74,7 @@ public partial class App : Application
         string filePath = Path.Combine(folderPath, "theme.txt");
         if (File.Exists(filePath))
         {
-            contents = File.ReadAllText(filePath);
+            contents = await File.ReadAllTextAsync(filePath);
             if (contents == "Dark" || contents == "Light" || contents == "System")
             {
                 return contents;
@@ -108,8 +108,8 @@ public partial class App : Application
         }
         return "";
     }
-    public static string Theme { get; set; } = LoadTheme();
-    public static string ThemeMode { get; set; } = LoadThemeMode(LoadTheme());
+    public static string Theme { get; set; } = LoadTheme().Result;
+    public static string ThemeMode { get; set; } = LoadThemeMode(LoadTheme().Result);
     public static Window? MainWindow { get; private set; }
     public IHost? Host { get; private set; }
 
