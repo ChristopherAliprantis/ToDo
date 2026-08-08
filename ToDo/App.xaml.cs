@@ -108,8 +108,8 @@ public partial class App : Application
         }
         return "";
     }
-    public static string Theme { get; set; } = Task.Run(async() => await LoadTheme()).Result;
-    public static string ThemeMode { get; set; } = LoadThemeMode(Task.Run(async() => await LoadTheme()).Result);
+    public static string Theme { get; set; } = "";
+    public static string ThemeMode { get; set; } = "";
     public static Window? MainWindow { get; private set; }
     public IHost? Host { get; private set; }
 
@@ -117,7 +117,7 @@ public partial class App : Application
     public static INotificationService? NotificationService { get; private set; }
     public static Microsoft.UI.Dispatching.DispatcherQueue? MainDispatcher { get; private set; }
 
-    protected override void OnLaunched(LaunchActivatedEventArgs args)
+    protected async override void OnLaunched(LaunchActivatedEventArgs args)
     {
         MainDispatcher = Microsoft.UI.Dispatching.DispatcherQueue.GetForCurrentThread();
         Resources.Build(r => r.Merged(new XamlControlsResources()));
@@ -146,7 +146,8 @@ public partial class App : Application
         MainWindow.SetWindowIcon();
         MainWindow.Title = "ToDo";
         Host = builder.Build();
-
+        Theme = await LoadTheme();
+        ThemeMode = LoadThemeMode(Theme);
         rootFrame = MainWindow.Content as Frame ?? new Frame();
         MainWindow.Content = rootFrame;
 
