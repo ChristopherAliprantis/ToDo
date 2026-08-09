@@ -83,8 +83,12 @@ public sealed partial class Settings : Page
             Background = new SolidColorBrush(Colors.Transparent),
             BorderThickness = new Thickness(0),
             Padding = new Thickness(0),
+#if WINDOWS || DESKTOP
             HorizontalAlignment = HorizontalAlignment.Left,
-            VerticalAlignment = VerticalAlignment.Top
+#else
+            HorizontalAlignment = HorizontalAlignment.Center,
+#endif
+            VerticalAlignment = VerticalAlignment.Top,
         };
         
         var hoverBrush = new SolidColorBrush(ColorHelper.FromArgb(132, 235, 235, 235));
@@ -111,7 +115,6 @@ public sealed partial class Settings : Page
 #else
             if (bounds.Width > bounds.Height == false) size = ActualHeight / 23.0;
             else size = ActualHeight / 8.0;
-            arrowpic.Margin = new Thickness(0, 0, 0, size * 2);
 #endif
             back.Width = size;
             back.Height = size;
@@ -151,7 +154,12 @@ public sealed partial class Settings : Page
             ((TextBlock)theme.Children[0]).Height = ActualHeight / 15.0;
             ((TextBlock)theme.Children[0]).FontSize = ((TextBlock)theme.Children[0]).Height / 2.0;
             theme.Width = ActualWidth;
+#if ANDROID
+            if (bounds.Width > bounds.Height == false) theme.Height = ActualHeight / 15.0;
+            else theme.Height = ActualHeight / 10.0;
+#else
             theme.Height = ActualHeight / 15.0;
+#endif
             THEME.Height = theme.Height;
             if (bounds.Width > bounds.Height == false) THEME.Width = THEME.Height * 2.8;
             else THEME.Width = THEME.Height * 4;
