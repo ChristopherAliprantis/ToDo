@@ -111,7 +111,7 @@ public sealed partial class Settings : Page
 #else
             if (bounds.Width > bounds.Height == false) size = ActualHeight / 23.0;
             else size = ActualHeight / 8.0;
-            arrowpic.Margin = new Thickness(size * 2, 0, 0, 0);
+            arrowpic.Margin = new Thickness(0, 0, 0, size * 2);
 #endif
             back.Width = size;
             back.Height = size;
@@ -122,6 +122,7 @@ public sealed partial class Settings : Page
 
         SizeChanged += (s, e) =>
         {
+            var bounds = App.MainWindow.Bounds;
             ResizeButton();
             theme.Spacing = ActualWidth / 15.0;
             ((TextBlock)theme.Children[0]).Height = ActualHeight / 15.0;
@@ -129,7 +130,8 @@ public sealed partial class Settings : Page
             theme.Width = ActualWidth;
             theme.Height = ActualHeight / 15.0;
             THEME.Height = theme.Height;
-            THEME.Width = THEME.Height * 2.8;
+            if (bounds.Width > bounds.Height == false) THEME.Width = THEME.Height * 2.8;
+            else THEME.Width = THEME.Height * 4;
             THEME.FontSize = THEME.Height / 2.0;
             foreach (var item in THEME.Items)
             {
