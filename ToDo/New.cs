@@ -488,3 +488,54 @@ partial class UpDownBox : UserControl
         };
     }
 }
+
+public sealed partial class CPwindow : Flyout
+{
+    public ColorPicker? cp = new ColorPicker
+    {
+        Color = Color.White,
+        IsColorSliderVisible = true,
+        IsColorChannelTextInputVisible = true,
+        IsHexInputVisible = true,
+        IsMoreButtonVisible = true,
+        ColorSpectrumShape = ColorSpectrumShape.Box,
+        IsAlphaEnabled = false,
+        IsAlphaSliderVisible = true,
+        IsAlphaTextInputVisible = true
+    };
+    public CPwindow()
+    {
+        this.Content = cp;
+    }
+}
+
+public sealed partial class CPWbutton : Button
+{
+    public CPwindow cpw = new CPwindow();
+    public Rectangle? rect = new();
+    public CPWbutton()
+    {
+        
+        this.Click += (s, e) =>
+        {
+            cpw = new CPwindow();
+            cpw.Placement = FlyoutPlacementMode.Full;
+            cpw.ShowAt(App.rootFrame);
+            cpw.cp.ColorChanged += (s, e) =>
+            {
+                rect.Fill = new SolidColorBrush(cpw.cp.Color);
+            };
+        };
+        this.Content = rect;
+        this.SizeChanged += (s, e) =>
+        {
+            rect.Width = this.ActualWidth;
+            rect.Height = this.ActualHeight;
+        };
+        this.Loaded += (s, e) =>
+        {
+            rect.Width = this.ActualWidth;
+            rect.Height = this.ActualHeight;
+        };
+    }
+}
