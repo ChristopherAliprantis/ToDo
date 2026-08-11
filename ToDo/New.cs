@@ -34,7 +34,6 @@ public sealed partial class New : Page // #if DESKTOP for all of skia desktop, #
         UpDownBox? time;
         StackPanel? times = new() ;
         Switch? Ti;
-        CPWbutton? color;
         all = new StackPanel
         {
             Orientation = Orientation.Vertical,
@@ -67,10 +66,6 @@ public sealed partial class New : Page // #if DESKTOP for all of skia desktop, #
                 (divide = new Rectangle
                 {
                     Fill = new SolidColorBrush(Color.Black)
-                }),
-                (color = new CPWbutton
-                {
-                    HorizontalAlignment = HorizontalAlignment.Left
                 }),
                 (Ti = new Switch
                 {
@@ -287,9 +282,6 @@ public sealed partial class New : Page // #if DESKTOP for all of skia desktop, #
             done.Height = back.Height;
             done.FontSize = back.FontSize;
             describe.Margin = done.Margin;
-            color.Height = done.Height * 0.8;
-            color.Width = done.Width;
-            color.Margin = done.Margin;
             Ti.Width = done.Width * 0.6;
             Ti.Height = done.Height * 0.59;
             Ti.Margin = done.Margin;
@@ -349,9 +341,6 @@ public sealed partial class New : Page // #if DESKTOP for all of skia desktop, #
             done.Height = back.Height;
             done.FontSize = back.FontSize;
             describe.Margin = done.Margin;
-            color.Height = done.Height * 0.8;
-            color.Width = done.Width;
-            color.Margin = done.Margin;
             Ti.Width = done.Width * 0.6;
             Ti.Height = done.Height * 0.59;
             Ti.Margin = done.Margin;
@@ -502,61 +491,3 @@ partial class UpDownBox : UserControl
     }
 }
 
-public sealed partial class CPwindow : Flyout
-{
-    public ColorPicker? cp = new ColorPicker
-    {
-        IsColorSliderVisible = true,
-        IsColorChannelTextInputVisible = true,
-        IsHexInputVisible = true,
-        IsMoreButtonVisible = true,
-        ColorSpectrumShape = ColorSpectrumShape.Box,
-        IsAlphaEnabled = true,
-        IsAlphaSliderVisible = true,
-        IsAlphaTextInputVisible = true
-    };
-    public CPwindow()
-    {
-        if (App.ThemeMode == "Light")
-        {
-            cp.Background = new SolidColorBrush(Colors.White);
-
-        }
-        else if (App.ThemeMode == "Dark")
-        {
-            cp.Background = new SolidColorBrush(Colors.Black);
-        }
-        this.Content = cp;
-    }
-}
-
-public sealed partial class CPWbutton : Button
-{
-    public CPwindow cpw = new CPwindow();
-    public Rectangle? rect = new();
-    public CPWbutton()
-    {
-        
-        this.Click += (s, e) =>
-        {
-            cpw = new CPwindow();
-            cpw.Placement = FlyoutPlacementMode.TopEdgeAlignedRight;
-            cpw.ShowAt(App.rootFrame);
-            cpw.cp.ColorChanged += (s, e) =>
-            {
-                rect.Fill = new SolidColorBrush(cpw.cp.Color);
-            };
-        };
-        this.Content = rect;
-        this.SizeChanged += (s, e) =>
-        {
-            rect.Width = this.ActualWidth;
-            rect.Height = this.ActualHeight;
-        };
-        this.Loaded += (s, e) =>
-        {
-            rect.Width = this.ActualWidth;
-            rect.Height = this.ActualHeight;
-        };
-    }
-}
