@@ -511,7 +511,7 @@ public sealed partial class CPwindow : Flyout
         IsHexInputVisible = true,
         IsMoreButtonVisible = true,
         ColorSpectrumShape = ColorSpectrumShape.Box,
-        IsAlphaEnabled = false,
+        IsAlphaEnabled = true,
         IsAlphaSliderVisible = true,
         IsAlphaTextInputVisible = true
     };
