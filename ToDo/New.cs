@@ -34,6 +34,7 @@ public sealed partial class New : Page // #if DESKTOP for all of skia desktop, #
         UpDownBox? time;
         StackPanel? times = new() ;
         Switch? Ti;
+        CPWbutton? color;
         all = new StackPanel
         {
             Orientation = Orientation.Vertical,
@@ -66,6 +67,10 @@ public sealed partial class New : Page // #if DESKTOP for all of skia desktop, #
                 (divide = new Rectangle
                 {
                     Fill = new SolidColorBrush(Color.Black)
+                }),
+                (color = new CPWbutton
+                {
+                    HorizontalAlignment = HorizontalAlignment.Left
                 }),
                 (Ti = new Switch
                 {
@@ -282,6 +287,9 @@ public sealed partial class New : Page // #if DESKTOP for all of skia desktop, #
             done.Height = back.Height;
             done.FontSize = back.FontSize;
             describe.Margin = done.Margin;
+            color.Height = done.Height * 0.8;
+            color.Width = done.Width;
+            color.Margin = done.Margin;
             Ti.Width = done.Width * 0.6;
             Ti.Height = done.Height * 0.59;
             Ti.Margin = done.Margin;
@@ -493,7 +501,6 @@ public sealed partial class CPwindow : Flyout
 {
     public ColorPicker? cp = new ColorPicker
     {
-        Color = Color.White,
         IsColorSliderVisible = true,
         IsColorChannelTextInputVisible = true,
         IsHexInputVisible = true,
@@ -505,6 +512,15 @@ public sealed partial class CPwindow : Flyout
     };
     public CPwindow()
     {
+        if (App.ThemeMode == "Light")
+        {
+            cp.Background = new SolidColorBrush(Colors.White);
+
+        }
+        else if (App.ThemeMode == "Dark")
+        {
+            cp.Background = new SolidColorBrush(Colors.Black);
+        }
         this.Content = cp;
     }
 }
