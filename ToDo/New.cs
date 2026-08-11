@@ -302,6 +302,8 @@ public sealed partial class New : Page // #if DESKTOP for all of skia desktop, #
         };
         this.SizeChanged += (s,e) =>
         {
+            time.disabled = !(bool)Ti.IsOn;
+            date.disabled = !(bool)Ti.IsOn;
             var bounds = App.MainWindow.Bounds;
             all.Width = this.ActualWidth;
             space.Height = new GridLength(this.ActualHeight / 9.2, GridUnitType.Pixel);
@@ -347,6 +349,9 @@ public sealed partial class New : Page // #if DESKTOP for all of skia desktop, #
             done.Height = back.Height;
             done.FontSize = back.FontSize;
             describe.Margin = done.Margin;
+            color.Height = done.Height * 0.8;
+            color.Width = done.Width;
+            color.Margin = done.Margin;
             Ti.Width = done.Width * 0.6;
             Ti.Height = done.Height * 0.59;
             Ti.Margin = done.Margin;
@@ -535,7 +540,7 @@ public sealed partial class CPWbutton : Button
         this.Click += (s, e) =>
         {
             cpw = new CPwindow();
-            cpw.Placement = FlyoutPlacementMode.Full;
+            cpw.Placement = FlyoutPlacementMode.TopEdgeAlignedRight;
             cpw.ShowAt(App.rootFrame);
             cpw.cp.ColorChanged += (s, e) =>
             {
