@@ -139,6 +139,7 @@ public sealed partial class New : Page // #if DESKTOP for all of skia desktop, #
         Co.Toggled += (s, e) =>
         {
             color.IsEnabled = (bool)Co.IsOn;
+
             if (Co.IsOn == false)
             {
                 if (App.ThemeMode == "Light")
@@ -150,6 +151,10 @@ public sealed partial class New : Page // #if DESKTOP for all of skia desktop, #
                     color.cpw.cp.Color = Color.Black;
                 }
                 
+            }
+            else if (edit.Item1 != null)
+            {
+                color.cpw.cp.Color = edit.Item1.Color.Value;
             }
         };
         time.up.Click += (s, e) =>
