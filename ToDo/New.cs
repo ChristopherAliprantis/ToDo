@@ -29,7 +29,6 @@ public sealed partial class New : Page // #if DESKTOP for all of skia desktop, #
         TimeOnly Time = TimeOnly.FromDateTime(DateTime.Now);
         DateOnly Date = DateOnly.FromDateTime(DateTime.Now);
         TextBox? describe;
-        Button? op;
         UpDownBox? date;
         UpDownBox? time;
         StackPanel? times = new();
@@ -253,8 +252,8 @@ public sealed partial class New : Page // #if DESKTOP for all of skia desktop, #
                 }
                 string ID = System.Guid.NewGuid().ToString();
                 Console.WriteLine($"New ToDo ID: {ID}");
-                if (ind == null) await MainPage.todos.ADD(title.Text, describe.Text, Date, Time, ID);
-                else await MainPage.todos.ADD(title.Text, describe.Text, Date, Time, ID, ind.Value);
+                if (ind == null) await MainPage.todos.ADD(title.Text, describe.Text, Date, Time, ID, color.cpw.cp.Color);
+                else await MainPage.todos.ADD(title.Text, describe.Text, Date, Time, ID, ind.Value, color.cpw.cp.Color);
                 if (edit.Item2 == true && edit.Item1 != null)
                 {
                     await edit.Item1.Delete();

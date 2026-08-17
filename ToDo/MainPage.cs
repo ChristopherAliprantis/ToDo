@@ -712,7 +712,8 @@ public partial class ToDos : StackPanel
                     Descrip = t.Descrip,
                     Date = t.Date,
                     Time = t.Time,
-                    ID = t.ID
+                    ID = t.ID,
+                    Color = CH.ColorToHex(t.Color),
                 });
             }
 
@@ -769,7 +770,10 @@ public partial class ToDos : StackPanel
                         d.Descrip ?? "",
                         d.Date,
                         d.Time,
-                        d.ID));
+                        d.ID,
+                        CH.HexToColor(d.Color)
+                    )
+                );
             }
 
             MainPage.RebuildTodos();
@@ -794,4 +798,43 @@ public class ToDoData
     public TimeOnly? Time { get; set; }
 
     public string? ID { get; set; }
+
+    public string? Color { get; set; } = null;
+}
+public static class CH
+{
+    public static string? ColorToHex(Color? color)
+    {
+        if (color == null) return null;
+        return $"#{color.Value.A:X2}{color.Value.R:X2}{color.Value.G:X2}{color.Value.B:X2}";
+    }
+
+    public static Color? HexToColor(string? hex)
+    {
+        if (hex == null) return null;
+        if (string.IsNullOrWhiteSpace(hex))
+        {
+            throw new ArgumentException("Hex string cannot be null or empty.", nameof(hex));
+        }
+
+        hex = hex.Trim().TrimStart('#');
+
+        if (hex.Length == 6)
+        {
+            byte r = Convert.ToByte(hex.Substring(0, 2), 16);
+            byte g = Convert.ToByte(hex.Substring(2, 2), 16);
+            byte b = Convert.ToByte(hex.Substring(4, 2), 16);
+            return Color.FromArgb(255, r, g, b);
+        }
+        else if (hex.Length == 8)
+        {
+            byte a = Convert.ToByte(hex.Substring(0, 2), 16);
+            byte r = Convert.ToByte(hex.Substring(2, 2), 16);
+            byte g = Convert.ToByte(hex.Substring(4, 2), 16);
+            byte b = Convert.ToByte(hex.Substring(6, 2), 16);
+            return Color.FromArgb(a, r, g, b);
+        }
+
+        throw new FormatException($"Invalid hex color string length: {hex.Length}. Input: '{hex}'");
+    }
 }
