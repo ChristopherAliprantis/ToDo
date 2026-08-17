@@ -55,11 +55,11 @@ public sealed partial class MainPage : Page // #if DESKTOP for all of skia deskt
             {
                 new Button
                 {
-                    Background = new SolidColorBrush(Color.Transparent),
+                    Background = new SolidColorBrush(Colors.Transparent),
                     Content = reloadpic,
                     BorderThickness = new Thickness(0),
                     Padding = new Thickness(0.1),
-                    BorderBrush = new SolidColorBrush(Color.Transparent),
+                    BorderBrush = new SolidColorBrush(Colors.Transparent),
                 },
                 todos,
             }
@@ -98,14 +98,14 @@ public sealed partial class MainPage : Page // #if DESKTOP for all of skia deskt
         {
             BorderThickness = new Thickness(0),
             Content = "New",
-            Background = new SolidColorBrush(Color.Transparent),
+            Background = new SolidColorBrush(Colors.Transparent),
         };
 
         SETTINGS = new Button
         {
             BorderThickness = new Thickness(0),
             Content = "Settings",
-            Background = new SolidColorBrush(Color.Transparent),
+            Background = new SolidColorBrush(Colors.Transparent),
         };
 
         NEW.Click += (s, e) =>
@@ -389,7 +389,7 @@ public sealed partial class MainPage : Page // #if DESKTOP for all of skia deskt
             }
             else
             {
-                TODOS[i].border.Background = new SolidColorBrush(Color.Value);
+                TODOS[i].border.Background = new SolidColorBrush(TODOS[i].Color.Value);
                 if (App.ThemeMode == "Light")
                 {
                     TODOS[i].border.BorderBrush = new SolidColorBrush(Colors.Black);
