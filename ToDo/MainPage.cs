@@ -2,6 +2,7 @@ namespace ToDo;
 
 using System.Text.Json;
 using Microsoft.UI.Xaml.Media.Imaging;
+using Windows.UI;
 using Path = System.IO.Path;
 
 public sealed partial class MainPage : Page // #if DESKTOP for all of skia desktop, #if WINDOWS for windows, #if ANDROID for android.
@@ -373,15 +374,30 @@ public sealed partial class MainPage : Page // #if DESKTOP for all of skia deskt
             {
                 continue;
             }
-            if (App.ThemeMode == "Light")
+            if (TODOS[i].Color == null)
             {
-                TODOS[i].border.Background = new SolidColorBrush(Colors.White);
-                TODOS[i].border.BorderBrush = new SolidColorBrush(Colors.Black);
+                if (App.ThemeMode == "Light")
+                {
+                    TODOS[i].border.Background = new SolidColorBrush(Colors.White);
+                    TODOS[i].border.BorderBrush = new SolidColorBrush(Colors.Black);
+                }
+                else if (App.ThemeMode == "Dark")
+                {
+                    TODOS[i].border.Background = new SolidColorBrush(Colors.Black);
+                    TODOS[i].border.BorderBrush = new SolidColorBrush(Colors.White);
+                }
             }
-            else if (App.ThemeMode == "Dark")
+            else
             {
-                TODOS[i].border.Background = new SolidColorBrush(Colors.Black);
-                TODOS[i].border.BorderBrush = new SolidColorBrush(Colors.White);
+                TODOS[i].border.Background = new SolidColorBrush(Color.Value);
+                if (App.ThemeMode == "Light")
+                {
+                    TODOS[i].border.BorderBrush = new SolidColorBrush(Colors.Black);
+                }
+                else if (App.ThemeMode == "Dark")
+                {
+                    TODOS[i].border.BorderBrush = new SolidColorBrush(Colors.White);
+                }
             }
             TODOS[i].Width = avail;
             TODOS[i].content.Padding = new Thickness(avail / 17, avail / 17, avail / 17, avail / 17);
@@ -464,13 +480,15 @@ public partial class ToDos : StackPanel
         public string? DTime;
         public string? DDate;
         public string? ID;
-        public ToDo(string title, string descrip, DateOnly? date, TimeOnly? time, string? id)
+        public Windows.UI.Color? Color;
+        public ToDo(string title, string descrip, DateOnly? date, TimeOnly? time, string? id, Windows.UI.Color? color)
         {
             Title = title;
             Descrip = descrip;
             Date = date;
             Time = time;
             ID = id;
+            Color = color;
             if (Date == null)
             {
                 DDate = "";
@@ -530,7 +548,7 @@ public partial class ToDos : StackPanel
             Content = border = new Border
             {
                 BorderThickness = new Thickness(1.3),
-                BorderBrush = new SolidColorBrush(Color.Black),
+                BorderBrush = new SolidColorBrush(Colors.Black),
                 Width = this.Width,
                 Height = this.Height,
                 CornerRadius = new CornerRadius(5.2),
@@ -563,15 +581,30 @@ public partial class ToDos : StackPanel
                     await Delete();
                 }
             };
-            if (App.ThemeMode == "Light")
+            if (Color == null)
             {
-                border.Background = new SolidColorBrush(Colors.White);
-                border.BorderBrush = new SolidColorBrush(Colors.Black);
+                if (App.ThemeMode == "Light")
+                {
+                    border.Background = new SolidColorBrush(Colors.White);
+                    border.BorderBrush = new SolidColorBrush(Colors.Black);
+                }
+                else if (App.ThemeMode == "Dark")
+                {
+                    border.Background = new SolidColorBrush(Colors.Black);
+                    border.BorderBrush = new SolidColorBrush(Colors.White);
+                }
             }
-            else if (App.ThemeMode == "Dark")
+            else
             {
-                border.Background = new SolidColorBrush(Colors.Black);
-                border.BorderBrush = new SolidColorBrush(Colors.White);
+                border.Background = new SolidColorBrush(Color.Value);
+                if (App.ThemeMode == "Light")
+                {
+                    border.BorderBrush = new SolidColorBrush(Colors.Black);
+                }
+                else if (App.ThemeMode == "Dark")
+                {
+                    border.BorderBrush = new SolidColorBrush(Colors.White);
+                }
             }
 
         }
@@ -610,9 +643,9 @@ public partial class ToDos : StackPanel
             await MainPage.TODOS[pos].Delete();
         }
     }
-    public async Task ADD(string title, string descrip, DateOnly? date, TimeOnly? time, string? id)
+    public async Task ADD(string title, string descrip, DateOnly? date, TimeOnly? time, string? id, Color Color)
     {
-        var N = new ToDo(title, descrip, date, time, id);
+        var N = new ToDo(title, descrip, date, time, id, Color);
         if (N.ID != null)
         {
             Notifications.SendNotif(N);
@@ -621,9 +654,9 @@ public partial class ToDos : StackPanel
         await MainPage.todos.Save();
     }
 
-    public async Task ADD(string title, string descrip, DateOnly? date, TimeOnly? time, string? id, int index)
+    public async Task ADD(string title, string descrip, DateOnly? date, TimeOnly? time, string? id, int index, Color Color)
     {
-        var N = new ToDo(title, descrip, date, time, id);
+        var N = new ToDo(title, descrip, date, time, id, Color);
         if (N.ID != null)
         {
             Notifications.SendNotif(N);

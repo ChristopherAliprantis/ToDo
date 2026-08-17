@@ -32,8 +32,10 @@ public sealed partial class New : Page // #if DESKTOP for all of skia desktop, #
         Button? op;
         UpDownBox? date;
         UpDownBox? time;
-        StackPanel? times = new() ;
+        StackPanel? times = new();
         Switch? Ti;
+        Switch? Co;
+        CPWbutton? color;
         all = new StackPanel
         {
             Orientation = Orientation.Vertical,
@@ -66,6 +68,20 @@ public sealed partial class New : Page // #if DESKTOP for all of skia desktop, #
                 (divide = new Rectangle
                 {
                     Fill = new SolidColorBrush(Color.Black)
+                }),
+                (Co = new Switch
+                {
+                    IsOn = false,
+                    MinWidth = 0,
+                    MinHeight = 0,
+                    HorizontalAlignment = HorizontalAlignment.Left
+                }),
+
+                (color = new CPWbutton
+                {
+                    IsEnabled = false,
+                    HorizontalAlignment = HorizontalAlignment.Left
+                    
                 }),
                 (Ti = new Switch
                 {
@@ -103,8 +119,40 @@ public sealed partial class New : Page // #if DESKTOP for all of skia desktop, #
                 date.Text = Date.ToString("yyyy-MM-dd");
                 time.Text = Time.ToString("hh:mm tt");
             }
-            
+            if (edit.Item1.Color != null)
+            {
+                color.IsEnabled = true;
+                color.Background = edit.Item1.Color;
+            }
+            else
+            {
+                if (App.ThemeMode == "Light")
+                {
+                    color.cpw.cp.Color = Color.White;
+                }
+                else if (App.ThemeMode == "Dark")
+                {
+                    color.cpw.cp.Color = Color.Black;
+                }
+            }
+
         }
+        Co.Toggled += (s, e) =>
+        {
+            color.IsEnabled = (bool)Co.IsOn;
+            if (Co.IsOn == false)
+            {
+                if (App.ThemeMode == "Light")
+                {
+                    color.cpw.cp.Color = Color.White;
+                }
+                else if (App.ThemeMode == "Dark")
+                {
+                    color.cpw.cp.Color = Color.Black;
+                }
+                
+            }
+        };
         time.up.Click += (s, e) =>
         {
             if (Time != TimeOnly.MaxValue)
@@ -169,7 +217,7 @@ public sealed partial class New : Page // #if DESKTOP for all of skia desktop, #
         {
             App.rootFrame.Navigate(typeof(MainPage));
         };
-        done.Click += async(s, e) =>
+        done.Click += async (s, e) =>
         {
             int? ind = null;
             if (Ti.IsOn == false)
@@ -183,8 +231,8 @@ public sealed partial class New : Page // #if DESKTOP for all of skia desktop, #
                         ind = null;
                     }
                 }
-                if (ind == null) await MainPage.todos.ADD(title.Text, describe.Text, null, null, null);
-                else await MainPage.todos.ADD(title.Text, describe.Text, null,null, null, ind.Value);
+                if (ind == null) await MainPage.todos.ADD(title.Text, describe.Text, null, null, null, color.cpw.cp.Color);
+                else await MainPage.todos.ADD(title.Text, describe.Text, null, null, null, ind.Value, color.cpw.cp.Color);
                 if (edit.Item2 == true && edit.Item1 != null) await edit.Item1.Delete();
                 edit = (null, false);
                 await MainPage.todos.Save();
@@ -195,7 +243,7 @@ public sealed partial class New : Page // #if DESKTOP for all of skia desktop, #
                 if (Date.ToDateTime(Time) < DateTime.Now) return;
                 if (edit.Item2 == true && edit.Item1 != null)
                 {
-                    
+
                     var t = edit.Item1;
                     ind = MainPage.TODOS.IndexOf(edit.Item1);
                     if (ind == -1)
@@ -282,9 +330,15 @@ public sealed partial class New : Page // #if DESKTOP for all of skia desktop, #
             done.Height = back.Height;
             done.FontSize = back.FontSize;
             describe.Margin = done.Margin;
+            color.Height = done.Height * 0.8;
+            color.Width = done.Width;
+            color.Margin = done.Margin;
             Ti.Width = done.Width * 0.6;
             Ti.Height = done.Height * 0.59;
             Ti.Margin = done.Margin;
+            Co.Width = done.Width * 0.6;
+            Co.Height = done.Height * 0.59;
+            Co.Margin = done.Margin;
             date.Height = done.Height;
             date.Width = done.Width * 2.76;
             time.Height = done.Height;
@@ -292,7 +346,7 @@ public sealed partial class New : Page // #if DESKTOP for all of skia desktop, #
             time.Margin = done.Margin;
             date.Margin = done.Margin;
         };
-        this.SizeChanged += (s,e) =>
+        this.SizeChanged += (s, e) =>
         {
             time.disabled = !(bool)Ti.IsOn;
             date.disabled = !(bool)Ti.IsOn;
@@ -341,9 +395,15 @@ public sealed partial class New : Page // #if DESKTOP for all of skia desktop, #
             done.Height = back.Height;
             done.FontSize = back.FontSize;
             describe.Margin = done.Margin;
+            color.Height = done.Height * 0.8;
+            color.Width = done.Width;
+            color.Margin = done.Margin;
             Ti.Width = done.Width * 0.6;
             Ti.Height = done.Height * 0.59;
             Ti.Margin = done.Margin;
+            Co.Width = done.Width * 0.6;
+            Co.Height = done.Height * 0.59;
+            Co.Margin = done.Margin;
             date.Height = done.Height;
             date.Width = done.Width * 2.76;
             time.Height = done.Height;
@@ -411,7 +471,7 @@ partial class UpDownBox : UserControl
     }
 
     public UpDownBox()
-    { 
+    {
         var c = new StackPanel
         {
             Orientation = Orientation.Horizontal,
@@ -491,3 +551,61 @@ partial class UpDownBox : UserControl
     }
 }
 
+public sealed partial class CPwindow : Flyout
+{
+    public ColorPicker? cp = new ColorPicker
+    {
+        IsColorSliderVisible = true,
+        IsColorChannelTextInputVisible = true,
+        IsHexInputVisible = true,
+        IsMoreButtonVisible = true,
+        ColorSpectrumShape = ColorSpectrumShape.Box,
+        IsAlphaEnabled = true,
+        IsAlphaSliderVisible = true,
+        IsAlphaTextInputVisible = true
+    };
+    public CPwindow()
+    {
+        if (App.ThemeMode == "Light")
+        {
+            cp.Background = new SolidColorBrush(Colors.White);
+
+        }
+        else if (App.ThemeMode == "Dark")
+        {
+            cp.Background = new SolidColorBrush(Colors.Black);
+        }
+        this.Content = cp;
+    }
+}
+
+public sealed partial class CPWbutton : Button
+{
+    public CPwindow cpw = new CPwindow();
+    public Rectangle? rect = new();
+    public CPWbutton()
+    {
+
+        this.Click += (s, e) =>
+        {
+            cpw = new CPwindow();
+            cpw.Placement = FlyoutPlacementMode.TopEdgeAlignedRight;
+            cpw.ShowAt(App.rootFrame);
+            cpw.cp.ColorChanged += (s, e) =>
+            {
+                rect.Fill = new SolidColorBrush(cpw.cp.Color);
+            };
+        };
+        this.Content = rect;
+        this.SizeChanged += (s, e) =>
+        {
+            rect.Width = this.ActualWidth;
+            rect.Height = this.ActualHeight;
+        };
+        this.Loaded += (s, e) =>
+        {
+            rect.Width = this.ActualWidth;
+            rect.Height = this.ActualHeight;
+        };
+    }
+}
