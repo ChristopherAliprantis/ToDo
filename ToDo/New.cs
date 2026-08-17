@@ -121,7 +121,7 @@ public sealed partial class New : Page // #if DESKTOP for all of skia desktop, #
             if (edit.Item1.Color != null)
             {
                 color.IsEnabled = true;
-                color.Background = edit.Item1.Color;
+                color.cpw.cp.Color = edit.Item1.Color.Value;
             }
             else
             {
