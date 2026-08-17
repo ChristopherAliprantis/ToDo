@@ -118,10 +118,13 @@ public sealed partial class New : Page // #if DESKTOP for all of skia desktop, #
                 date.Text = Date.ToString("yyyy-MM-dd");
                 time.Text = Time.ToString("hh:mm tt");
             }
-            if (edit.Item1.Color != null)
+            else if (edit.Item1 != null)
             {
                 color.IsEnabled = true;
-                color.cpw.cp.Color = edit.Item1.Color.Value;
+                if (edit.Item1.Color != null)
+                {
+                    color.cpw.cp.Color = edit.Item1.Color.Value;
+                }
             }
             else
             {
@@ -154,7 +157,10 @@ public sealed partial class New : Page // #if DESKTOP for all of skia desktop, #
             }
             else if (edit.Item1 != null)
             {
-                color.cpw.cp.Color = edit.Item1.Color.Value;
+                if (edit.Item1.Color != null)
+                {
+                    color.cpw.cp.Color = edit.Item1.Color.Value;
+                }
             }
         };
         time.up.Click += (s, e) =>
