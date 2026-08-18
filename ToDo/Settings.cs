@@ -248,18 +248,19 @@ public sealed partial class Settings : Page
     }
 }
 
-sealed class Switch : UserControl
+public sealed class Switch : Microsoft.UI.Xaml.Controls.UserControl
 {
     private const double DesignWidth = 44;
     private const double DesignHeight = 20;
+    private const double DragThreshold = 4;
 
-    private readonly Grid root;
-    private readonly Canvas canvas;
-    private readonly Border track;
-    private readonly Ellipse thumb;
-    private readonly CompositeTransform thumbTransform;
+    private readonly Microsoft.UI.Xaml.Controls.Grid root;
+    private readonly Microsoft.UI.Xaml.Controls.Canvas canvas;
+    private readonly Microsoft.UI.Xaml.Controls.Border track;
+    private readonly Microsoft.UI.Xaml.Shapes.Ellipse thumb;
+    private readonly Microsoft.UI.Xaml.Media.CompositeTransform thumbTransform;
 
-    private Storyboard? currentStoryboard;
+    private Microsoft.UI.Xaml.Media.Animation.Storyboard? currentStoryboard;
 
     private bool isPointerOver;
     private bool isPressed;
@@ -267,67 +268,60 @@ sealed class Switch : UserControl
     private bool hasMoved;
     private bool ignoreVisualUpdate;
 
+    private uint? activePointerId;
+
     private double pressStartX;
-    private double currentThumbX;
+    private double dragProgress;
 
-    private double thumbOffset;
-    public event RoutedEventHandler? Toggled;
+    public event Microsoft.UI.Xaml.RoutedEventHandler? Toggled;
 
-
-
-    public static readonly DependencyProperty IsOnProperty =
-        DependencyProperty.Register(
+    public static readonly Microsoft.UI.Xaml.DependencyProperty IsOnProperty =
+        Microsoft.UI.Xaml.DependencyProperty.Register(
             nameof(IsOn),
             typeof(bool),
             typeof(Switch),
-            new PropertyMetadata(false, OnIsOnChanged));
+            new Microsoft.UI.Xaml.PropertyMetadata(
+                false,
+                OnIsOnChanged));
 
-
-
-    public static readonly DependencyProperty OnColorProperty =
-        DependencyProperty.Register(
+    public static readonly Microsoft.UI.Xaml.DependencyProperty OnColorProperty =
+        Microsoft.UI.Xaml.DependencyProperty.Register(
             nameof(OnColor),
-            typeof(Brush),
+            typeof(Microsoft.UI.Xaml.Media.Brush),
             typeof(Switch),
-            new PropertyMetadata(
-                new SolidColorBrush(
-                    Color.FromARGB(
+            new Microsoft.UI.Xaml.PropertyMetadata(
+                new Microsoft.UI.Xaml.Media.SolidColorBrush(
+                    Windows.UI.Color.FromArgb(
                         255,
                         0,
                         120,
                         212))));
 
-
-
-    public static readonly DependencyProperty OffColorProperty =
-        DependencyProperty.Register(
+    public static readonly Microsoft.UI.Xaml.DependencyProperty OffColorProperty =
+        Microsoft.UI.Xaml.DependencyProperty.Register(
             nameof(OffColor),
-            typeof(Brush),
+            typeof(Microsoft.UI.Xaml.Media.Brush),
             typeof(Switch),
-            new PropertyMetadata(
-                new SolidColorBrush(
-                    Color.FromARGB(
+            new Microsoft.UI.Xaml.PropertyMetadata(
+                new Microsoft.UI.Xaml.Media.SolidColorBrush(
+                    Windows.UI.Color.FromArgb(
                         255,
                         128,
                         128,
                         128))));
 
-
-
-    public static readonly DependencyProperty ThumbColorProperty =
-        DependencyProperty.Register(
+    public static readonly Microsoft.UI.Xaml.DependencyProperty ThumbColorProperty =
+        Microsoft.UI.Xaml.DependencyProperty.Register(
             nameof(ThumbColor),
-            typeof(Brush),
+            typeof(Microsoft.UI.Xaml.Media.Brush),
             typeof(Switch),
-            new PropertyMetadata(
-                new SolidColorBrush(
-                    Color.FromARGB(
+            new Microsoft.UI.Xaml.PropertyMetadata(
+                new Microsoft.UI.Xaml.Media.SolidColorBrush(
+                    Windows.UI.Color.FromArgb(
                         255,
                         255,
                         255,
                         255))));
-
-
 
     public bool IsOn
     {
@@ -335,48 +329,41 @@ sealed class Switch : UserControl
         set => SetValue(IsOnProperty, value);
     }
 
-
-    public Brush OnColor
+    public Microsoft.UI.Xaml.Media.Brush OnColor
     {
-        get => (Brush)GetValue(OnColorProperty);
+        get => (Microsoft.UI.Xaml.Media.Brush)GetValue(OnColorProperty);
         set => SetValue(OnColorProperty, value);
     }
 
-
-    public Brush OffColor
+    public Microsoft.UI.Xaml.Media.Brush OffColor
     {
-        get => (Brush)GetValue(OffColorProperty);
+        get => (Microsoft.UI.Xaml.Media.Brush)GetValue(OffColorProperty);
         set => SetValue(OffColorProperty, value);
     }
 
-
-    public Brush ThumbColor
+    public Microsoft.UI.Xaml.Media.Brush ThumbColor
     {
-        get => (Brush)GetValue(ThumbColorProperty);
+        get => (Microsoft.UI.Xaml.Media.Brush)GetValue(ThumbColorProperty);
         set => SetValue(ThumbColorProperty, value);
     }
 
-
-
-
     public Switch()
     {
-        root = new Grid();
+        root = new Microsoft.UI.Xaml.Controls.Grid();
 
-        canvas = new Canvas();
+        canvas = new Microsoft.UI.Xaml.Controls.Canvas();
 
-        track = new Border();
+        track = new Microsoft.UI.Xaml.Controls.Border();
 
+        thumbTransform =
+            new Microsoft.UI.Xaml.Media.CompositeTransform();
 
-        thumbTransform = new CompositeTransform();
-
-
-        thumb = new Ellipse
-        {
-            RenderTransform = thumbTransform,
-            Shadow = new ThemeShadow()
-        };
-
+        thumb =
+            new Microsoft.UI.Xaml.Shapes.Ellipse
+            {
+                RenderTransform = thumbTransform,
+                Shadow = new Microsoft.UI.Xaml.Media.ThemeShadow()
+            };
 
         canvas.Children.Add(track);
         canvas.Children.Add(thumb);
@@ -385,258 +372,354 @@ sealed class Switch : UserControl
 
         Content = root;
 
+        PointerEntered += OnPointerEntered;
+        PointerExited += OnPointerExited;
 
+        PointerPressed += OnPointerPressed;
+        PointerMoved += OnPointerMoved;
+        PointerReleased += OnPointerReleased;
 
-        PointerEntered += (_, _) =>
-        {
-            isPointerOver = true;
-            UpdateVisual(false);
-        };
+        PointerCanceled += OnPointerCanceled;
+        PointerCaptureLost += OnPointerCaptureLost;
 
-
-        PointerExited += (_, _) =>
-        {
-            isPointerOver = false;
-            UpdateVisual(false);
-        };
-
-
-
-        PointerPressed += (_, e) =>
-        {
-            if (!IsEnabled)
-                return;
-
-
-            currentStoryboard?.Stop();
-
-
-            isPressed = true;
-            isDragging = false;
-            hasMoved = false;
-
-
-            pressStartX =
-                e.GetCurrentPoint(this)
-                 .Position.X;
-
-
-            CapturePointer(e.Pointer);
-
-
-            SetSquish(true);
-        };
-
-
-
-        PointerMoved += (_, e) =>
-        {
-            if (!isPressed)
-                return;
-
-
-            double x =
-                e.GetCurrentPoint(this)
-                 .Position.X;
-
-
-            if (Math.Abs(x - pressStartX) > 4)
-            {
-                hasMoved = true;
-                isDragging = true;
-            }
-
-
-            if (isDragging)
-            {
-                MoveThumb(x);
-            }
-        };
-
-
-
-        PointerReleased += (_, e) =>
-        {
-            if (!isPressed)
-                return;
-
-
-            isPressed = false;
-
-
-            ReleasePointerCapture(e.Pointer);
-
-
-            SetSquish(false);
-
-
-            ignoreVisualUpdate = false;
-
-
-
-            if (!hasMoved)
-            {
-                IsOn = !IsOn;
-            }
-            else
-            {
-                IsOn =
-                    thumbOffset >
-                    (GetOnPosition() - GetOffPosition()) / 2;
-            }
-
-
-
-            isDragging = false;
-
-
-            currentThumbX =
-                IsOn
-                ? GetOnPosition()
-                : GetOffPosition();
-        };
-
-
-
-        SizeChanged += (_, _) =>
-        {
-            UpdateVisual(false);
-        };
-
-
-        Loaded += (_, _) =>
-        {
-            UpdateVisual(false);
-        };
+        SizeChanged += OnSizeChanged;
+        Loaded += OnLoaded;
     }
 
+    private void OnLoaded(
+        object sender,
+        Microsoft.UI.Xaml.RoutedEventArgs e)
+    {
+        dragProgress = IsOn ? 1 : 0;
 
+        UpdateVisual(false);
+    }
 
+    private void OnSizeChanged(
+        object sender,
+        Microsoft.UI.Xaml.SizeChangedEventArgs e)
+    {
+        UpdateVisual(false);
+    }
+
+    private void OnPointerEntered(
+        object sender,
+        Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
+    {
+        isPointerOver = true;
+
+        UpdateOpacity();
+    }
+
+    private void OnPointerExited(
+        object sender,
+        Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
+    {
+        isPointerOver = false;
+
+        UpdateOpacity();
+    }
+
+    private void OnPointerPressed(
+        object sender,
+        Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
+    {
+        if (!IsEnabled)
+            return;
+
+        if (activePointerId.HasValue)
+            return;
+
+        var point = e.GetCurrentPoint(this);
+
+        activePointerId = point.PointerId;
+
+        currentStoryboard?.Stop();
+        currentStoryboard = null;
+
+        isPressed = true;
+        isDragging = false;
+        hasMoved = false;
+
+        pressStartX = point.Position.X;
+
+        double travel = GetThumbTravel();
+
+        if (travel > 0)
+        {
+            dragProgress =
+                Math.Clamp(
+                    thumbTransform.TranslateX / travel,
+                    0,
+                    1);
+        }
+        else
+        {
+            dragProgress = IsOn ? 1 : 0;
+        }
+
+        CapturePointer(e.Pointer);
+
+        SetSquish(true);
+
+        UpdateOpacity();
+
+        e.Handled = true;
+    }
+
+    private void OnPointerMoved(
+        object sender,
+        Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
+    {
+        if (!isPressed ||
+            !activePointerId.HasValue)
+        {
+            return;
+        }
+
+        var point = e.GetCurrentPoint(this);
+
+        if (point.PointerId != activePointerId.Value)
+            return;
+
+        double x = point.Position.X;
+
+        if (!hasMoved &&
+            Math.Abs(x - pressStartX) > DragThreshold)
+        {
+            hasMoved = true;
+            isDragging = true;
+        }
+
+        if (!isDragging)
+            return;
+
+        MoveThumb(x);
+
+        e.Handled = true;
+    }
+
+    private void OnPointerReleased(
+        object sender,
+        Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
+    {
+        if (!isPressed ||
+            !activePointerId.HasValue)
+        {
+            return;
+        }
+
+        var point = e.GetCurrentPoint(this);
+
+        if (point.PointerId != activePointerId.Value)
+            return;
+
+        FinishPointerInteraction();
+
+        e.Handled = true;
+    }
+
+    private void OnPointerCanceled(
+        object sender,
+        Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
+    {
+        if (!isPressed ||
+            !activePointerId.HasValue)
+        {
+            return;
+        }
+
+        var point = e.GetCurrentPoint(this);
+
+        if (point.PointerId != activePointerId.Value)
+            return;
+
+        CancelPointerInteraction();
+
+        e.Handled = true;
+    }
+
+    private void OnPointerCaptureLost(
+        object sender,
+        Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
+    {
+        if (!isPressed)
+            return;
+
+        CancelPointerInteraction();
+    }
+
+    private void FinishPointerInteraction()
+    {
+        isPressed = false;
+
+        try
+        {
+            ReleasePointerCaptures();
+        }
+        catch
+        {
+        }
+
+        activePointerId = null;
+
+        SetSquish(false);
+
+        bool newState;
+
+        if (!hasMoved)
+        {
+            newState = !IsOn;
+        }
+        else
+        {
+            newState = dragProgress >= 0.5;
+        }
+
+        isDragging = false;
+        hasMoved = false;
+
+        ignoreVisualUpdate = true;
+
+        IsOn = newState;
+
+        ignoreVisualUpdate = false;
+
+        dragProgress = IsOn ? 1 : 0;
+
+        UpdateVisual(true);
+    }
+
+    private void CancelPointerInteraction()
+    {
+        isPressed = false;
+        isDragging = false;
+        hasMoved = false;
+
+        try
+        {
+            ReleasePointerCaptures();
+        }
+        catch
+        {
+        }
+
+        activePointerId = null;
+
+        SetSquish(false);
+
+        ignoreVisualUpdate = false;
+
+        dragProgress = IsOn ? 1 : 0;
+
+        UpdateVisual(false);
+    }
 
     private static void OnIsOnChanged(
-        DependencyObject sender,
-        DependencyPropertyChangedEventArgs e)
+        Microsoft.UI.Xaml.DependencyObject sender,
+        Microsoft.UI.Xaml.DependencyPropertyChangedEventArgs e)
     {
         var control = (Switch)sender;
 
-
-        if (!control.ignoreVisualUpdate)
+        if (!control.ignoreVisualUpdate &&
+            !control.isDragging)
         {
-            control.UpdateVisual(true);
-        }
+            control.dragProgress =
+                control.IsOn ? 1 : 0;
 
+            control.UpdateVisual(false);
+        }
 
         control.Toggled?.Invoke(
             control,
-            new RoutedEventArgs());
+            new Microsoft.UI.Xaml.RoutedEventArgs());
     }
-
-
-
 
     private void UpdateVisual(bool animate)
     {
         if (ActualWidth <= 0 ||
             ActualHeight <= 0)
+        {
             return;
-
-
+        }
 
         double scale =
             Math.Min(
                 ActualWidth / DesignWidth,
                 ActualHeight / DesignHeight);
 
-
-
         double width =
             DesignWidth * scale;
-
 
         double height =
             DesignHeight * scale;
 
-
         double left =
             (ActualWidth - width) / 2;
-
 
         double top =
             (ActualHeight - height) / 2;
 
-
-
         double thumbSize =
             15 * scale;
-
-
-        double padding =
-            2 * scale;
-
-
 
         track.Width = width;
         track.Height = height;
 
         track.CornerRadius =
-            new CornerRadius(height / 2);
-
+            new Microsoft.UI.Xaml.CornerRadius(
+                height / 2);
 
         track.Background =
             IsOn
-            ? OnColor
-            : OffColor;
+                ? OnColor
+                : OffColor;
 
+        Microsoft.UI.Xaml.Controls.Canvas.SetLeft(
+            track,
+            left);
 
-        Canvas.SetLeft(track, left);
-        Canvas.SetTop(track, top);
-
-
+        Microsoft.UI.Xaml.Controls.Canvas.SetTop(
+            track,
+            top);
 
         thumb.Width = thumbSize;
         thumb.Height = thumbSize;
 
-        thumb.Fill =
-            ThumbColor;
-
+        thumb.Fill = ThumbColor;
 
         thumb.Stroke =
-            new SolidColorBrush(
-                Color.FromARGB(
+            new Microsoft.UI.Xaml.Media.SolidColorBrush(
+                Windows.UI.Color.FromArgb(
                     40,
                     0,
                     0,
                     0));
 
+        thumb.StrokeThickness = scale;
 
-        thumb.StrokeThickness =
-            scale;
-
-
-        Canvas.SetLeft(
+        Microsoft.UI.Xaml.Controls.Canvas.SetLeft(
             thumb,
             GetOffPosition());
 
-        Canvas.SetTop(
+        Microsoft.UI.Xaml.Controls.Canvas.SetTop(
             thumb,
             top + ((height - thumbSize) / 2));
 
+        double travel = GetThumbTravel();
 
-
-        double target =
-            IsOn
-            ? GetOnPosition()
-            : GetOffPosition();
-
-
-        thumbOffset =
-            target - GetOffPosition();
-
-
-
-        if (!isDragging)
+        if (isDragging)
         {
-            currentThumbX = target;
+            thumbTransform.TranslateX =
+                Math.Clamp(
+                    dragProgress,
+                    0,
+                    1) * travel;
+        }
+        else
+        {
+            double target =
+                (IsOn ? 1 : 0) * travel;
 
             if (animate)
             {
@@ -644,49 +727,48 @@ sealed class Switch : UserControl
             }
             else
             {
-                thumbTransform.TranslateX = thumbOffset;
+                currentStoryboard?.Stop();
+
+                thumbTransform.TranslateX =
+                    target;
             }
         }
 
-
-
-        if (!IsEnabled)
-            Opacity = 0.4;
-        else if (isPressed)
-            Opacity = 0.75;
-        else if (isPointerOver)
-            Opacity = 0.9;
-        else
-            Opacity = 1;
+        UpdateOpacity();
     }
-
-
-
 
     private void MoveThumb(double pointerX)
     {
         ignoreVisualUpdate = true;
 
+        double offPosition =
+            GetOffPosition();
 
-        double x =
+        double travel =
+            GetThumbTravel();
+
+        if (travel <= 0)
+            return;
+
+        double thumbCenter =
+            pointerX -
+            (thumb.Width / 2);
+
+        double offset =
+            thumbCenter -
+            offPosition;
+
+        dragProgress =
             Math.Clamp(
-                pointerX - thumb.Width / 2,
-                GetOffPosition(),
-                GetOnPosition());
-
-
-        thumbOffset =
-            x - GetOffPosition();
-
+                offset / travel,
+                0,
+                1);
 
         thumbTransform.TranslateX =
-            thumbOffset;
-
+            dragProgress * travel;
 
         SetSquish(true);
     }
-
-
 
     private double GetOffPosition()
     {
@@ -695,20 +777,15 @@ sealed class Switch : UserControl
                 ActualWidth / DesignWidth,
                 ActualHeight / DesignHeight);
 
-
         double width =
             DesignWidth * scale;
-
 
         double left =
             (ActualWidth - width) / 2;
 
-
-        return left + (2 * scale);
+        return left +
+               (2 * scale);
     }
-
-
-
 
     private double GetOnPosition()
     {
@@ -717,18 +794,14 @@ sealed class Switch : UserControl
                 ActualWidth / DesignWidth,
                 ActualHeight / DesignHeight);
 
-
         double width =
             DesignWidth * scale;
-
 
         double thumbSize =
             15 * scale;
 
-
         double left =
             (ActualWidth - width) / 2;
-
 
         return left +
                width -
@@ -736,52 +809,81 @@ sealed class Switch : UserControl
                (2 * scale);
     }
 
-
-
+    private double GetThumbTravel()
+    {
+        return Math.Max(
+            0,
+            GetOnPosition() -
+            GetOffPosition());
+    }
 
     private void AnimateThumb(double target)
     {
         currentStoryboard?.Stop();
 
         currentStoryboard =
-            new Storyboard();
-
-
-        double offset =
-            target - GetOffPosition();
-
+            new Microsoft.UI.Xaml.Media.Animation.Storyboard();
 
         var animation =
-            new DoubleAnimation
+            new Microsoft.UI.Xaml.Media.Animation.DoubleAnimation
             {
                 From =
                     thumbTransform.TranslateX,
 
-                To = offset,
+                To =
+                    target,
 
                 Duration =
-                    new Duration(
-                        TimeSpan.FromMilliseconds(
-                            160)),
+                    new Microsoft.UI.Xaml.Duration(
+                        TimeSpan.FromMilliseconds(160)),
 
                 EasingFunction =
-                    new CubicEase()
+                    new Microsoft.UI.Xaml.Media.Animation.CubicEase
+                    {
+                        EasingMode =
+                            Microsoft.UI.Xaml.Media.Animation.EasingMode.EaseOut
+                    }
             };
-    }
 
-    private double GetThumbTravel()
-    {
-        return GetOnPosition() - GetOffPosition();
-    }
+        Microsoft.UI.Xaml.Media.Animation.Storyboard.SetTarget(
+            animation,
+            thumbTransform);
 
+        Microsoft.UI.Xaml.Media.Animation.Storyboard.SetTargetProperty(
+            animation,
+            "TranslateX");
+
+        currentStoryboard.Children.Add(animation);
+
+        currentStoryboard.Begin();
+    }
 
     private void SetSquish(bool value)
     {
         thumbTransform.ScaleX =
-            value ? 1.08 : 1;
-
+            value ? 1.08 : 1.0;
 
         thumbTransform.ScaleY =
-            value ? 0.92 : 1;
+            value ? 0.92 : 1.0;
+    }
+
+    private void UpdateOpacity()
+    {
+        if (!IsEnabled)
+        {
+            Opacity = 0.4;
+        }
+        else if (isPressed)
+        {
+            Opacity = 0.75;
+        }
+        else if (isPointerOver)
+        {
+            Opacity = 0.9;
+        }
+        else
+        {
+            Opacity = 1.0;
+        }
     }
 }

@@ -643,7 +643,7 @@ public partial class ToDos : StackPanel
             await MainPage.TODOS[pos].Delete();
         }
     }
-    public async Task ADD(string title, string descrip, DateOnly? date, TimeOnly? time, string? id, Color Color)
+    public async Task ADD(string title, string descrip, DateOnly? date, TimeOnly? time, string? id, Color? Color)
     {
         var N = new ToDo(title, descrip, date, time, id, Color);
         if (N.ID != null)
@@ -654,7 +654,7 @@ public partial class ToDos : StackPanel
         await MainPage.todos.Save();
     }
 
-    public async Task ADD(string title, string descrip, DateOnly? date, TimeOnly? time, string? id, int index, Color Color)
+    public async Task ADD(string title, string descrip, DateOnly? date, TimeOnly? time, string? id, int index, Color? Color)
     {
         var N = new ToDo(title, descrip, date, time, id, Color);
         if (N.ID != null)

@@ -1,5 +1,7 @@
 using Uno.Diagnostics.Eventing;
 using static ToDo.ToDos;
+using Microsoft.UI.Input;
+using Microsoft.UI.Xaml.Input;
 namespace ToDo;
 
 
@@ -123,30 +125,32 @@ public sealed partial class New : Page // #if DESKTOP for all of skia desktop, #
                 color.IsEnabled = true;
                 if (edit.Item1.Color != null)
                 {
-                    color.cpw.cp.Color = edit.Item1.Color.Value;
+                    color.color = edit.Item1.Color.Value;
                 }
             }
             else
             {
-                color.Remove();
+                if (edit.Item1.Color != null) Co.IsOn = true;
+                else Co.IsOn = false;
+                color.IsEnabled = Co.IsOn;
+                color.color = null;
             }
 
         }
         Co.Toggled += (s, e) =>
         {
-            color.IsEnabled = (bool)Co.IsOn;
-
             if (Co.IsOn == false)
             {
-                color.Remove();
+                color.color = null;
             }
             else if (edit.Item1 != null)
             {
                 if (edit.Item1.Color != null)
                 {
-                    color.cpw.cp.Color = edit.Item1.Color.Value;
+                    color.color = edit.Item1.Color.Value;
                 }
             }
+            color.IsEnabled = (bool)Co.IsOn;
         };
         time.up.Click += (s, e) =>
         {
@@ -226,8 +230,8 @@ public sealed partial class New : Page // #if DESKTOP for all of skia desktop, #
                         ind = null;
                     }
                 }
-                if (ind == null) await MainPage.todos.ADD(title.Text, describe.Text, null, null, null, color.cpw.cp.Color);
-                else await MainPage.todos.ADD(title.Text, describe.Text, null, null, null, ind.Value, color.cpw.cp.Color);
+                if (ind == null) await MainPage.todos.ADD(title.Text, describe.Text, null, null, null, color.color);
+                else await MainPage.todos.ADD(title.Text, describe.Text, null, null, null, ind.Value, color.color);
                 if (edit.Item2 == true && edit.Item1 != null) await edit.Item1.Delete();
                 edit = (null, false);
                 await MainPage.todos.Save();
@@ -248,8 +252,8 @@ public sealed partial class New : Page // #if DESKTOP for all of skia desktop, #
                 }
                 string ID = System.Guid.NewGuid().ToString();
                 Console.WriteLine($"New ToDo ID: {ID}");
-                if (ind == null) await MainPage.todos.ADD(title.Text, describe.Text, Date, Time, ID, color.cpw.cp.Color);
-                else await MainPage.todos.ADD(title.Text, describe.Text, Date, Time, ID, ind.Value, color.cpw.cp.Color);
+                if (ind == null) await MainPage.todos.ADD(title.Text, describe.Text, Date, Time, ID, color.color);
+                else await MainPage.todos.ADD(title.Text, describe.Text, Date, Time, ID, ind.Value, color.color);
                 if (edit.Item2 == true && edit.Item1 != null)
                 {
                     await edit.Item1.Delete();
