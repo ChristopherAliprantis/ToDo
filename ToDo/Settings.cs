@@ -266,7 +266,7 @@ public sealed class Switch : Microsoft.UI.Xaml.Controls.UserControl
     private bool isPressed;
     private bool isDragging;
     private bool hasMoved;
-    private bool ignoreVisualUpdate;
+    private bool isInitialized;
 
     private uint? activePointerId;
 
@@ -362,7 +362,8 @@ public sealed class Switch : Microsoft.UI.Xaml.Controls.UserControl
             new Microsoft.UI.Xaml.Shapes.Ellipse
             {
                 RenderTransform = thumbTransform,
-                Shadow = new Microsoft.UI.Xaml.Media.ThemeShadow()
+                Shadow =
+                    new Microsoft.UI.Xaml.Media.ThemeShadow()
             };
 
         canvas.Children.Add(track);
@@ -390,6 +391,8 @@ public sealed class Switch : Microsoft.UI.Xaml.Controls.UserControl
         object sender,
         Microsoft.UI.Xaml.RoutedEventArgs e)
     {
+        isInitialized = true;
+
         dragProgress = IsOn ? 1 : 0;
 
         UpdateVisual(false);
@@ -551,7 +554,23 @@ public sealed class Switch : Microsoft.UI.Xaml.Controls.UserControl
 
     private void FinishPointerInteraction()
     {
+        bool wasDragging = isDragging;
+        bool wasMoved = hasMoved;
+
+        bool newState;
+
+        if (!wasMoved)
+        {
+            newState = !IsOn;
+        }
+        else
+        {
+            newState = dragProgress >= 0.5;
+        }
+
         isPressed = false;
+        isDragging = false;
+        hasMoved = false;
 
         try
         {
@@ -565,29 +584,16 @@ public sealed class Switch : Microsoft.UI.Xaml.Controls.UserControl
 
         SetSquish(false);
 
-        bool newState;
-
-        if (!hasMoved)
+        if (IsOn != newState)
         {
-            newState = !IsOn;
+            IsOn = newState;
         }
-        else
-        {
-            newState = dragProgress >= 0.5;
-        }
-
-        isDragging = false;
-        hasMoved = false;
-
-        ignoreVisualUpdate = true;
-
-        IsOn = newState;
-
-        ignoreVisualUpdate = false;
 
         dragProgress = IsOn ? 1 : 0;
 
         UpdateVisual(true);
+
+        UpdateOpacity();
     }
 
     private void CancelPointerInteraction()
@@ -608,20 +614,29 @@ public sealed class Switch : Microsoft.UI.Xaml.Controls.UserControl
 
         SetSquish(false);
 
-        ignoreVisualUpdate = false;
-
         dragProgress = IsOn ? 1 : 0;
 
-        UpdateVisual(false);
+        UpdateVisual(true);
+
+        UpdateOpacity();
     }
 
     private static void OnIsOnChanged(
-    Microsoft.UI.Xaml.DependencyObject sender,
-    Microsoft.UI.Xaml.DependencyPropertyChangedEventArgs e)
+        Microsoft.UI.Xaml.DependencyObject sender,
+        Microsoft.UI.Xaml.DependencyPropertyChangedEventArgs e)
     {
         var control = (Switch)sender;
 
-        control.UpdateVisual(false);
+        if (!control.isDragging)
+        {
+            control.currentStoryboard?.Stop();
+            control.currentStoryboard = null;
+
+            control.dragProgress =
+                control.IsOn ? 1 : 0;
+
+            control.UpdateVisual(false);
+        }
 
         control.Toggled?.Invoke(
             control,
@@ -712,7 +727,9 @@ public sealed class Switch : Microsoft.UI.Xaml.Controls.UserControl
         else
         {
             double target =
-                (IsOn ? 1 : 0) * travel;
+                IsOn
+                    ? travel
+                    : 0;
 
             if (animate)
             {
@@ -721,6 +738,7 @@ public sealed class Switch : Microsoft.UI.Xaml.Controls.UserControl
             else
             {
                 currentStoryboard?.Stop();
+                currentStoryboard = null;
 
                 thumbTransform.TranslateX =
                     target;
@@ -732,8 +750,6 @@ public sealed class Switch : Microsoft.UI.Xaml.Controls.UserControl
 
     private void MoveThumb(double pointerX)
     {
-        ignoreVisualUpdate = true;
-
         double offPosition =
             GetOffPosition();
 
