@@ -611,7 +611,7 @@ public sealed partial class CPWbutton : Button
             cpw.ShowAt(App.rootFrame);
             cpw.cp.ColorChanged += (s, e) =>
             {
-                rect.Fill = new SolidColorBrush(cpw.cp.Color);
+                color = cpw.cp.Color;
             };
         };
         this.Content = rect;
