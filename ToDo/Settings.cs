@@ -616,19 +616,12 @@ public sealed class Switch : Microsoft.UI.Xaml.Controls.UserControl
     }
 
     private static void OnIsOnChanged(
-        Microsoft.UI.Xaml.DependencyObject sender,
-        Microsoft.UI.Xaml.DependencyPropertyChangedEventArgs e)
+    Microsoft.UI.Xaml.DependencyObject sender,
+    Microsoft.UI.Xaml.DependencyPropertyChangedEventArgs e)
     {
         var control = (Switch)sender;
 
-        if (!control.ignoreVisualUpdate &&
-            !control.isDragging)
-        {
-            control.dragProgress =
-                control.IsOn ? 1 : 0;
-
-            control.UpdateVisual(false);
-        }
+        control.UpdateVisual(false);
 
         control.Toggled?.Invoke(
             control,
