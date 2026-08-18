@@ -128,14 +128,7 @@ public sealed partial class New : Page // #if DESKTOP for all of skia desktop, #
             }
             else
             {
-                if (App.ThemeMode == "Light")
-                {
-                    color.cpw.cp.Color = Color.White;
-                }
-                else if (App.ThemeMode == "Dark")
-                {
-                    color.cpw.cp.Color = Color.Black;
-                }
+                color.Remove();
             }
 
         }
@@ -145,15 +138,7 @@ public sealed partial class New : Page // #if DESKTOP for all of skia desktop, #
 
             if (Co.IsOn == false)
             {
-                if (App.ThemeMode == "Light")
-                {
-                    color.cpw.cp.Color = Color.White;
-                }
-                else if (App.ThemeMode == "Dark")
-                {
-                    color.cpw.cp.Color = Color.Black;
-                }
-                
+                color.Remove();
             }
             else if (edit.Item1 != null)
             {
@@ -345,7 +330,7 @@ public sealed partial class New : Page // #if DESKTOP for all of skia desktop, #
             color.Margin = done.Margin;
             Ti.Width = done.Width * 0.6;
             Ti.Height = done.Height * 0.59;
-            Ti.Margin = done.Margin;
+            Ti.Margin = new Thickness((this.ActualWidth / 6.597677), all.Spacing * 1.5, 0, 0);
             Co.Width = done.Width * 0.6;
             Co.Height = done.Height * 0.59;
             Co.Margin = done.Margin;
@@ -410,7 +395,7 @@ public sealed partial class New : Page // #if DESKTOP for all of skia desktop, #
             color.Margin = done.Margin;
             Ti.Width = done.Width * 0.6;
             Ti.Height = done.Height * 0.59;
-            Ti.Margin = done.Margin;
+            Ti.Margin = new Thickness((this.ActualWidth / 6.597677), all.Spacing * 1.5, 0, 0);
             Co.Width = done.Width * 0.6;
             Co.Height = done.Height * 0.59;
             Co.Margin = done.Margin;
@@ -593,6 +578,25 @@ public sealed partial class CPWbutton : Button
 {
     public CPwindow cpw = new CPwindow();
     public Rectangle? rect = new();
+    private Windows.UI.Color? _color;
+    public Windows.UI.Color? color
+    {
+        get => _color;
+        set
+        {
+            if (value != null)
+            {
+                cpw.cp.Color = value.Value;
+                _color = value.Value;
+                rect.Fill = new SolidColorBrush(value.Value);
+            }
+            else
+            {
+                _color = null;
+                rect.Fill = new SolidColorBrush(Color.Transparent);
+            }
+        }
+    }
     public CPWbutton()
     {
 
