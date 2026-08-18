@@ -127,15 +127,16 @@ public sealed partial class New : Page // #if DESKTOP for all of skia desktop, #
         }
         Co.Toggled += (s, e) =>
         {
-            color.color = edit.Item1.Color;
-            if (edit.Item1 != null)
+            color.IsEnabled = Co.IsOn;
+
+            if (!Co.IsOn)
             {
-                if (edit.Item1.Color != null)
-                {
-                    color.color = edit.Item1.Color.Value;
-                }
+                color.color = null;
             }
-            color.IsEnabled = (bool)Co.IsOn;
+            else if (edit.Item1?.Color != null)
+            {
+                color.color = edit.Item1.Color.Value;
+            }
         };
         time.up.Click += (s, e) =>
         {
