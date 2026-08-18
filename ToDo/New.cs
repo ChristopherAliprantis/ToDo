@@ -120,30 +120,15 @@ public sealed partial class New : Page // #if DESKTOP for all of skia desktop, #
                 date.Text = Date.ToString("yyyy-MM-dd");
                 time.Text = Time.ToString("hh:mm tt");
             }
-            else if (edit.Item1 != null)
-            {
-                color.IsEnabled = true;
-                if (edit.Item1.Color != null)
-                {
-                    color.color = edit.Item1.Color.Value;
-                }
-            }
-            else
-            {
-                if (edit.Item1.Color != null) Co.IsOn = true;
-                else Co.IsOn = false;
-                color.IsEnabled = Co.IsOn;
-                color.color = null;
-            }
+            Co.IsOn = edit.Item1.Color != null;
+            color.IsEnabled = Co.IsOn;
+            color.color = edit.Item1.Color;
 
         }
         Co.Toggled += (s, e) =>
         {
-            if (Co.IsOn == false)
-            {
-                color.color = null;
-            }
-            else if (edit.Item1 != null)
+            color.color = edit.Item1.Color;
+            if (edit.Item1 != null)
             {
                 if (edit.Item1.Color != null)
                 {
