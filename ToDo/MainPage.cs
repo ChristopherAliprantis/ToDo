@@ -595,7 +595,6 @@ public partial class ToDos : StackPanel
                 }
             }
             else
-            {
                 border.Background = new SolidColorBrush(Color.Value);
                 if (App.ThemeMode == "Light")
                 {
@@ -607,42 +606,42 @@ public partial class ToDos : StackPanel
                 }
             }
 
-        }
+        
 
-        public async Task Delete()
-        {
-            Console.WriteLine($"Deleting ToDo: '{ID}'");
-            if (ID != null) Console.WriteLine("ID is not null");
-            for (int i = 0; i < MainPage.todos.Children.Count; i++)
+            public async Task Delete()
             {
-                ((StackPanel)MainPage.todos.Children[i]).Children.Clear();
-            }
-
-            if (!string.IsNullOrWhiteSpace(ID))
-            {
-                Console.WriteLine($"Cancelling notification with ID: {ID}");
-                Notifications.CancelNotif(this);
-            }
-            MainPage.TODOS.Remove(this);
-            await MainPage.todos.Save();
-            await MainPage.todos.Load();
-        }
-
-        public static async Task DeleteById(string ID)
-        {
-            int i = 0;
-            int pos = 0;
-            foreach (ToDo t in (MainPage.TODOS))
-            {
-                if (t.ID == ID)
+                Console.WriteLine($"Deleting ToDo: '{ID}'");
+                if (ID != null) Console.WriteLine("ID is not null");
+                for (int i = 0; i < MainPage.todos.Children.Count; i++)
                 {
-                    pos = i;
+                    ((StackPanel)MainPage.todos.Children[i]).Children.Clear();
                 }
-                i++;
+
+                if (!string.IsNullOrWhiteSpace(ID))
+                {
+                    Console.WriteLine($"Cancelling notification with ID: {ID}");
+                    Notifications.CancelNotif(this);
+                }
+                MainPage.TODOS.Remove(this);
+                await MainPage.todos.Save();
+                await MainPage.todos.Load();
             }
-            await MainPage.TODOS[pos].Delete();
-        }
-    }
+
+            public static async Task DeleteById(string ID)
+            {
+                int i = 0;
+                int pos = 0;
+                foreach (ToDo t in (MainPage.TODOS))
+                {
+                    if (t.ID == ID)
+                    {
+                        pos = i;
+                    }
+                    i++;
+                }
+                await MainPage.TODOS[pos].Delete();
+            }
+   }
     public async Task ADD(string title, string descrip, DateOnly? date, TimeOnly? time, string? id, Color? Color)
     {
         var N = new ToDo(title, descrip, date, time, id, Color);
