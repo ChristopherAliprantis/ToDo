@@ -51,7 +51,8 @@ public class BootReceiver : BroadcastReceiver
                             d.Descrip ?? "",
                             d.Date,
                             d.Time,
-                            d.ID));
+                            d.ID,
+                            CH.HexToColor(d.Color)));
                     }
 
                     INotificationService notifs = new AndroidNotificationService();
@@ -101,7 +102,8 @@ public class BootReceiver : BroadcastReceiver
                             Descrip = t.Descrip,
                             Date = t.Date,
                             Time = t.Time,
-                            ID = t.ID
+                            ID = t.ID,
+                            Color = CH.ColorToHex(t.Color)
                         });
                     }
 
