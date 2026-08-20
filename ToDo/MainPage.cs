@@ -595,6 +595,7 @@ public partial class ToDos : StackPanel
                 }
             }
             else
+            {
                 border.Background = new SolidColorBrush(Color.Value);
                 if (App.ThemeMode == "Light")
                 {
@@ -605,6 +606,7 @@ public partial class ToDos : StackPanel
                     border.BorderBrush = new SolidColorBrush(Colors.White);
                 }
             }
+        }
 
         
 
