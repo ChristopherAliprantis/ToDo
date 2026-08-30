@@ -42,6 +42,10 @@ public partial class App : Application
             _uiSettings ??= new UISettings();
             _dispatcherQueue = DispatcherQueue.GetForCurrentThread();
             _uiSettings.ColorValuesChanged += OnColorValuesChanged;
+            var watcher = new ThemeFileWatcher(_dispatcherQueue, (themeText) =>
+            {
+                ThemeChanged?.Invoke(this, themeText);
+            });
         }
 
         public string GetCurrentTheme()
@@ -58,10 +62,74 @@ public partial class App : Application
             });
         }
     }
+
+    public class ThemeFileWatcher
+    {
+        private readonly FileSystemWatcher _watcher;
+        private readonly DispatcherQueue _dispatcherQueue;
+
+        public ThemeFileWatcher(DispatcherQueue dispatcherQueue, Action<string> onThemeContentChanged)
+        {
+            _dispatcherQueue = dispatcherQueue ?? throw new ArgumentNullException(nameof(dispatcherQueue));
+
+            string folderPath = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                "ToDo"
+            );
+
+            string fileName = "theme.txt";
+
+            if (!Directory.Exists(folderPath))
+            {
+                Directory.CreateDirectory(folderPath);
+            }
+
+            _watcher = new FileSystemWatcher(folderPath, fileName)
+            {
+                NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.FileName
+            };
+
+            _watcher.Changed += async (sender, e) =>
+            {
+                string content = await ReadFileWithRetryAsync(e.FullPath);
+
+                if (content != null)
+                {
+                    _dispatcherQueue.TryEnqueue(() =>
+                    {
+                        onThemeContentChanged(content);
+                    });
+                }
+            };
+
+            _watcher.EnableRaisingEvents = true;
+        }
+
+        private async Task<string> ReadFileWithRetryAsync(string filePath)
+        {
+            int retries = 5;
+            while (retries > 0)
+            {
+                try
+                {
+                    using var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                    using var reader = new StreamReader(stream);
+                    return await reader.ReadToEndAsync();
+                }
+                catch (IOException)
+                {
+                    retries--;
+                    await Task.Delay(100);
+                }
+            }
+            return null;
+        }
+    }
     public App()
     {
             this.InitializeComponent();
     }
+
     public static Themess Themes = new Themess();
     public static async Task<string> LoadTheme()
     {

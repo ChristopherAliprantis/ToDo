@@ -3,6 +3,7 @@ namespace ToDo;
 using System.Text.Json;
 using Microsoft.UI.Xaml.Media.Imaging;
 using Windows.UI;
+using static ToDo.App;
 using Path = System.IO.Path;
 
 public sealed partial class MainPage : Page // #if DESKTOP for all of skia desktop, #if WINDOWS for windows, #if ANDROID for android.
@@ -278,6 +279,7 @@ public sealed partial class MainPage : Page // #if DESKTOP for all of skia deskt
             SETTINGS.FontSize = Bar.Width / 5.5;
             RebuildTodos();
         };
+        
         if (App.ThemeMode == "Light")
         {
             H.Background = new SolidColorBrush(Colors.White);
