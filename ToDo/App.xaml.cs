@@ -64,68 +64,112 @@ public partial class App : Application
         }
     }
 
-    public class ThemeFileWatcher
+    public sealed class ThemeFileWatcher : IDisposable
     {
         private readonly FileSystemWatcher _watcher;
         private readonly DispatcherQueue _dispatcherQueue;
+        private readonly Action<string> _onThemeContentChanged;
 
-        public ThemeFileWatcher(DispatcherQueue dispatcherQueue, Action<string> onThemeContentChanged)
+        public ThemeFileWatcher(
+            DispatcherQueue dispatcherQueue,
+            Action<string> onThemeContentChanged)
         {
-            _dispatcherQueue = dispatcherQueue ?? throw new ArgumentNullException(nameof(dispatcherQueue));
+            _dispatcherQueue = dispatcherQueue
+                ?? throw new ArgumentNullException(nameof(dispatcherQueue));
+
+            _onThemeContentChanged = onThemeContentChanged
+                ?? throw new ArgumentNullException(nameof(onThemeContentChanged));
 
             string folderPath = Path.Combine(
-                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                "ToDo"
-            );
+                Environment.GetFolderPath(
+                    Environment.SpecialFolder.LocalApplicationData),
+                "ToDo");
 
-            string fileName = "theme.txt";
+            Directory.CreateDirectory(folderPath);
 
-            if (!Directory.Exists(folderPath))
+            string filePath = Path.Combine(folderPath, "theme.txt");
+
+            _watcher = new FileSystemWatcher(folderPath, "theme.txt")
             {
-                Directory.CreateDirectory(folderPath);
-            }
-
-            _watcher = new FileSystemWatcher(folderPath, fileName)
-            {
-                NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.FileName
+                NotifyFilter =
+                    NotifyFilters.LastWrite |
+                    NotifyFilters.FileName |
+                    NotifyFilters.Size
             };
 
-            _watcher.Changed += async (sender, e) =>
-            {
-                string content = await ReadFileWithRetryAsync(e.FullPath);
-
-                if (content != null)
-                {
-                    _dispatcherQueue.TryEnqueue(() =>
-                    {
-                        onThemeContentChanged(content);
-                    });
-                }
-            };
+            _watcher.Changed += OnFileChanged;
+            _watcher.Created += OnFileChanged;
+            _watcher.Renamed += OnFileRenamed;
 
             _watcher.EnableRaisingEvents = true;
         }
 
-        private async Task<string> ReadFileWithRetryAsync(string filePath)
+        private async void OnFileChanged(
+            object sender,
+            FileSystemEventArgs e)
         {
-            int retries = 5;
-            while (retries > 0)
+            await ProcessFileAsync(e.FullPath);
+        }
+
+        private async void OnFileRenamed(
+            object sender,
+            RenamedEventArgs e)
+        {
+            await ProcessFileAsync(e.FullPath);
+        }
+
+        private async Task ProcessFileAsync(string filePath)
+        {
+            var content = await ReadFileWithRetryAsync(filePath);
+
+            if (content == null)
+                return;
+
+            _dispatcherQueue.TryEnqueue(() =>
+            {
+                _onThemeContentChanged(content);
+            });
+        }
+
+        private async Task<string?> ReadFileWithRetryAsync(string filePath)
+        {
+            for (int attempt = 0; attempt < 5; attempt++)
             {
                 try
                 {
-                    using var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                    using var stream = new FileStream(
+                        filePath,
+                        FileMode.Open,
+                        FileAccess.Read,
+                        FileShare.ReadWrite);
+
                     using var reader = new StreamReader(stream);
+
                     return await reader.ReadToEndAsync();
                 }
                 catch (IOException)
                 {
-                    retries--;
+                    await Task.Delay(100);
+                }
+                catch (UnauthorizedAccessException)
+                {
                     await Task.Delay(100);
                 }
             }
+
             return null;
         }
+
+        public void Dispose()
+        {
+            _watcher.EnableRaisingEvents = false;
+            _watcher.Changed -= OnFileChanged;
+            _watcher.Created -= OnFileChanged;
+            _watcher.Renamed -= OnFileRenamed;
+            _watcher.Dispose();
+        }
     }
+
     public App()
     {
             this.InitializeComponent();
