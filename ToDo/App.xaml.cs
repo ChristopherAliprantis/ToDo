@@ -34,6 +34,7 @@ public partial class App : Application
     {
         private static UISettings _uiSettings;
         private readonly DispatcherQueue _dispatcherQueue;
+        private ThemeFileWatcher watcher;
 
         public event EventHandler<string> ThemeChanged;
 
@@ -42,7 +43,7 @@ public partial class App : Application
             _uiSettings ??= new UISettings();
             _dispatcherQueue = DispatcherQueue.GetForCurrentThread();
             _uiSettings.ColorValuesChanged += OnColorValuesChanged;
-            var watcher = new ThemeFileWatcher(_dispatcherQueue, (themeText) =>
+            watcher = new ThemeFileWatcher(_dispatcherQueue, (themeText) =>
             {
                 ThemeChanged?.Invoke(this, themeText);
             });
