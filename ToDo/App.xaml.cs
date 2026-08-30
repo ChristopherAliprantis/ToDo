@@ -30,39 +30,61 @@ public partial class App : Application
     }
 #endif
 
-    public sealed class Themess
+    public sealed class Themess : IDisposable
     {
         private static UISettings _uiSettings;
         private readonly DispatcherQueue _dispatcherQueue;
-        private ThemeFileWatcher watcher;
+        private readonly ThemeFileWatcher _themeWatcher;
 
         public event EventHandler<string> ThemeChanged;
 
         public Themess()
         {
             _uiSettings ??= new UISettings();
+
             _dispatcherQueue = DispatcherQueue.GetForCurrentThread();
+
             _uiSettings.ColorValuesChanged += OnColorValuesChanged;
-            watcher = new ThemeFileWatcher(_dispatcherQueue, (themeText) =>
-            {
-                ThemeChanged?.Invoke(this, themeText);
-            });
+
+            _themeWatcher = new ThemeFileWatcher(
+                _dispatcherQueue,
+                themeText =>
+                {
+                    ThemeChanged?.Invoke(this, themeText);
+                });
         }
 
         public string GetCurrentTheme()
         {
-            var background = _uiSettings.GetColorValue(UIColorType.Background);
-            return (background.R == 0 && background.G == 0 && background.B == 0) ? "Dark" : "Light";
+            var background =
+                _uiSettings.GetColorValue(UIColorType.Background);
+
+            return background.R == 0 &&
+                   background.G == 0 &&
+                   background.B == 0
+                ? "Dark"
+                : "Light";
         }
 
-        private void OnColorValuesChanged(UISettings sender, object args)
+        private void OnColorValuesChanged(
+            UISettings sender,
+            object args)
         {
             _dispatcherQueue?.TryEnqueue(() =>
             {
-                ThemeChanged?.Invoke(this, GetCurrentTheme());
+                ThemeChanged?.Invoke(
+                    this,
+                    GetCurrentTheme());
             });
         }
+
+        public void Dispose()
+        {
+            _uiSettings.ColorValuesChanged -= OnColorValuesChanged;
+            _themeWatcher.Dispose();
+        }
     }
+
 
     public sealed class ThemeFileWatcher : IDisposable
     {
@@ -87,14 +109,14 @@ public partial class App : Application
 
             Directory.CreateDirectory(folderPath);
 
-            string filePath = Path.Combine(folderPath, "theme.txt");
-
-            _watcher = new FileSystemWatcher(folderPath, "theme.txt")
+            _watcher = new FileSystemWatcher(
+                folderPath,
+                "theme.txt")
             {
                 NotifyFilter =
                     NotifyFilters.LastWrite |
-                    NotifyFilters.FileName |
-                    NotifyFilters.Size
+                    NotifyFilters.Size |
+                    NotifyFilters.FileName
             };
 
             _watcher.Changed += OnFileChanged;
@@ -104,23 +126,23 @@ public partial class App : Application
             _watcher.EnableRaisingEvents = true;
         }
 
-        private async void OnFileChanged(
+        private void OnFileChanged(
             object sender,
             FileSystemEventArgs e)
         {
-            await ProcessFileAsync(e.FullPath);
+            _ = ProcessFileChangedAsync(e.FullPath);
         }
 
-        private async void OnFileRenamed(
+        private void OnFileRenamed(
             object sender,
             RenamedEventArgs e)
         {
-            await ProcessFileAsync(e.FullPath);
+            _ = ProcessFileChangedAsync(e.FullPath);
         }
 
-        private async Task ProcessFileAsync(string filePath)
+        private async Task ProcessFileChangedAsync(string path)
         {
-            var content = await ReadFileWithRetryAsync(filePath);
+            var content = await ReadFileWithRetryAsync(path);
 
             if (content == null)
                 return;
@@ -131,27 +153,26 @@ public partial class App : Application
             });
         }
 
-        private async Task<string?> ReadFileWithRetryAsync(string filePath)
+        private static async Task<string?> ReadFileWithRetryAsync(
+            string filePath)
         {
             for (int attempt = 0; attempt < 5; attempt++)
             {
                 try
                 {
-                    using var stream = new FileStream(
+                    await using var stream = new FileStream(
                         filePath,
                         FileMode.Open,
                         FileAccess.Read,
-                        FileShare.ReadWrite);
+                        FileShare.ReadWrite,
+                        4096,
+                        useAsync: true);
 
                     using var reader = new StreamReader(stream);
 
                     return await reader.ReadToEndAsync();
                 }
                 catch (IOException)
-                {
-                    await Task.Delay(100);
-                }
-                catch (UnauthorizedAccessException)
                 {
                     await Task.Delay(100);
                 }
@@ -163,9 +184,11 @@ public partial class App : Application
         public void Dispose()
         {
             _watcher.EnableRaisingEvents = false;
+
             _watcher.Changed -= OnFileChanged;
             _watcher.Created -= OnFileChanged;
             _watcher.Renamed -= OnFileRenamed;
+
             _watcher.Dispose();
         }
     }
