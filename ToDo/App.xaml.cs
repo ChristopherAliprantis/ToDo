@@ -30,175 +30,38 @@ public partial class App : Application
     }
 #endif
 
-    public sealed class Themess : IDisposable
+    public sealed class Themess
     {
         private static UISettings _uiSettings;
         private readonly DispatcherQueue _dispatcherQueue;
-        private readonly ThemeFileWatcher _themeWatcher;
 
         public event EventHandler<string> ThemeChanged;
 
         public Themess()
         {
             _uiSettings ??= new UISettings();
-
             _dispatcherQueue = DispatcherQueue.GetForCurrentThread();
-
             _uiSettings.ColorValuesChanged += OnColorValuesChanged;
-
-            _themeWatcher = new ThemeFileWatcher(
-                _dispatcherQueue,
-                async themeText =>
-                {
-                    await LoadTheme();
-                    ThemeChanged?.Invoke(this, themeText);
-                });
         }
 
         public string GetCurrentTheme()
         {
-            var background =
-                _uiSettings.GetColorValue(UIColorType.Background);
-
-            return background.R == 0 &&
-                   background.G == 0 &&
-                   background.B == 0
-                ? "Dark"
-                : "Light";
+            var background = _uiSettings.GetColorValue(UIColorType.Background);
+            return (background.R == 0 && background.G == 0 && background.B == 0) ? "Dark" : "Light";
         }
 
-        private void OnColorValuesChanged(
-            UISettings sender,
-            object args)
+        private void OnColorValuesChanged(UISettings sender, object args)
         {
             _dispatcherQueue?.TryEnqueue(() =>
             {
-                ThemeChanged?.Invoke(
-                    this,
-                    GetCurrentTheme());
+                ThemeChanged?.Invoke(this, GetCurrentTheme());
             });
         }
-
-        public void Dispose()
-        {
-            _uiSettings.ColorValuesChanged -= OnColorValuesChanged;
-            _themeWatcher.Dispose();
-        }
     }
-
-
-    public sealed class ThemeFileWatcher : IDisposable
-    {
-        private readonly FileSystemWatcher _watcher;
-        private readonly DispatcherQueue _dispatcherQueue;
-        private readonly Action<string> _onThemeContentChanged;
-
-        public ThemeFileWatcher(
-            DispatcherQueue dispatcherQueue,
-            Action<string> onThemeContentChanged)
-        {
-            _dispatcherQueue = dispatcherQueue
-                ?? throw new ArgumentNullException(nameof(dispatcherQueue));
-
-            _onThemeContentChanged = onThemeContentChanged
-                ?? throw new ArgumentNullException(nameof(onThemeContentChanged));
-
-            string folderPath = Path.Combine(
-                Environment.GetFolderPath(
-                    Environment.SpecialFolder.LocalApplicationData),
-                "ToDo");
-
-            Directory.CreateDirectory(folderPath);
-
-            _watcher = new FileSystemWatcher(
-                folderPath,
-                "theme.txt")
-            {
-                NotifyFilter =
-                    NotifyFilters.LastWrite |
-                    NotifyFilters.Size |
-                    NotifyFilters.FileName
-            };
-
-            _watcher.Changed += OnFileChanged;
-            _watcher.Created += OnFileChanged;
-            _watcher.Renamed += OnFileRenamed;
-
-            _watcher.EnableRaisingEvents = true;
-        }
-
-        private void OnFileChanged(
-            object sender,
-            FileSystemEventArgs e)
-        {
-            _ = ProcessFileChangedAsync(e.FullPath);
-        }
-
-        private void OnFileRenamed(
-            object sender,
-            RenamedEventArgs e)
-        {
-            _ = ProcessFileChangedAsync(e.FullPath);
-        }
-
-        private async Task ProcessFileChangedAsync(string path)
-        {
-            var content = await ReadFileWithRetryAsync(path);
-
-            if (content == null)
-                return;
-
-            _dispatcherQueue.TryEnqueue(() =>
-            {
-                _onThemeContentChanged(content);
-            });
-        }
-
-        private static async Task<string?> ReadFileWithRetryAsync(
-            string filePath)
-        {
-            for (int attempt = 0; attempt < 5; attempt++)
-            {
-                try
-                {
-                    await using var stream = new FileStream(
-                        filePath,
-                        FileMode.Open,
-                        FileAccess.Read,
-                        FileShare.ReadWrite,
-                        4096,
-                        useAsync: true);
-
-                    using var reader = new StreamReader(stream);
-
-                    return await reader.ReadToEndAsync();
-                }
-                catch (IOException)
-                {
-                    await Task.Delay(100);
-                }
-            }
-
-            return null;
-        }
-
-        public void Dispose()
-        {
-            _watcher.EnableRaisingEvents = false;
-
-            _watcher.Changed -= OnFileChanged;
-            _watcher.Created -= OnFileChanged;
-            _watcher.Renamed -= OnFileRenamed;
-
-            _watcher.Dispose();
-        }
-    }
-
     public App()
     {
-            this.InitializeComponent();
+        this.InitializeComponent();
     }
-
     public static Themess Themes = new Themess();
     public static async Task<string> LoadTheme()
     {
