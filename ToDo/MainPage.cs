@@ -3,7 +3,6 @@ namespace ToDo;
 using System.Text.Json;
 using Microsoft.UI.Xaml.Media.Imaging;
 using Windows.UI;
-using static ToDo.App;
 using Path = System.IO.Path;
 
 public sealed partial class MainPage : Page // #if DESKTOP for all of skia desktop, #if WINDOWS for windows, #if ANDROID for android.
@@ -37,7 +36,7 @@ public sealed partial class MainPage : Page // #if DESKTOP for all of skia deskt
                 new ColumnDefinition { Width = new GridLength(1,GridUnitType.Star) }
             }
         };
-        
+
         var rs = new Microsoft.UI.Xaml.Media.Imaging.SvgImageSource(new Uri("ms-appx:///Assets/reload"));
         var reloadpic = new Microsoft.UI.Xaml.Controls.Image
         {
@@ -179,7 +178,7 @@ public sealed partial class MainPage : Page // #if DESKTOP for all of skia deskt
             todos.col2.Children.Clear();
             todos.col3.Children.Clear();
             todos.col4.Children.Clear();
-            todos.Spacing = h / 96 * 2.7; 
+            todos.Spacing = h / 96 * 2.7;
             todos.col1.Spacing = h / 96 * 2.7;
 
             if (bounds.Width > bounds.Height)
@@ -279,7 +278,6 @@ public sealed partial class MainPage : Page // #if DESKTOP for all of skia deskt
             SETTINGS.FontSize = Bar.Width / 5.5;
             RebuildTodos();
         };
-        
         if (App.ThemeMode == "Light")
         {
             H.Background = new SolidColorBrush(Colors.White);
@@ -610,42 +608,42 @@ public partial class ToDos : StackPanel
             }
         }
 
-        
 
-            public async Task Delete()
+
+        public async Task Delete()
+        {
+            Console.WriteLine($"Deleting ToDo: '{ID}'");
+            if (ID != null) Console.WriteLine("ID is not null");
+            for (int i = 0; i < MainPage.todos.Children.Count; i++)
             {
-                Console.WriteLine($"Deleting ToDo: '{ID}'");
-                if (ID != null) Console.WriteLine("ID is not null");
-                for (int i = 0; i < MainPage.todos.Children.Count; i++)
-                {
-                    ((StackPanel)MainPage.todos.Children[i]).Children.Clear();
-                }
-
-                if (!string.IsNullOrWhiteSpace(ID))
-                {
-                    Console.WriteLine($"Cancelling notification with ID: {ID}");
-                    Notifications.CancelNotif(this);
-                }
-                MainPage.TODOS.Remove(this);
-                await MainPage.todos.Save();
-                await MainPage.todos.Load();
+                ((StackPanel)MainPage.todos.Children[i]).Children.Clear();
             }
 
-            public static async Task DeleteById(string ID)
+            if (!string.IsNullOrWhiteSpace(ID))
             {
-                int i = 0;
-                int pos = 0;
-                foreach (ToDo t in (MainPage.TODOS))
-                {
-                    if (t.ID == ID)
-                    {
-                        pos = i;
-                    }
-                    i++;
-                }
-                await MainPage.TODOS[pos].Delete();
+                Console.WriteLine($"Cancelling notification with ID: {ID}");
+                Notifications.CancelNotif(this);
             }
-   }
+            MainPage.TODOS.Remove(this);
+            await MainPage.todos.Save();
+            await MainPage.todos.Load();
+        }
+
+        public static async Task DeleteById(string ID)
+        {
+            int i = 0;
+            int pos = 0;
+            foreach (ToDo t in (MainPage.TODOS))
+            {
+                if (t.ID == ID)
+                {
+                    pos = i;
+                }
+                i++;
+            }
+            await MainPage.TODOS[pos].Delete();
+        }
+    }
     public async Task ADD(string title, string descrip, DateOnly? date, TimeOnly? time, string? id, Color? Color)
     {
         var N = new ToDo(title, descrip, date, time, id, Color);
