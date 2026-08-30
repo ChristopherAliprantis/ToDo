@@ -48,8 +48,9 @@ public partial class App : Application
 
             _themeWatcher = new ThemeFileWatcher(
                 _dispatcherQueue,
-                themeText =>
+                async themeText =>
                 {
+                    await LoadTheme();
                     ThemeChanged?.Invoke(this, themeText);
                 });
         }
