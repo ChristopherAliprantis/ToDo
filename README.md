@@ -4,3 +4,5 @@ ToDo, your ultimate time management app. Please do not copy this app and claim i
 of this you can distribute the apk or exe as long as I get credit.
 
 To see the source code of the DLL for notification APIs for the Windows platform, then click [here](https://github.com/ChristopherAliprantis/ToDo/tree/WinRTapisDLLforWindows)
+
+NOTE: do not download this app after July 4th, 2053 as the android keystore certificate expires then
